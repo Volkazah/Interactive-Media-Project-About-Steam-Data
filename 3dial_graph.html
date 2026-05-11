@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Best of the Best | Game Discovery Engine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: #1B1B1B;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Source Sans Pro', 'Inter', system-ui, sans-serif;
+            padding: 10px;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .main-wrapper {
+            position: relative;
+            width: min(80vw, 80vh, 800px);
+            margin: 20px auto 70px;   /* Reduced top margin since header has fixed height */
+            flex-shrink: 0;           /* Prevent shrinking */
+        }
+
+        /* Vertical Year Selector */
+        .vertical-selector {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border-radius: 40px;
+            padding: 20px 12px;
+            width: 130px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            border: 1px solid rgba(239,223,192,0.3);
+            align-self: center;
+            position: relative;
+        }
+
+        .vertical-selector h4 {
+            color: #EFDFC0;
+            text-align: center;
+            font-size: 18px;
+            font-family: 'Source Sans Pro', monospace;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .year-wheel {
+            position: relative;
+            height: 350px;
+            overflow: hidden;
+            cursor: grab;
+            border-radius: 30px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .year-wheel:active {
+            cursor: grabbing;
+        }
+
+        .year-items {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+            transition: transform 0.05s linear;
+        }
+
+        .year-item {
+            text-align: center;
+            padding: 12px 0;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Source Sans Pro', monospace;
+            color: #EFDFC0;
+            transition: all 0.15s ease;
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            margin: 4px 8px;
+            border-radius: 30px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(239,223,192,0.2);
+            cursor: pointer;
+        }
+
+        .year-item:hover {
+            background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+            transform: scale(1.02);
+        }
+
+        .year-item.active {
+            background: linear-gradient(145deg, #EFDFC0, #d4c4a0);
+            color: #1B1B1B;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(239,223,192,0.5);
+            border-color: rgba(239,223,192,0.8);
+        }
+
+        .year-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .year-nav button {
+            background: #3a3a3a;
+            border: 1px solid #EFDFC0;
+            color: #EFDFC0;
+            font-size: 20px;
+            padding: 5px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: monospace;
+        }
+
+        .year-nav button:hover {
+            background: #EFDFC0;
+            color: #1B1B1B;
+        }
+
+        .toggle-panel {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 20px;
+            width: 240px;
+            border: 1px solid rgba(239,223,192,0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            align-self: center;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .toggle-panel h3 {
+            color: #EFDFC0;
+            font-size: 18px;
+            font-family: 'Source Sans Pro', monospace;
+            margin-bottom: 15px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(239,223,192,0.2);
+            cursor: pointer;
+        }
+
+        .toggle-item:hover {
+            background: rgba(239,223,192,0.1);
+        }
+
+        .toggle-label {
+            color: #EFDFC0;
+            font-size: 16px;
+            font-family: 'Source Sans Pro', monospace;
+            font-weight: 500;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: #3a3a3a;
+            border-radius: 30px;
+            position: relative;
+            transition: 0.2s;
+            cursor: pointer;
+            border: 1px solid rgba(239,223,192,0.3);
+        }
+
+        .toggle-switch.active {
+            background: #EFDFC0;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #1B1B1B;
+            border-radius: 50%;
+            top: 2px;
+            left: 3px;
+            transition: 0.2s;
+        }
+
+        .toggle-switch.active::after {
+            left: 25px;
+            background: #1B1B1B;
+        }
+
+        .header-text {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 40px;
+            min-height: 180px;        /* Fixed minimum height for up to 4 rows */
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .main-title {
+            font-family: 'Consolas', monospace;
+            font-size: 72px;
+            color: #EFDFC0;
+            letter-spacing: 6px;
+            font-weight: bold;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 100%;
+            white-space: nowrap;      /* Force single line */
+            overflow: visible;         /* Allow text to be visible */
+        }
+
+        .dynamic-title {
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 36px;
+            color: #EFDFC0;
+            line-height: 1.4;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 100%;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            word-wrap: break-word;
+            white-space: normal;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;        /* Fixed minimum height for text content */
+            height: auto;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: rgba(0,0,0,0.2);
+            border-radius: 50%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            cursor: grab;
+        }
+
+        canvas:active {
+            cursor: grabbing;
+        }
+
+        /* Larger Center Card */
+        .center-card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24%;
+            height: 24%;
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 20;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.05);
+            border: 2px solid rgba(239,223,192,0.5);
+            pointer-events: none;
+        }
+
+        .game-name {
+            font-size: clamp(16px, 4vw, 28px);
+            font-weight: 800;
+            font-family: 'Source Sans Pro', sans-serif;
+            background: linear-gradient(135deg, #EFDFC0, #d4c4a0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            text-align: center;
+            word-break: break-word;
+            padding: 0 15px;
+        }
+
+
+        .legend {
+            position: absolute;
+            bottom: -45px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            font-family: 'Source Sans Pro', monospace;
+            color: #8F8585;
+            pointer-events: none;
+        }
+
+        .import-area {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .import-btn {
+            background: #2a2a2a;
+            border: 1px solid #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: #EFDFC0;
+            font-size: 12px;
+            font-family: 'Source Sans Pro', monospace;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .import-btn:hover {
+            background: #EFDFC0;
+            color: #1B1B1B;
+        }
+        #csvInput { display: none; }
+        
+        .status-badge {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-family: 'Source Sans Pro', monospace;
+            color: #EFDFC0;
+            pointer-events: none;
+        }
+        
+        .warning-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 20px 30px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 200;
+            border: 1px solid #EFDFC0;
+            display: none;
+        }
+        
+        .warning-message.show {
+            display: block;
+        }
+        
+        .warning-message button {
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: #EFDFC0;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Source Sans Pro', monospace;
+        }
+        
+        .reset-filters {
+            position: fixed;
+            bottom: 20px;
+            right: 150px;
+            background: #3a3a3a;
+            border: 1px solid #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: #EFDFC0;
+            font-size: 12px;
+            font-family: 'Source Sans Pro', monospace;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            font-weight: 600;
+            transition: 0.2s;
+            z-index: 100;
+        }
+        .reset-filters:hover {
+            background: #EFDFC0;
+            color: #1B1B1B;
+        }
+
+        @media (max-width: 1000px) {
+            .header-text {
+                min-height: 160px;     /* Slightly smaller on mobile */
+                padding: 0 20px;
+                margin-bottom: 20px;
+            }
+            
+            .dynamic-title {
+                font-size: 24px;
+                min-height: 120px;     /* Smaller fixed height on mobile */
+                padding: 0 15px;
+                line-height: 1.3;
+            }
+            
+            .main-wrapper {
+                margin: 10px auto 50px;
+            }
+            .main-layout {
+                flex-direction: column;
+                align-items: center;
+            }
+            .vertical-selector {
+                order: 1;
+                width: 90%;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                padding: 12px 20px;
+            }
+            .vertical-selector h4 { margin-bottom: 0; margin-right: 15px; font-size: 14px; }
+            .year-wheel { height: 60px; width: 300px; }
+            .year-items { display: flex; gap: 10px; top: 50%; transform: translateY(-50%); white-space: nowrap; }
+            .year-item { display: inline-block; padding: 8px 16px; font-size: 14px; }
+            .toggle-panel { width: 90%; order: 3; max-height: 250px; }
+            .main-wrapper { order: 2; width: min(85vw, 85vh, 550px); margin-top: 20px; }
+            .main-title { font-size: 48px; letter-spacing: 3px; }
+            .dynamic-title { font-size: 24px; padding: 0 15px; }
+            .header-text { padding: 0 20px; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-layout">
+    <div class="main-wrapper">
+        <div class="header-text">
+            <div class="main-title">BEST OF THE BEST</div>
+            <div class="dynamic-title" id="dynamicTitle">Loading game data...</div>
+        </div>
+
+        <div class="wheel-container" id="wheelContainer">
+            <canvas id="ringCanvas" width="800" height="800"></canvas>
+            <div class="center-card">
+                <div class="game-name" id="centerGameName">—</div>
+            </div>
+        </div>
+        <div class="legend">🖱️ Drag any visible ring to rotate · Top segment = active filter</div>
+    </div>
+
+    <!-- Vertical Year Selector -->
+    <div class="vertical-selector">
+        <h4>📅 YEAR</h4>
+        <div class="year-wheel" id="yearWheel">
+            <div class="year-items" id="yearItems"></div>
+        </div>
+        <div class="year-nav">
+            <button id="yearUpBtn">▲</button>
+            <button id="yearDownBtn">▼</button>
+        </div>
+    </div>
+
+    <div class="toggle-panel">
+        <h3>🎮 CUSTOMIZE DIALS</h3>
+        <div id="toggleContainer"></div>
+    </div>
+</div>
+
+<div class="import-area">
+    <button class="reset-filters" id="resetBtn">⟳ Reset Filters</button>
+    <label class="import-btn" for="csvInput">📂 IMPORT CSV</label>
+    <input type="file" id="csvInput" accept=".csv">
+</div>
+<div class="status-badge" id="dataStatus">⚠️ No data — import CSV</div>
+
+<div class="warning-message" id="warningMsg">
+    <div>⚠️ Invalid CSV format</div>
+    <div style="font-size: 12px; margin-top: 10px;">Expected columns:<br>
+    game_name, release_year, recommendations_count, reviews, rating,<br>
+    median_playtime_hours, peak_players, steam_genres, player_type,<br>
+    supported_platforms, achievements_count, follows, price$</div>
+    <button onclick="this.parentElement.classList.remove('show')">OK</button>
+</div>
+
+<script>
+    // ============================================================
+    // FIXED: Full rotation working, larger visuals, improved text
+    // ============================================================
+    const canvas = document.getElementById('ringCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, centerX, centerY;
+    let gamesDataset = [];
+    let currentBestGame = null;
+    let currentYearFilter = 'Any';
+
+    // New color palette for dials
+    const COLOR_PALETTE = ['#FFE7B6', '#F0D9A8', '#EED196', '#E7BB66', '#D98D00'];
+    
+    function parseNumberWithCommas(value) {
+        if (value === undefined || value === null || value === '') return null;
+        if (value === '—' || value === '-' || value === 'N/A' || value === 'n/a') return null;
+        if (typeof value === 'number') return value;
+        const cleaned = String(value).replace(/,/g, '').trim();
+        const parsed = parseFloat(cleaned);
+        return isNaN(parsed) ? null : parsed;
+    }
+
+    // Price range options
+    const priceOptions = ['any', 'free to play', '<$5', '<$10', '<$15', '<$20', '<$30', '<$40', '<$60', '>$60'];
+    const priceValues = ['All', 'Free', '0-5', '5-10', '10-15', '15-20', '20-30', '30-40', '40-60', '60-plus'];
+
+    function getPriceText(range, isFreeToPlay = false) {
+        if (isFreeToPlay) return 'free';
+        if (range === 'Free') return 'free';
+        if (range === '0-5') return 'in a price range under $5';
+        if (range === '5-10') return 'in a price range from $5 to $10';
+        if (range === '10-15') return 'in a price range from $10 to $15';
+        if (range === '15-20') return 'in a price range from $15 to $20';
+        if (range === '20-30') return 'in a price range from $20 to $30';
+        if (range === '30-40') return 'in a price range from $30 to $40';
+        if (range === '40-60') return 'in a price range from $40 to $60';
+        if (range === '60-plus') return 'in a price range of $60 and more';
+        return '';
+    }
+
+    function checkPriceRange(price, range) {
+        if (price === null || price === undefined) return false;
+        if (range === 'All') return true;
+        if (range === 'Free') return price === 0;
+        if (range === '0-5') return price > 0 && price < 5;
+        if (range === '5-10') return price >= 5 && price < 10;
+        if (range === '10-15') return price >= 10 && price < 15;
+        if (range === '15-20') return price >= 15 && price < 20;
+        if (range === '20-30') return price >= 20 && price < 30;
+        if (range === '30-40') return price >= 30 && price < 40;
+        if (range === '40-60') return price >= 40 && price < 60;
+        if (range === '60-plus') return price >= 60;
+        return true;
+    }
+
+    // Metric options
+    const metricOptions = [
+        'most recommended', 'high rated', 'most reviews', 'most achievements',
+        'median playtime', 'peak CCU', 'most followers'
+    ];
+    const metricValues = [
+        'recommendations_count', 'rating', 'reviews', 'achievements_count',
+        'median_playtime_hours', 'peak_players', 'follows'
+    ];
+    const metricTextMap = {
+        'most recommended': 'has the most recommendations for',
+        'high rated': 'is the highest rated',
+        'most reviews': 'is the most reviewed',
+        'most achievements': 'has the most achievements',
+        'median playtime': 'has the highest median playtime',
+        'peak CCU': 'has the highest CCU peak',
+        'most followers': 'has the most followers'
+    };
+
+    // Genre options
+    const genreOptions = ['any', 'simulation', 'strategy', 'action', 'RPG', 'racing', 'indie', 'adventure', 'casual', 'sports'];
+    const genreValues = ['All', 'Simulation', 'Strategy', 'Action', 'RPG', 'Racing', 'Indie', 'Adventure', 'Casual', 'Sports'];
+
+    // OS options
+    const osOptions = ['any', 'windows', 'mac', 'linux'];
+    const osValues = ['All', 'Windows', 'Mac', 'Linux'];
+
+    // All rings configuration - UPDATED RADII for larger circle (max radius 0.95)
+    const ALL_RINGS = [
+        { name: 'metric', label: 'METRIC', options: metricOptions, values: metricValues, currentIdx: 1, rotationAngle: 0,
+          colors: { bg: COLOR_PALETTE[0], active: '#FA8112', text: '#000000', inactiveText: '#000000' } },
+        { name: 'genre', label: 'GENRE', options: genreOptions, values: genreValues, currentIdx: 0, rotationAngle: 0,
+          colors: { bg: COLOR_PALETTE[1], active: '#FA8112', text: '#000000', inactiveText: '#000000' } },
+        { name: 'player', label: 'PLAYER TYPE', options: ['any', 'single-player', 'multi-player', 'single&multi-player'],
+          values: ['All', 'Single-player', 'Multi-player', 'Single&Multi-player'], currentIdx: 0, rotationAngle: 0,
+          colors: { bg: COLOR_PALETTE[2], active: '#FA8112', text: '#000000', inactiveText: '#000000' } },
+        { name: 'os', label: 'SUPPORTED OS', options: osOptions, values: osValues, currentIdx: 0, rotationAngle: 0,
+          colors: { bg: COLOR_PALETTE[3], active: '#FA8112', text: '#000000', inactiveText: '#000000' } },
+        { name: 'price', label: 'PRICE', options: priceOptions, values: priceValues, currentIdx: 0, rotationAngle: 0,
+          colors: { bg: COLOR_PALETTE[4], active: '#FA8112', text: '#000000', inactiveText: '#000000' } }
+    ];
+
+    let visibleRings = { metric: true, genre: true, player: true, os: true, price: true };
+
+    // Dynamic radius calculation - MAX RADIUS 0.95 (no empty border)
+    function calculateDynamicRadii() {
+        const visibleNames = Object.keys(visibleRings).filter(name => visibleRings[name]);
+        const count = visibleNames.length;
+        if (count === 0) return [];
+        
+        const ringGap = 0.015;
+        const maxRadius = 1;  // Almost touches canvas edge
+        const minRadius = 0.22;
+        const availableSpan = maxRadius - minRadius;
+        const totalGaps = (count - 1) * ringGap;
+        const totalRingThickness = availableSpan - totalGaps;
+        const ringThickness = totalRingThickness / count;
+        
+        const orderedRingNames = ['metric', 'genre', 'player', 'os', 'price'];
+        const visibleOrdered = orderedRingNames.filter(name => visibleRings[name]);
+        const ringsWithRadii = [];
+        let currentOuter = maxRadius;
+        
+        for (let i = 0; i < visibleOrdered.length; i++) {
+            const ringName = visibleOrdered[i];
+            const ring = ALL_RINGS.find(r => r.name === ringName);
+            if (ring) {
+                const inner = currentOuter - ringThickness;
+                ringsWithRadii.push({ ...ring, outerR: currentOuter, innerR: inner });
+                currentOuter = inner - ringGap;
+            }
+        }
+        
+        for (let ring of ringsWithRadii) {
+            if (ring.innerR < 0.18) ring.innerR = 0.18;
+            if (ring.outerR < ring.innerR + 0.05) ring.outerR = ring.innerR + 0.08;
+        }
+        return ringsWithRadii;
+    }
+
+    let RINGS = calculateDynamicRadii();
+
+    // Year selector
+    const yearsList = [];
+    for (let year = 1997; year <= 2026; year++) {
+        yearsList.push(year.toString());
+    }
+    const allYears = ['Any', ...yearsList, 'Any'];
+    let yearIndex = 0;
+    
+    let isDraggingYear = false;
+    let dragStartY = 0;
+    let dragStartIndex = 0;
+    let currentDragYearIndex = 0;
+    let dragging = false;
+    let activeRingIdx = null;
+    let dragStartAngle = 0;
+    let dragStartRotation = 0;
+    let updateScheduled = false;
+
+    // ========== CSV PARSING ==========
+    function parseCSVtoGames(csvText) {
+        const lines = csvText.split(/\r?\n/);
+        if (lines.length < 2) return [];
+        
+        let delimiter = ',';
+        if (lines[0].includes(';') && !lines[0].includes(',')) delimiter = ';';
+        
+        const headers = lines[0].split(delimiter).map(h => h.trim().toLowerCase());
+        const games = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            
+            let inQuotes = false;
+            let current = '';
+            const row = [];
+            for (let ch of lines[i]) {
+                if (ch === '"') { inQuotes = !inQuotes; }
+                else if (ch === delimiter && !inQuotes) { row.push(current.trim()); current = ''; }
+                else { current += ch; }
+            }
+            row.push(current.trim());
+            if (row.length < 5) continue;
+            
+            let game = {};
+            headers.forEach((h, idx) => {
+                let val = row[idx] || '';
+                if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+                game[h] = val;
+            });
+            
+            let price = null;
+            const priceRaw = game.price$ || game.price;
+            if (priceRaw && priceRaw !== '—' && priceRaw !== '-' && priceRaw !== 'N/A') {
+                price = parseNumberWithCommas(priceRaw);
+                if (String(priceRaw).toLowerCase() === 'free') price = 0;
+            }
+            
+            games.push({
+                name: game.game_name || game.name || `Game_${i}`,
+                release_year: parseNumberWithCommas(game.release_year) || 2000,
+                steam_genres: game.steam_genres || 'Action',
+                player_type: game.player_type || 'Single-player',
+                supported_platforms: game.supported_platforms || 'Windows',
+                recommendations_count: parseNumberWithCommas(game.recommendations_count) || 0,
+                reviews: parseNumberWithCommas(game.reviews) || 0,
+                rating: parseNumberWithCommas(game.rating) || 70,
+                achievements_count: parseNumberWithCommas(game.achievements_count) || 0,
+                median_playtime_hours: parseNumberWithCommas(game.median_playtime_hours) || 0,
+                peak_players: parseNumberWithCommas(game.peak_players) || 0,
+                follows: parseNumberWithCommas(game.follows) || 0,
+                price: price
+            });
+        }
+        return games;
+    }
+    
+    function autoLoadCSV() {
+        const csvPath = '3_dial.csv';
+        fetch(csvPath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(csvText => {
+                console.log('CSV loaded automatically from data/3_dial.csv');
+                const parsed = parseCSVtoGames(csvText);
+                if (parsed.length === 0) { 
+                    document.getElementById('warningMsg').classList.add('show');
+                    document.getElementById('dataStatus').innerHTML = '⚠️ CSV parsed but no valid games found';
+                    return; 
+                }
+                gamesDataset = parsed;
+                resetAllRings();
+                document.getElementById('dataStatus').innerHTML = `✅ Auto-loaded ${parsed.length.toLocaleString()} games from data/3_dial.csv`;
+            })
+            .catch(error => {
+                console.error('Error loading CSV:', error);
+                document.getElementById('dataStatus').innerHTML = `⚠️ Could not auto-load data/3_dial.csv - ${error.message}<br>📁 Please use "IMPORT CSV" button to select file manually`;
+                // Keep the manual upload option available as fallback
+            });
+    }
+
+    // ========== Filter functions ==========
+    function gameMatchesPlayerType(game, filterPlayer) {
+        if (filterPlayer === 'All') return true;
+        if (!game.player_type) return false;
+        const gamePlayer = game.player_type.toLowerCase().trim();
+        const filterLower = filterPlayer.toLowerCase().trim();
+        if (filterLower === 'single-player') return gamePlayer === 'single-player';
+        if (filterLower === 'multi-player') return gamePlayer === 'multi-player';
+        if (filterLower === 'single&multi-player') return gamePlayer === 'single&multi-player';
+        return false;
+    }
+
+    function gameMatchesGenre(game, filterGenre) {
+        if (filterGenre === 'All') return true;
+        if (!game.steam_genres) return false;
+        const gameGenres = game.steam_genres.split(',').map(g => g.trim().toLowerCase());
+        return gameGenres.includes(filterGenre.toLowerCase());
+    }
+
+    function gameMatchesOS(game, filterOS) {
+        if (filterOS === 'All') return true;
+        if (!game.supported_platforms) return false;
+        const platforms = game.supported_platforms.split(',').map(p => p.trim().toLowerCase());
+        return platforms.includes(filterOS.toLowerCase());
+    }
+
+    function getFilteredGames() {
+        if (!gamesDataset.length) return [];
+        let filtered = [...gamesDataset];
+        
+        if (currentYearFilter !== 'Any') {
+            const yearNum = parseInt(currentYearFilter);
+            if (!isNaN(yearNum)) {
+                filtered = filtered.filter(g => g.release_year === yearNum);
+            }
+        }
+        
+        for (let ring of RINGS) {
+            if (ring.name === 'genre') {
+                const genreVal = ring.values[ring.currentIdx];
+                if (genreVal !== 'All') filtered = filtered.filter(g => gameMatchesGenre(g, genreVal));
+            } else if (ring.name === 'player') {
+                const playerVal = ring.values[ring.currentIdx];
+                if (playerVal !== 'All') filtered = filtered.filter(g => gameMatchesPlayerType(g, playerVal));
+            } else if (ring.name === 'os') {
+                const osVal = ring.values[ring.currentIdx];
+                if (osVal !== 'All') filtered = filtered.filter(g => gameMatchesOS(g, osVal));
+            } else if (ring.name === 'price') {
+                const priceVal = ring.values[ring.currentIdx];
+                if (priceVal !== 'All') filtered = filtered.filter(g => checkPriceRange(g.price, priceVal));
+            }
+        }
+        return filtered;
+    }
+
+    function updateBestGame() {
+        if (!gamesDataset.length) { currentBestGame = null; updateUI(); return; }
+        const filtered = getFilteredGames();
+        if (filtered.length === 0) { currentBestGame = null; updateUI(); return; }
+        
+        const metricRing = RINGS.find(r => r.name === 'metric');
+        const metricKey = metricRing ? metricRing.values[metricRing.currentIdx] : 'rating';
+        
+        let best = filtered[0];
+        for (let g of filtered) {
+            if (g[metricKey] > best[metricKey]) best = g;
+        }
+        currentBestGame = best;
+        updateUI();
+    }
+
+    function formatMetricValue(value, metricKey) {
+        if (metricKey === 'rating') return value.toFixed(1);
+        if (metricKey === 'median_playtime_hours') {
+            if (value >= 24) return `${Math.floor(value / 24)}d ${value % 24}h`;
+            if (value >= 1) return `${value.toFixed(1)}h`;
+            return `${Math.floor(value * 60)}m`;
+        }
+        if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+        if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
+        return value.toString();
+    }
+
+    // ========== IMPROVED TEXT GENERATION ==========
+    function capitalizeFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function formatPlayerType(playerOption) {
+        if (playerOption === 'single-player') return 'Singleplayer';
+        if (playerOption === 'multi-player') return 'Multiplayer';
+        if (playerOption === 'single&multi-player') return 'Single&Multiplayer';
+        return '';
+    }
+
+    function generateDynamicText() {
+        if (!currentBestGame || !gamesDataset.length) {
+            return 'No data loaded — please import CSV';
+        }
+        
+        const metricRing = RINGS.find(r => r.name === 'metric');
+        const genreRing = RINGS.find(r => r.name === 'genre');
+        const playerRing = RINGS.find(r => r.name === 'player');
+        const osRing = RINGS.find(r => r.name === 'os');
+        const priceRing = RINGS.find(r => r.name === 'price');
+        
+        const metricOption = metricRing?.options[metricRing.currentIdx] || 'high rated';
+        const metricText = metricTextMap[metricOption] || 'is the best';
+        
+        const genreOption = genreRing?.options[genreRing.currentIdx] || 'any';
+        const isSpecificGenre = genreOption !== 'any';
+        const genreName = capitalizeFirst(genreOption);
+        
+        const playerOption = playerRing?.options[playerRing.currentIdx] || 'any';
+        const isSpecificPlayer = playerOption !== 'any';
+        const playerName = formatPlayerType(playerOption);
+        
+        const osOption = osRing?.options[osRing.currentIdx] || 'any';
+        const isSpecificOS = osOption !== 'any';
+        
+        const priceOption = priceRing?.options[priceRing.currentIdx] || 'any';
+        const priceValue = priceRing?.values[priceRing.currentIdx] || 'All';
+        const isSpecificPrice = priceOption !== 'any';
+        const isFreeToPlay = priceOption === 'free to play';
+        const priceText = getPriceText(priceValue, isFreeToPlay);
+        
+        const yearOption = currentYearFilter;
+        const isSpecificYear = yearOption !== 'Any';
+        
+        // Build the text parts array for better handling
+        const textParts = [];
+        textParts.push(`«${currentBestGame.name}» ${metricText}`);
+        
+        if (isSpecificPrice && isFreeToPlay) {
+            textParts.push(priceText);
+        }
+        
+        if (isSpecificPlayer) {
+            textParts.push(playerName);
+        }
+        
+        if (isSpecificGenre) {
+            textParts.push(genreName);
+        } else {
+            textParts.push('game');
+        }
+        
+        if (isSpecificOS) {
+            textParts.push(`on ${osOption}`);
+        }
+        
+        if (isSpecificPrice && !isFreeToPlay && priceText) {
+            textParts.push(priceText);
+        }
+        
+        if (isSpecificYear) {
+            textParts.push(`in ${yearOption}`);
+        } else {
+            textParts.push('of all time');
+        }
+        
+        // Join with spaces
+        return textParts.join(' ');
+    }
+    // Function to scale text to fit container
+    function fitTextToContainer(text, containerWidth, containerHeight, fontSize, fontFamily) {
+        // Create temporary canvas to measure text
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.font = `${fontSize}px '${fontFamily}'`;
+        
+        let currentFontSize = fontSize;
+        let textWidth = tempCtx.measureText(text).width;
+        const maxWidth = containerWidth * 0.9; // 90% of container width
+        const maxHeight = containerHeight * 0.8; // 80% of container height
+        
+        // Scale down until text fits
+        while ((textWidth > maxWidth || currentFontSize > maxHeight) && currentFontSize > 12) {
+            currentFontSize = currentFontSize - 2;
+            tempCtx.font = `${currentFontSize}px '${fontFamily}'`;
+            textWidth = tempCtx.measureText(text).width;
+        }
+        
+        return currentFontSize;
+    }
+
+    function updateUI() {
+        if (!currentBestGame || !gamesDataset.length) {
+            document.getElementById('centerGameName').innerHTML = '—';
+            document.getElementById('dynamicTitle').innerHTML = 'No games match the current filters — try adjusting the dials';
+            document.getElementById('dynamicTitle').style.color = '#8F8585';
+            return;
+        }
+        
+        document.getElementById('dynamicTitle').style.color = '#EFDFC0';
+        
+        const gameName = currentBestGame.name;
+        const centerElement = document.getElementById('centerGameName');
+        
+        // Get container dimensions
+        const centerCard = document.querySelector('.center-card');
+        const containerWidth = centerCard.offsetWidth;
+        const containerHeight = centerCard.offsetHeight;
+        
+        // Calculate appropriate font size
+        const baseFontSize = 28; // Starting font size in pixels
+        const calculatedFontSize = fitTextToContainer(gameName, containerWidth, containerHeight, baseFontSize, 'Source Sans Pro');
+        
+        // Apply the calculated font size
+        centerElement.style.fontSize = `${calculatedFontSize}px`;
+        centerElement.innerHTML = gameName;
+        
+        const dynamicText = generateDynamicText();
+        document.getElementById('dynamicTitle').innerHTML = dynamicText;
+    }
+
+    // ========== DRAW RINGS with FIXED full rotation ==========
+    function drawRings() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        
+        for (let idx = 0; idx < RINGS.length; idx++) {
+            const ring = RINGS[idx];
+            const inner = ring.innerR * centerX;
+            const outer = ring.outerR * centerX;
+            if (inner < 0 || outer < 0 || inner >= outer) continue;
+            
+            const segments = ring.options.length;
+            const angleStep = (Math.PI * 2) / segments;
+            const startOffset = -Math.PI / 2 + ring.rotationAngle;
+            
+            // Find which segment is at the top (12 o'clock position)
+            // This uses the actual angle of each segment's midpoint
+            let activeSegmentIdx = 0;
+            let smallestDistance = Infinity;
+            const targetAngle = -Math.PI / 2; // Top position
+            
+            for (let i = 0; i < segments; i++) {
+                const midAngle = startOffset + i * angleStep + angleStep / 2;
+                // Normalize angles to compare properly
+                let diff = Math.abs(midAngle - targetAngle);
+                diff = Math.min(diff, Math.abs(diff - Math.PI * 2));
+                if (diff < smallestDistance) {
+                    smallestDistance = diff;
+                    activeSegmentIdx = i;
+                }
+            }
+            
+            // Update currentIdx if changed
+            if (ring.currentIdx !== activeSegmentIdx) {
+                ring.currentIdx = activeSegmentIdx;
+                if (!dragging && !updateScheduled) {
+                    updateScheduled = true;
+                    requestAnimationFrame(() => { updateBestGame(); updateScheduled = false; });
+                } else if (!dragging) {
+                    updateBestGame();
+                }
+            }
+            
+            // Draw all segments
+            for (let i = 0; i < segments; i++) {
+                const start = startOffset + i * angleStep;
+                const end = start + angleStep;
+                const isActive = (i === activeSegmentIdx);
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, outer, start, end);
+                ctx.arc(centerX, centerY, inner, end, start, true);
+                ctx.closePath();
+                ctx.fillStyle = isActive ? ring.colors.active : ring.colors.bg;
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                
+                // Draw text with larger font (40px equivalent)
+                const midAngle = start + angleStep / 2;
+                const textRadius = (inner + outer) / 2;
+                const x = centerX + Math.cos(midAngle) * textRadius;
+                const y = centerY + Math.sin(midAngle) * textRadius;
+                
+                ctx.save();
+                ctx.translate(x, y);
+                // Rotate to follow the circle's curve
+                ctx.rotate(midAngle + Math.PI/2);
+                ctx.fillStyle = isActive ? '#1B1B1B' : ring.colors.inactiveText;
+                ctx.font = `500 ${Math.max(14, centerX * 0.035)}px 'Source Sans Pro', sans-serif`;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                let label = ring.options[i];
+                if (label === 'single&multi-player') label = 'Single & Multi';
+                ctx.fillText(label, 0, 0);
+                ctx.restore();
+            }
+            
+            // Draw ring borders
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, outer, 0, Math.PI*2);
+            ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, inner, 0, Math.PI*2);
+            ctx.stroke();
+        }
+        
+        // Top indicator triangle
+        const topY = centerY - centerX * 0.88;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 8, topY);
+        ctx.lineTo(centerX, topY - 8);
+        ctx.lineTo(centerX + 8, topY);
+        ctx.fillStyle = '#EFDFC0';
+        ctx.fill();
+    }
+
+    // ========== Year Selector ==========
+    function updateYearSelectorVisual() {
+        const container = document.getElementById('yearItems');
+        if (!container) return;
+        
+        const halfWindow = 2;
+        let startIdx = Math.max(0, yearIndex - halfWindow);
+        let endIdx = Math.min(allYears.length - 1, startIdx + 4);
+        if (endIdx - startIdx < 4) {
+            startIdx = Math.max(0, endIdx - 4);
+        }
+        
+        const visibleYears = allYears.slice(startIdx, endIdx + 1);
+        container.innerHTML = '';
+        
+        const activePosInVisible = yearIndex - startIdx;
+        const itemHeight = 52;
+        const centerOffset = (activePosInVisible - 2) * itemHeight;
+        container.style.transform = `translateY(calc(-50% - ${centerOffset}px))`;
+        
+        visibleYears.forEach(year => {
+            const div = document.createElement('div');
+            div.className = 'year-item';
+            const displayYear = year === 'Any' ? 'ANY' : year;
+            if (year === currentYearFilter) div.classList.add('active');
+            div.textContent = displayYear;
+            div.onclick = (e) => {
+                e.stopPropagation();
+                const newIndex = allYears.indexOf(year);
+                if (newIndex !== -1) {
+                    yearIndex = newIndex;
+                    currentYearFilter = year;
+                    updateYearSelectorVisual();
+                    updateBestGame();
+                }
+            };
+            container.appendChild(div);
+        });
+    }
+
+    function setYearByIndex(newIndex) {
+        newIndex = Math.max(0, Math.min(allYears.length - 1, newIndex));
+        if (newIndex !== yearIndex) {
+            yearIndex = newIndex;
+            currentYearFilter = allYears[yearIndex];
+            updateYearSelectorVisual();
+            updateBestGame();
+        }
+    }
+
+    function scrollYearUp() { setYearByIndex(yearIndex - 1); }
+    function scrollYearDown() { setYearByIndex(yearIndex + 1); }
+
+    function initYearSelector() {
+        updateYearSelectorVisual();
+        document.getElementById('yearUpBtn')?.addEventListener('click', scrollYearUp);
+        document.getElementById('yearDownBtn')?.addEventListener('click', scrollYearDown);
+        
+        const wheel = document.getElementById('yearWheel');
+        if (wheel) {
+            wheel.addEventListener('mousedown', (e) => {
+                isDraggingYear = true;
+                dragStartY = e.clientY;
+                dragStartIndex = yearIndex;
+                wheel.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+            window.addEventListener('mousemove', (e) => {
+                if (!isDraggingYear) return;
+                const deltaY = e.clientY - dragStartY;
+                const deltaIndex = Math.round(-deltaY / 45);
+                const newIndex = dragStartIndex + deltaIndex;
+                if (newIndex !== currentDragYearIndex) {
+                    currentDragYearIndex = newIndex;
+                    setYearByIndex(newIndex);
+                }
+            });
+            window.addEventListener('mouseup', () => {
+                isDraggingYear = false;
+                currentDragYearIndex = yearIndex;
+                if (wheel) wheel.style.cursor = 'grab';
+            });
+            wheel.addEventListener('touchstart', (e) => {
+                isDraggingYear = true;
+                dragStartY = e.touches[0].clientY;
+                dragStartIndex = yearIndex;
+                wheel.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+            window.addEventListener('touchmove', (e) => {
+                if (!isDraggingYear) return;
+                const deltaY = e.touches[0].clientY - dragStartY;
+                const deltaIndex = Math.round(-deltaY / 45);
+                const newIndex = dragStartIndex + deltaIndex;
+                if (newIndex !== currentDragYearIndex) {
+                    currentDragYearIndex = newIndex;
+                    setYearByIndex(newIndex);
+                }
+            });
+            window.addEventListener('touchend', () => {
+                isDraggingYear = false;
+                currentDragYearIndex = yearIndex;
+                if (wheel) wheel.style.cursor = 'grab';
+            });
+        }
+    }
+
+    // ========== Ring Interaction with improved angle handling ==========
+    function getAngleFromEvent(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        let clientX, clientY;
+        if (e.touches) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
+        else { clientX = e.clientX; clientY = e.clientY; }
+        const canvasX = (clientX - rect.left) * scaleX;
+        const canvasY = (clientY - rect.top) * scaleY;
+        return Math.atan2(canvasY - centerY, canvasX - centerX);
+    }
+
+    function getRingAt(px, py) {
+        const dx = px - centerX, dy = py - centerY;
+        const r = Math.hypot(dx, dy);
+        for (let i = 0; i < RINGS.length; i++) {
+            const inner = RINGS[i].innerR * centerX;
+            const outer = RINGS[i].outerR * centerX;
+            if (r >= inner && r <= outer) return i;
+        }
+        return -1;
+    }
+
+    function onDragStart(e) {
+        if (!gamesDataset.length) return;
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        let clientX, clientY;
+        if (e.touches) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
+        else { clientX = e.clientX; clientY = e.clientY; }
+        const canvasX = (clientX - rect.left) * scaleX;
+        const canvasY = (clientY - rect.top) * scaleY;
+        const ringIdx = getRingAt(canvasX, canvasY);
+        if (ringIdx === -1) return;
+        activeRingIdx = ringIdx;
+        dragging = true;
+        dragStartAngle = getAngleFromEvent(e);
+        dragStartRotation = RINGS[activeRingIdx].rotationAngle;
+        canvas.style.cursor = 'grabbing';
+    }
+
+    function onDragMove(e) {
+        if (!dragging || activeRingIdx === null) return;
+        e.preventDefault();
+        const currentAngle = getAngleFromEvent(e);
+        let delta = currentAngle - dragStartAngle;
+        // Normalize delta to prevent huge jumps
+        if (delta > Math.PI) delta -= Math.PI * 2;
+        if (delta < -Math.PI) delta += Math.PI * 2;
+        RINGS[activeRingIdx].rotationAngle = dragStartRotation + delta;
+        drawRings();
+    }
+
+    function onDragEnd() {
+        if (dragging && activeRingIdx !== null) updateBestGame();
+        dragging = false;
+        activeRingIdx = null;
+        canvas.style.cursor = 'grab';
+    }
+
+    function resetAllRings() {
+        ALL_RINGS.forEach(ring => { ring.rotationAngle = 0; ring.currentIdx = ring.name === 'metric' ? 1 : 0; });
+        currentYearFilter = 'Any';
+        yearIndex = 0;
+        currentDragYearIndex = 0;
+        updateYearSelectorVisual();
+        RINGS = calculateDynamicRadii();
+        drawRings();
+        updateBestGame();
+    }
+
+    function toggleRing(ringName) {
+        visibleRings[ringName] = !visibleRings[ringName];
+        RINGS = calculateDynamicRadii();
+        drawRings();
+        updateBestGame();
+        updateToggleUI();
+    }
+
+    function updateToggleUI() {
+        const container = document.getElementById('toggleContainer');
+        container.innerHTML = '';
+        ALL_RINGS.forEach(ring => {
+            const item = document.createElement('div');
+            item.className = 'toggle-item';
+            item.onclick = () => toggleRing(ring.name);
+            item.innerHTML = `<span class="toggle-label">${ring.label}</span><div class="toggle-switch ${visibleRings[ring.name] ? 'active' : ''}"></div>`;
+            container.appendChild(item);
+        });
+    }
+
+    function resizeCanvas() {
+        const container = document.getElementById('wheelContainer');
+        const size = container.clientWidth;
+        canvas.width = size;
+        canvas.height = size;
+        width = size;
+        height = size;
+        centerX = size/2;
+        centerY = size/2;
+        RINGS = calculateDynamicRadii();
+        drawRings();
+    }
+
+    // CSV loading
+    document.getElementById('csvInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const parsed = parseCSVtoGames(ev.target.result);
+            if (parsed.length === 0) { document.getElementById('warningMsg').classList.add('show'); return; }
+            gamesDataset = parsed;
+            resetAllRings();
+            document.getElementById('dataStatus').innerHTML = `✅ ${parsed.length.toLocaleString()} games loaded`;
+        };
+        reader.readAsText(file, 'UTF-8');
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', resetAllRings);
+
+    // Initialize
+    updateToggleUI();
+    initYearSelector();
+    window.addEventListener('resize', () => { resizeCanvas(); drawRings(); });
+    resizeCanvas();
+    drawRings();
+    
+    canvas.addEventListener('mousedown', onDragStart);
+    window.addEventListener('mousemove', onDragMove);
+    window.addEventListener('mouseup', onDragEnd);
+    canvas.addEventListener('touchstart', onDragStart);
+    window.addEventListener('touchmove', onDragMove);
+    window.addEventListener('touchend', onDragEnd);
+    canvas.style.cursor = 'grab';
+    
+    // Auto-load CSV when page loads
+    autoLoadCSV();
+</script>
+</body>
+</html>

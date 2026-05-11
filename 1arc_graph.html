@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Games - Gamer Reviews Flow Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1B1B1B;
+            color: #EFDFC0;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Header with titles */
+        .title-section {
+            text-align: center;
+            padding: 20px 20px 10px 20px;
+            flex-shrink: 0;
+        }
+
+        .main-title {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 60px;
+            color: #EFDFC0;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .sub-title {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 46px;
+            color: #EFDFC0;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* Top controls bar */
+        .top-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px 20px;
+            flex-shrink: 0;
+            background: rgba(27, 27, 27, 0.8);
+            border-bottom: 1px solid rgba(239, 223, 192, 0.2);
+        }
+
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        #gameSearch {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 14px;
+            border: 1px solid rgba(239, 223, 192, 0.3);
+            border-radius: 25px;
+            background: rgba(239, 223, 192, 0.1);
+            color: #EFDFC0;
+            outline: none;
+            transition: all 0.3s;
+            font-family: 'Source Sans Pro', monospace;
+        }
+
+        #gameSearch:focus {
+            background: rgba(239, 223, 192, 0.2);
+            border-color: #EFDFC0;
+        }
+
+        #gameSearch::placeholder {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #2a2a2a;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 4px;
+            border: 1px solid rgba(239, 223, 192, 0.2);
+        }
+
+        .autocomplete-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(239, 223, 192, 0.1);
+            color: #EFDFC0;
+        }
+
+        .autocomplete-item:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        .autocomplete-item strong {
+            color: #FFD933;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            font-size: 13px;
+            background: rgba(239, 223, 192, 0.1);
+            border: 1px solid rgba(239, 223, 192, 0.2);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Source Sans Pro', monospace;
+            color: #EFDFC0;
+        }
+
+        .filter-btn.active {
+            background: rgba(239, 223, 192, 0.3);
+            border-color: #EFDFC0;
+        }
+
+        .filter-btn:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        .reset-btn {
+            padding: 8px 20px;
+            font-size: 13px;
+            background: rgba(243, 156, 18, 0.5);
+            border: 1px solid rgba(243, 156, 18, 0.5);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Source Sans Pro', monospace;
+            color: #EFDFC0;
+        }
+
+        .reset-btn:hover {
+            background: rgba(243, 156, 18, 0.8);
+        }
+
+        .clear-btn {
+            padding: 8px 20px;
+            font-size: 13px;
+            background: rgba(231, 76, 60, 0.5);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Source Sans Pro', monospace;
+            color: #EFDFC0;
+        }
+
+        .clear-btn:hover {
+            background: rgba(231, 76, 60, 0.8);
+        }
+
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            position: relative;
+            min-height: 0;
+        }
+
+        /* Graph container */
+        .vis-container {
+            flex: 1;
+            background: transparent;
+            border-radius: 0;
+            overflow: auto;
+            position: relative;
+        }
+
+        .vis-container.active {
+            display: block;
+        }
+
+        svg {
+            display: block;
+            margin: 0 auto;
+            background: transparent;
+            cursor: grab;
+            width: 100%;
+            height: 100%;
+        }
+
+        svg:active {
+            cursor: grabbing;
+        }
+
+        /* Floating controls panel - bottom left (only upload) */
+        .upload-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(27, 27, 27, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 1px solid rgba(239, 223, 192, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            min-width: 180px;
+        }
+
+        .upload-section {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 6px;
+            border-radius: 8px;
+            background: rgba(239, 223, 192, 0.1);
+        }
+
+        .upload-section:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        #csvFile {
+            display: none;
+        }
+
+        .upload-label {
+            cursor: pointer;
+            display: block;
+            font-size: 12px;
+            color: #EFDFC0;
+            font-weight: bold;
+        }
+
+        .file-info {
+            margin-top: 4px;
+            font-size: 9px;
+            color: #aaa;
+        }
+
+        #dataStats {
+            font-size: 10px;
+            color: #6bcf7f;
+            text-align: center;
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(239, 223, 192, 0.1);
+        }
+
+        /* Bottom right panel for compared games */
+        .games-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(27, 27, 27, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 15px 18px;
+            border: 1px solid rgba(239, 223, 192, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            min-width: 320px;
+            max-width: 400px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .persistent-title {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .games-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: flex-start;
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        .game-tag {
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid;
+        }
+
+        .game-tag span:first-child {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .remove-game {
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.7;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .search-result {
+            font-size: 12px;
+            margin-top: 5px;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            flex: 1;
+            overflow-y: auto;
+            min-height: 200px;
+            max-height: 400px;
+        }
+
+        .result-item {
+            padding: 8px 0;
+            font-size: 12px;
+            border-left: 3px solid;
+            padding-left: 10px;
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+
+        .result-item strong {
+            font-size: 13px;
+        }
+
+        .drag-instruction {
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+            margin-top: 10px;
+            flex-shrink: 0;
+        }
+
+        .scale-info {
+            font-size: 9px;
+            text-align: center;
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(239, 223, 192, 0.1);
+            color: #888;
+            flex-shrink: 0;
+        }
+
+        /* Graph text styles */
+        .label {
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 35px;
+            font-weight: 600;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            fill: #EFDFC0;
+            text-shadow: none;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .sphere {
+            cursor: move;
+            transition: filter 0.3s, stroke 0.2s;
+        }
+
+        .sphere:hover {
+            filter: brightness(0.95);
+            stroke-width: 3 !important;
+        }
+
+        /* Animation colors */
+        @keyframes continuousPulse0 {
+            0%, 100% { filter: drop-shadow(0 0 2px #E19898); stroke: #E19898; }
+            50% { filter: drop-shadow(0 0 15px #E19898); stroke: #E19898; }
+        }
+        @keyframes continuousPulse1 {
+            0%, 100% { filter: drop-shadow(0 0 2px #1DCD9F); stroke: #1DCD9F; }
+            50% { filter: drop-shadow(0 0 15px #1DCD9F); stroke: #1DCD9F; }
+        }
+        @keyframes continuousPulse2 {
+            0%, 100% { filter: drop-shadow(0 0 2px #FFD933); stroke: #FFD933; }
+            50% { filter: drop-shadow(0 0 15px #FFD933); stroke: #FFD933; }
+        }
+        @keyframes continuousPulse3 {
+            0%, 100% { filter: drop-shadow(0 0 2px #9929EA); stroke: #9929EA; }
+            50% { filter: drop-shadow(0 0 15px #9929EA); stroke: #9929EA; }
+        }
+        @keyframes continuousPulse4 {
+            0%, 100% { filter: drop-shadow(0 0 2px #4924FF); stroke: #4924FF; }
+            50% { filter: drop-shadow(0 0 15px #4924FF); stroke: #4924FF; }
+        }
+
+        @keyframes continuousFlow0 {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -100; }
+        }
+        @keyframes continuousFlow1 {
+            0% { stroke-dashoffset: 20; }
+            100% { stroke-dashoffset: -80; }
+        }
+        @keyframes continuousFlow2 {
+            0% { stroke-dashoffset: 40; }
+            100% { stroke-dashoffset: -60; }
+        }
+        @keyframes continuousFlow3 {
+            0% { stroke-dashoffset: 60; }
+            100% { stroke-dashoffset: -40; }
+        }
+        @keyframes continuousFlow4 {
+            0% { stroke-dashoffset: 80; }
+            100% { stroke-dashoffset: -20; }
+        }
+
+        .pulse-sphere-0 { animation: continuousPulse0 3s ease-in-out infinite; stroke-width: 4; }
+        .pulse-sphere-1 { animation: continuousPulse1 3s ease-in-out infinite; stroke-width: 4; }
+        .pulse-sphere-2 { animation: continuousPulse2 3s ease-in-out infinite; stroke-width: 4; }
+        .pulse-sphere-3 { animation: continuousPulse3 3s ease-in-out infinite; stroke-width: 4; }
+        .pulse-sphere-4 { animation: continuousPulse4 3s ease-in-out infinite; stroke-width: 4; }
+
+        .flow-arc-0 { stroke-dasharray: 12 20; animation: continuousFlow0 4s linear infinite; }
+        .flow-arc-1 { stroke-dasharray: 12 20; animation: continuousFlow1 4s linear infinite; }
+        .flow-arc-2 { stroke-dasharray: 12 20; animation: continuousFlow2 4s linear infinite; }
+        .flow-arc-3 { stroke-dasharray: 12 20; animation: continuousFlow3 4s linear infinite; }
+        .flow-arc-4 { stroke-dasharray: 12 20; animation: continuousFlow4 4s linear infinite; }
+
+        .custom-tooltip {
+            position: absolute;
+            background: #2a2a2a;
+            backdrop-filter: blur(8px);
+            color: #EFDFC0;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            pointer-events: none;
+            border: 1px solid #EFDFC0;
+            z-index: 1000;
+            font-family: 'Source Sans Pro', monospace;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            white-space: nowrap;
+            line-height: 1.4;
+        }
+
+        .custom-tooltip strong {
+            color: #FFD933;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+
+        /* Scrollbar */
+        .autocomplete-items::-webkit-scrollbar,
+        .games-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .autocomplete-items::-webkit-scrollbar-track,
+        .games-list::-webkit-scrollbar-track {
+            background: #333;
+        }
+
+        .autocomplete-items::-webkit-scrollbar-thumb,
+        .games-list::-webkit-scrollbar-thumb {
+            background: #EFDFC0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="title-section">
+        <div class="main-title">Gamers do change their opinion about videogames</div>
+        <div class="sub-title">and often not in a better way</div>
+        <div class="sub-title" style="font-size: 36px; margin-top: 10px;">distribution change in gamer's reviews across 3139 top reviewed games in April 2026</div>
+    </div>
+
+    <!-- Top controls bar -->
+    <div class="top-controls" id="topControls" style="display: none;">
+        <div class="search-container">
+            <input type="text" id="gameSearch" placeholder="Search game..." autocomplete="off">
+            <div id="autocompleteList" class="autocomplete-items"></div>
+        </div>
+        
+        <div class="filter-section">
+            <button id="filterBoth" class="filter-btn active">Both</button>
+            <button id="filterAscending" class="filter-btn">Ascending ↑</button>
+            <button id="filterDescending" class="filter-btn">Descending ↓</button>
+        </div>
+        
+        <button id="resetBtn" class="reset-btn">🔄 Reset Positions</button>
+        <button id="clearAllBtn" class="clear-btn">🗑 Clear All</button>
+    </div>
+
+    <div class="main-content">
+        <div class="vis-container" id="visContainer">
+            <div id="vis"></div>
+        </div>
+
+        <!-- Floating upload panel - bottom left -->
+        <div class="upload-panel" id="uploadPanel">
+            <div class="upload-section" id="uploadSection">
+                <input type="file" id="csvFile" accept=".csv">
+                <label for="csvFile" class="upload-label">📁 Upload CSV File</label>
+                <div class="file-info">Click or drag & drop CSV file</div>
+            </div>
+            <div id="dataStats" class="stats-summary"></div>
+        </div>
+
+        <!-- Bottom right panel for compared games -->
+        <div class="games-panel" id="gamesPanel" style="display: none;">
+            <div class="persistent-title">Compare up to 5 Games</div>
+            <div class="games-list" id="gamesList"></div>
+            <div id="searchResult" class="search-result"></div>
+            <div class="drag-instruction">💡 Drag spheres • Hover for details</div>
+            <div class="scale-info" id="scaleInfo"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const STEAM_CATEGORIES = [
+        "overwhelmingly positive",
+        "very positive", 
+        "mostly positive",
+        "mixed",
+        "mostly negative",
+        "very negative",
+        "overwhelmingly negative"
+    ];
+    
+    const CATEGORY_ORDER = {
+        "overwhelmingly negative": 1,
+        "very negative": 2,
+        "mostly negative": 3,
+        "mixed": 4,
+        "mostly positive": 5,
+        "very positive": 6,
+        "overwhelmingly positive": 7
+    };
+    
+    const SPHERE_COLORS = {
+        "overwhelmingly negative": "#FFE7B6",
+        "very negative": "#FDDEA0",
+        "mostly negative": "#F0D9A8",
+        "mixed": "#EED196",
+        "mostly positive": "#E7BB66",
+        "very positive": "#D98D00",
+        "overwhelmingly positive": "#FA8112"
+    };
+    
+    const ANIMATION_COLORS = [
+        "#E19898", "#1DCD9F", "#FFD933", "#9929EA", "#4924FF"
+    ];
+    
+    let categories = [...STEAM_CATEGORIES];
+    let categoryTotals = {};
+    let categoryRecentTotals = {};
+    let categoryGameCounts = {};
+    let arcDataAscending = {};
+    let arcDataDescending = {};
+    let gamesData = [];
+    let svg, width, height, nodeGroup, linkGroup, labelGroup, animationGroup;
+    let nodes = [];
+    let linksAscending = [];
+    let linksDescending = [];
+    let persistentGames = [];
+    let tooltip = null;
+    let currentFilter = "both";
+    
+    let minSphereRadius = 15;
+    let maxSphereRadius = 120;
+    let minArcThickness = 2;
+    let maxArcThickness = 12;
+    
+    const uploadSection = document.getElementById('uploadSection');
+    const fileInput = document.getElementById('csvFile');
+    
+    function autoLoadCSV() {
+        const csvPath = '1_arc.csv';  // Path to your CSV file
+        fetch(csvPath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(csvText => {
+                console.log('CSV loaded automatically');
+                loadDataFromCSV(csvText, '1_arc.csv');
+            })
+            .catch(error => {
+                console.error('Error loading CSV:', error);
+                document.getElementById('dataStats').innerHTML = `<span class="error">❌ Error loading data/1_arc.csv: ${error.message}</span>`;
+            });
+    }
+
+    function handleFileUpload(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) { loadDataFromCSV(event.target.result, file.name); };
+        reader.onerror = function() { document.getElementById('dataStats').innerHTML = '<span class="error">❌ Error reading file</span>'; };
+        reader.readAsText(file);
+    }
+    
+    uploadSection.addEventListener('click', (e) => {
+        if (e.target === uploadSection || e.target.classList.contains('upload-label') || e.target.classList.contains('file-info')) {
+            fileInput.click();
+        }
+    });
+    
+    uploadSection.addEventListener('dragover', (e) => { e.preventDefault(); uploadSection.classList.add('drag-over'); });
+    uploadSection.addEventListener('dragleave', () => { uploadSection.classList.remove('drag-over'); });
+    uploadSection.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadSection.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith('.csv')) handleFileUpload(file);
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            handleFileUpload(e.target.files[0]);
+            fileInput.value = '';
+        }
+    });
+    
+    function normalizeCategory(category) {
+        if (!category) return "unknown";
+        category = category.toLowerCase().trim();
+        if (category.includes("overwhelmingly positive")) return "overwhelmingly positive";
+        if (category.includes("very positive")) return "very positive";
+        if (category.includes("mostly positive")) return "mostly positive";
+        if (category.includes("mixed")) return "mixed";
+        if (category.includes("mostly negative")) return "mostly negative";
+        if (category.includes("very negative")) return "very negative";
+        if (category.includes("overwhelmingly negative")) return "overwhelmingly negative";
+        return category;
+    }
+    
+    function updateAutocomplete(searchTerm) {
+        const autocompleteList = document.getElementById('autocompleteList');
+        if (!searchTerm || searchTerm.length < 2) {
+            autocompleteList.innerHTML = '';
+            autocompleteList.style.display = 'none';
+            return;
+        }
+        
+        const matches = gamesData.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 8);
+        
+        if (matches.length === 0) {
+            autocompleteList.innerHTML = '<div class="autocomplete-item">No matches found</div>';
+            autocompleteList.style.display = 'block';
+            return;
+        }
+        
+        autocompleteList.innerHTML = matches.map(game => `
+            <div class="autocomplete-item" data-name="${game.name.replace(/"/g, '&quot;')}">
+                ${game.name.replace(new RegExp(`(${searchTerm})`, 'gi'), '<strong>$1</strong>')}
+                <span style="font-size: 11px; color: #888; float: right;">${game.totalCategory}</span>
+            </div>
+        `).join('');
+        autocompleteList.style.display = 'block';
+        
+        document.querySelectorAll('.autocomplete-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const gameName = item.getAttribute('data-name');
+                document.getElementById('gameSearch').value = gameName;
+                autocompleteList.innerHTML = '';
+                autocompleteList.style.display = 'none';
+                addGameToPersistent(gameName);
+            });
+        });
+    }
+    
+    function addGameToPersistent(gameName) {
+        const game = gamesData.find(g => g.name.toLowerCase() === gameName.toLowerCase());
+        if (!game) return;
+        
+        // Check if game already exists
+        if (persistentGames.find(p => p.game.name === game.name)) return;
+        
+        // Prevent adding 6th game - show warning and return
+        if (persistentGames.length >= 5) {
+            document.getElementById('searchResult').innerHTML = '<span style="color: #ff9f4a;">⚠️ Maximum 5 games can be compared at once. Remove a game first.</span>';
+            setTimeout(() => {
+                if (document.getElementById('searchResult').innerHTML.includes('Maximum')) {
+                    document.getElementById('searchResult').innerHTML = '';
+                }
+            }, 3000);
+            return;
+        }
+        
+        const colorIndex = persistentGames.length;
+        persistentGames.push({ game, colorIndex });
+        
+        updatePersistentGamesList();
+        updateSearchResults();
+        applyContinuousAnimation(game, colorIndex);
+    }
+    
+    function removeGameFromPersistent(index) {
+        const removed = persistentGames[index];
+        if (removed) {
+            // Remove animation for this specific game
+            removeHighlightForGame(removed);
+            
+            // Remove from array
+            persistentGames.splice(index, 1);
+            
+            // Re-index remaining games and reapply animations with new colors
+            persistentGames.forEach((game, idx) => {
+                game.colorIndex = idx;
+                // Remove old animation classes
+                nodeGroup.selectAll(".sphere").each(function() {
+                    const category = d3.select(this).attr("data-category");
+                    if (category === game.game.totalCategory || category === game.game.recentCategory) {
+                        d3.select(this).classed(`pulse-sphere-${idx + 1}`, false);
+                        d3.select(this).classed(`pulse-sphere-${idx}`, false);
+                    }
+                });
+                if (animationGroup) {
+                    animationGroup.selectAll(`.anim-arc-${idx + 1}`).remove();
+                    animationGroup.selectAll(`.anim-arc-${idx}`).remove();
+                }
+                // Reapply with new color index
+                applyContinuousAnimation(game.game, idx);
+            });
+            
+            updatePersistentGamesList();
+            updateSearchResults();
+        }
+    }
+    
+    function removeHighlightForGame(persistentGame) {
+        const { game, colorIndex } = persistentGame;
+        
+        // Remove pulse animation from spheres
+        nodeGroup.selectAll(".sphere").each(function() {
+            const category = d3.select(this).attr("data-category");
+            if (category === game.totalCategory || category === game.recentCategory) {
+                // Remove all possible pulse classes
+                d3.select(this).classed(`pulse-sphere-${colorIndex}`, false);
+                d3.select(this).classed(`pulse-sphere-0`, false);
+                d3.select(this).classed(`pulse-sphere-1`, false);
+                d3.select(this).classed(`pulse-sphere-2`, false);
+                d3.select(this).classed(`pulse-sphere-3`, false);
+                d3.select(this).classed(`pulse-sphere-4`, false);
+                d3.select(this).attr("stroke", SPHERE_COLORS).attr("stroke-width", 2);
+            }
+        });
+        
+        // Remove animation overlay arcs
+        if (animationGroup) {
+            animationGroup.selectAll(`.anim-arc-${colorIndex}`).remove();
+            // Also remove any orphaned animation arcs
+            animationGroup.selectAll(".anim-arc-0, .anim-arc-1, .anim-arc-2, .anim-arc-3, .anim-arc-4").remove();
+        }
+    }
+    
+    function applyContinuousAnimation(game, colorIndex) {
+        const color = ANIMATION_COLORS[colorIndex];
+        const isAscending = CATEGORY_ORDER[game.totalCategory] < CATEGORY_ORDER[game.recentCategory];
+        
+        nodeGroup.selectAll(".sphere").each(function() {
+            const category = d3.select(this).attr("data-category");
+            if (category === game.totalCategory || category === game.recentCategory) {
+                d3.select(this).classed(`pulse-sphere-${colorIndex}`, true);
+                d3.select(this).attr("stroke", color);
+            }
+        });
+        
+        let baseArc = null;
+        if (isAscending) {
+            baseArc = linkGroup.selectAll(".arc-green").filter(function() {
+                const source = d3.select(this).attr("data-source");
+                const target = d3.select(this).attr("data-target");
+                return (source === game.totalCategory && target === game.recentCategory);
+            });
+        } else {
+            baseArc = linkGroup.selectAll(".arc-red").filter(function() {
+                const source = d3.select(this).attr("data-source");
+                const target = d3.select(this).attr("data-target");
+                return (source === game.totalCategory && target === game.recentCategory);
+            });
+        }
+        
+        if (baseArc.size() > 0) {
+            const pathData = baseArc.attr("d");
+            const thickness = parseFloat(baseArc.attr("stroke-width"));
+            
+            if (!animationGroup) {
+                animationGroup = svg.append("g").attr("class", "animations");
+            }
+            
+            animationGroup.append("path")
+                .attr("d", pathData)
+                .attr("fill", "none")
+                .attr("stroke", color)
+                .attr("stroke-width", thickness + 3)
+                .attr("opacity", 0.6)
+                .attr("stroke-dasharray", "12 20")
+                .attr("class", `anim-arc-${colorIndex} flow-arc-${colorIndex}`)
+                .attr("data-source", game.totalCategory)
+                .attr("data-target", game.recentCategory);
+            
+            const updatePath = () => {
+                const newBaseArc = isAscending ? 
+                    linkGroup.selectAll(".arc-green").filter(function() {
+                        const source = d3.select(this).attr("data-source");
+                        const target = d3.select(this).attr("data-target");
+                        return (source === game.totalCategory && target === game.recentCategory);
+                    }) :
+                    linkGroup.selectAll(".arc-red").filter(function() {
+                        const source = d3.select(this).attr("data-source");
+                        const target = d3.select(this).attr("data-target");
+                        return (source === game.totalCategory && target === game.recentCategory);
+                    });
+                
+                if (newBaseArc.size() > 0) {
+                    const newPathData = newBaseArc.attr("d");
+                    animationGroup.selectAll(`.anim-arc-${colorIndex}`).attr("d", newPathData);
+                }
+                requestAnimationFrame(updatePath);
+            };
+            updatePath();
+        }
+    }
+    
+    function updatePersistentGamesList() {
+        const gamesList = document.getElementById('gamesList');
+        gamesList.innerHTML = persistentGames.map((item, idx) => `
+            <div class="game-tag" data-index="${idx}" style="border-color: ${ANIMATION_COLORS[item.colorIndex]}; background: ${ANIMATION_COLORS[item.colorIndex]}20;">
+                <span style="background: ${ANIMATION_COLORS[item.colorIndex]};"></span>
+                <span style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.game.name.length > 18 ? item.game.name.substring(0, 18) + '...' : item.game.name}</span>
+                <span class="remove-game" data-index="${idx}">✖</span>
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.game-tag').forEach(tag => {
+            tag.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('remove-game')) {
+                    const index = parseInt(tag.getAttribute('data-index'));
+                    const item = persistentGames[index];
+                    if (item) {
+                        flashConnection(item.game, item.colorIndex);
+                    }
+                }
+            });
+        });
+        
+        document.querySelectorAll('.remove-game').forEach(removeBtn => {
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const index = parseInt(removeBtn.getAttribute('data-index'));
+                removeGameFromPersistent(index);
+            });
+        });
+    }
+    
+    function flashConnection(game, colorIndex) {
+        const color = ANIMATION_COLORS[colorIndex];
+        
+        nodeGroup.selectAll(".sphere").each(function() {
+            const category = d3.select(this).attr("data-category");
+            if (category === game.totalCategory || category === game.recentCategory) {
+                const sphere = d3.select(this);
+                sphere.style("filter", `drop-shadow(0 0 20px ${color})`);
+                setTimeout(() => {
+                    sphere.style("filter", null);
+                }, 300);
+            }
+        });
+        
+        if (animationGroup) {
+            animationGroup.selectAll(`.anim-arc-${colorIndex}`)
+                .attr("stroke-width", 8)
+                .attr("opacity", 1);
+            setTimeout(() => {
+                animationGroup.selectAll(`.anim-arc-${colorIndex}`)
+                    .attr("stroke-width", null)
+                    .attr("opacity", 0.6);
+            }, 300);
+        }
+    }
+    
+    function updateSearchResults() {
+        const searchResult = document.getElementById('searchResult');
+        if (persistentGames.length === 0) {
+            searchResult.innerHTML = '';
+            return;
+        }
+        
+        searchResult.innerHTML = persistentGames.map(item => `
+            <div class="result-item" style="border-left-color: ${ANIMATION_COLORS[item.colorIndex]};">
+                <strong>${item.game.name}</strong><br>
+                <span style="font-size: 12px; color: #aaa;">${item.game.totalCategory} → ${item.game.recentCategory}</span><br>
+                <span style="font-size: 12px; color: #6bcf7f;">📊 ${item.game.recentNumber.toLocaleString()} recent reviews</span>
+            </div>
+        `).join('');
+    }
+    
+    function setFilter(filter) {
+        currentFilter = filter;
+        
+        document.getElementById('filterBoth').classList.remove('active');
+        document.getElementById('filterAscending').classList.remove('active');
+        document.getElementById('filterDescending').classList.remove('active');
+        
+        if (filter === 'both') document.getElementById('filterBoth').classList.add('active');
+        else if (filter === 'ascending') document.getElementById('filterAscending').classList.add('active');
+        else if (filter === 'descending') document.getElementById('filterDescending').classList.add('active');
+        
+        redrawArcs();
+        
+        persistentGames.forEach(item => {
+            applyContinuousAnimation(item.game, item.colorIndex);
+        });
+    }
+    
+    function loadDataFromCSV(csvText, fileName) {
+        try {
+            gamesData = [];
+            
+            const rows = csvText.split('\n').filter(row => row.trim());
+            if (rows.length < 2) throw new Error("CSV file appears to be empty");
+            
+            const headers = rows[0].split(',').map(h => h.trim().toLowerCase());
+            const nameIdx = headers.findIndex(h => h.includes('name') || h.includes('title') || h.includes('game'));
+            const totalCatIdx = headers.findIndex(h => (h.includes('total') && h.includes('category')) || h === 'total_category');
+            const totalNumIdx = headers.findIndex(h => (h.includes('total') && (h.includes('number') || h.includes('count'))) || h === 'total_number');
+            const recentCatIdx = headers.findIndex(h => (h.includes('recent') && h.includes('category')) || h === 'recent_category');
+            const recentNumIdx = headers.findIndex(h => (h.includes('recent') && (h.includes('number') || h.includes('count'))) || h === 'recent_number');
+            
+            if (nameIdx === -1) throw new Error("Could not find game name column");
+            
+            for (let i = 1; i < rows.length; i++) {
+                let row = rows[i];
+                let cols = [];
+                let inQuote = false;
+                let current = '';
+                
+                for (let char of row) {
+                    if (char === '"') {
+                        inQuote = !inQuote;
+                    } else if (char === ',' && !inQuote) {
+                        cols.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                cols.push(current.trim());
+                if (cols.length < 2) continue;
+                
+                const totalCategory = totalCatIdx !== -1 && cols[totalCatIdx] ? normalizeCategory(cols[totalCatIdx].replace(/^"|"$/g, '')) : "unknown";
+                const recentCategory = recentCatIdx !== -1 && cols[recentCatIdx] ? normalizeCategory(cols[recentCatIdx].replace(/^"|"$/g, '')) : "unknown";
+                const totalNumber = totalNumIdx !== -1 && cols[totalNumIdx] ? parseInt(cols[totalNumIdx].replace(/^"|"$/g, '')) || 0 : 0;
+                const recentNumber = recentNumIdx !== -1 && cols[recentNumIdx] ? parseInt(cols[recentNumIdx].replace(/^"|"$/g, '')) || 0 : 0;
+                
+                const game = {
+                    name: cols[nameIdx] ? cols[nameIdx].replace(/^"|"$/g, '') : "Unknown",
+                    totalCategory: totalCategory,
+                    totalNumber: totalNumber,
+                    recentCategory: recentCategory,
+                    recentNumber: recentNumber
+                };
+                
+                if (game.name && game.name !== "Unknown" && game.totalNumber > 0 && 
+                    STEAM_CATEGORIES.includes(game.totalCategory) && STEAM_CATEGORIES.includes(game.recentCategory)) {
+                    gamesData.push(game);
+                }
+            }
+            
+            if (gamesData.length === 0) throw new Error("No valid game data found");
+            
+            document.getElementById('dataStats').innerHTML = `✅ ${gamesData.length.toLocaleString()} games loaded`;
+            document.getElementById('topControls').style.display = 'flex';
+            document.getElementById('gamesPanel').style.display = 'block';
+            document.getElementById('visContainer').classList.add('active');
+            
+            processGameData();
+            
+            const searchInput = document.getElementById('gameSearch');
+            searchInput.addEventListener('input', (e) => { updateAutocomplete(e.target.value); });
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !document.getElementById('autocompleteList').contains(e.target)) {
+                    document.getElementById('autocompleteList').style.display = 'none';
+                }
+            });
+            
+            document.getElementById('filterBoth').addEventListener('click', () => setFilter('both'));
+            document.getElementById('filterAscending').addEventListener('click', () => setFilter('ascending'));
+            document.getElementById('filterDescending').addEventListener('click', () => setFilter('descending'));
+            document.getElementById('resetBtn').addEventListener('click', resetPositions);
+            document.getElementById('clearAllBtn').addEventListener('click', clearAllGames);
+            
+        } catch (error) {
+            console.error("Error loading CSV:", error);
+            document.getElementById('dataStats').innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+        }
+    }
+    
+    function processGameData() {
+        STEAM_CATEGORIES.forEach(cat => {
+            categoryTotals[cat] = 0;
+            categoryRecentTotals[cat] = 0;
+            categoryGameCounts[cat] = 0;
+        });
+        
+        gamesData.forEach(game => {
+            categoryTotals[game.totalCategory] += game.totalNumber;
+            categoryRecentTotals[game.recentCategory] += game.recentNumber;
+            categoryGameCounts[game.totalCategory]++;
+        });
+        
+        const ascendingMap = new Map();
+        const descendingMap = new Map();
+        
+        gamesData.forEach(game => {
+            const sourceOrder = CATEGORY_ORDER[game.totalCategory];
+            const targetOrder = CATEGORY_ORDER[game.recentCategory];
+            const key = `${game.totalCategory}|${game.recentCategory}`;
+            
+            if (sourceOrder < targetOrder) {
+                ascendingMap.set(key, (ascendingMap.get(key) || 0) + game.recentNumber);
+            } else if (sourceOrder > targetOrder) {
+                descendingMap.set(key, (descendingMap.get(key) || 0) + game.recentNumber);
+            }
+        });
+        
+        arcDataAscending = Object.fromEntries(ascendingMap);
+        arcDataDescending = Object.fromEntries(descendingMap);
+        
+        createVisualization();
+    }
+    
+    function scaleValue(value, minValue, maxValue, minScale, maxScale) {
+        if (maxValue === minValue) return (minScale + maxScale) / 2;
+        const normalized = Math.sqrt((value - minValue) / (maxValue - minValue));
+        return minScale + normalized * (maxScale - minScale);
+    }
+    
+    function createVisualization() {
+        const container = document.getElementById('vis');
+        container.innerHTML = '';
+        
+        width = Math.max(1400, window.innerWidth - 50);
+        height = Math.max(650, window.innerHeight - 200);
+        
+        svg = d3.select("#vis")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .call(d3.zoom().on("zoom", (event) => {
+                nodeGroup.attr("transform", event.transform);
+                linkGroup.attr("transform", event.transform);
+                labelGroup.attr("transform", event.transform);
+                if (animationGroup) animationGroup.attr("transform", event.transform);
+            }))
+            .append("g");
+        
+        linkGroup = svg.append("g").attr("class", "links");
+        nodeGroup = svg.append("g").attr("class", "nodes");
+        labelGroup = svg.append("g").attr("class", "labels");
+        animationGroup = svg.append("g").attr("class", "animations");
+        
+        const radius = Math.min(width, height) * 0.38;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        
+        const sphereValues = categories.map(cat => (categoryTotals[cat] || 0) + (categoryRecentTotals[cat] || 0));
+        const minSphereValue = Math.min(...sphereValues);
+        const maxSphereValue = Math.max(...sphereValues);
+        
+        nodes = categories.map((cat, idx) => {
+            const angle = (idx / categories.length) * Math.PI * 2;
+            const combinedValue = (categoryTotals[cat] || 0) + (categoryRecentTotals[cat] || 0);
+            const scaledRadius = scaleValue(combinedValue, minSphereValue, maxSphereValue, minSphereRadius, maxSphereRadius);
+            
+            return {
+                id: cat,
+                group: idx,
+                value: combinedValue,
+                scaledRadius: scaledRadius,
+                totalReviews: categoryTotals[cat] || 0,
+                recentReviews: categoryRecentTotals[cat] || 0,
+                gameCount: categoryGameCounts[cat] || 0,
+                x: centerX + Math.cos(angle) * radius,
+                y: centerY + Math.sin(angle) * radius,
+                fill: SPHERE_COLORS[cat] || SPHERE_COLORS
+            };
+        });
+        
+        const arcValuesAsc = Object.values(arcDataAscending);
+        const minArcAsc = arcValuesAsc.length > 0 ? Math.min(...arcValuesAsc) : 0;
+        const maxArcAsc = arcValuesAsc.length > 0 ? Math.max(...arcValuesAsc) : 1;
+        
+        linksAscending = [];
+        for (let [key, value] of Object.entries(arcDataAscending)) {
+            const [source, target] = key.split('|');
+            if (categories.includes(source) && categories.includes(target)) {
+                linksAscending.push({ 
+                    source, target, value, 
+                    scaledThickness: scaleValue(value, minArcAsc, maxArcAsc, minArcThickness, maxArcThickness)
+                });
+            }
+        }
+        
+        const arcValuesDesc = Object.values(arcDataDescending);
+        const minArcDesc = arcValuesDesc.length > 0 ? Math.min(...arcValuesDesc) : 0;
+        const maxArcDesc = arcValuesDesc.length > 0 ? Math.max(...arcValuesDesc) : 1;
+        
+        linksDescending = [];
+        for (let [key, value] of Object.entries(arcDataDescending)) {
+            const [source, target] = key.split('|');
+            if (categories.includes(source) && categories.includes(target)) {
+                linksDescending.push({ 
+                    source, target, value, 
+                    scaledThickness: scaleValue(value, minArcDesc, maxArcDesc, minArcThickness, maxArcThickness)
+                });
+            }
+        }
+        
+        const totalAscending = linksAscending.reduce((sum, l) => sum + l.value, 0);
+        const totalDescending = linksDescending.reduce((sum, l) => sum + l.value, 0);
+        
+        document.getElementById('scaleInfo').innerHTML = `🟢 Asc: ${totalAscending.toLocaleString()} | 🔴 Desc: ${totalDescending.toLocaleString()}`;
+        
+        drawArcsAndNodes();
+    }
+    
+    function dragStarted(event) {
+        d3.select(this).raise();
+    }
+    
+    function dragging(event) {
+        const d = d3.select(this).datum();
+        if (!d) return;
+        d.x = event.x;
+        d.y = event.y;
+        d3.select(this).attr("cx", d.x).attr("cy", d.y);
+        
+        labelGroup.selectAll(".label").each(function(labelData) {
+            if (labelData && labelData.id === d.id) {
+                d3.select(this).attr("x", d.x).attr("y", d.y);
+            }
+        });
+        redrawArcs();
+    }
+    
+    function dragEnded(event) {
+        redrawArcs();
+        persistentGames.forEach(item => {
+            applyContinuousAnimation(item.game, item.colorIndex);
+        });
+    }
+    
+    function drawParallelCurvedArc(sourceNode, targetNode, value, color, className, offsetMultiplier, isAscending) {
+        const dx = targetNode.x - sourceNode.x;
+        const dy = targetNode.y - sourceNode.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Perpendicular direction for parallel offset
+        const perpX = -dy / distance;
+        const perpY = dx / distance;
+        
+        // Offset amount for parallel curves (when both arcs exist)
+        const parallelOffset = offsetMultiplier * 25;
+        
+        // Midpoint with parallel offset
+        const midX = (sourceNode.x + targetNode.x) / 2 + perpX * parallelOffset;
+        const midY = (sourceNode.y + targetNode.y) / 2 + perpY * parallelOffset;
+        
+        // Additional curvature - makes arcs more curved
+        const curvatureAmount = 0.6;
+        const curveX = (targetNode.x - sourceNode.x) * curvatureAmount;
+        const curveY = (targetNode.y - sourceNode.y) * curvatureAmount;
+        
+        // Control point with both parallel offset and curvature
+        let cx = midX + (dy * 0.4);
+        let cy = midY - (dx * 0.4);
+        
+        // Adjust curvature based on distance
+        if (distance < 200) {
+            cx = midX + (dy * 0.6);
+            cy = midY - (dx * 0.6);
+        }
+        
+        const path = d3.path();
+        path.moveTo(sourceNode.x, sourceNode.y);
+        path.quadraticCurveTo(cx, cy, targetNode.x, targetNode.y);
+        
+        return linkGroup.append("path")
+            .attr("d", path.toString())
+            .attr("fill", "none")
+            .attr("stroke", color)
+            .attr("stroke-width", value)
+            .attr("opacity", 0.7)
+            .attr("class", className)
+            .attr("data-source", sourceNode.id)
+            .attr("data-target", targetNode.id)
+            .attr("data-value", value)
+            .on("mouseover", function(event) {
+                const key = `${sourceNode.id}|${targetNode.id}`;
+                let reviewCount = 0;
+                if (isAscending && arcDataAscending[key]) reviewCount = arcDataAscending[key];
+                else if (!isAscending && arcDataDescending[key]) reviewCount = arcDataDescending[key];
+                showArcTooltip(event, sourceNode, targetNode, reviewCount, isAscending);
+                d3.select(this).attr("stroke-width", value + 3).attr("opacity", 1);
+            })
+            .on("mousemove", moveTooltip)
+            .on("mouseout", function() {
+                hideTooltip();
+                d3.select(this).attr("stroke-width", value).attr("opacity", 0.7);
+            });
+    }
+    
+    function drawArcsAndNodes() {
+        drawArcs();
+        
+        const circles = nodeGroup.selectAll(".sphere")
+            .data(nodes)
+            .enter()
+            .append("circle")
+            .attr("class", "sphere")
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y)
+            .attr("r", d => d.scaledRadius)
+            .attr("fill", d => SPHERE_COLORS[d.id] || SPHERE_COLORS)
+            .attr("opacity", 1)
+            .attr("stroke", SPHERE_COLORS)
+            .attr("stroke-width", 2)
+            .attr("data-category", d => d.id)
+            .on("mouseover", function(event, d) { showSphereTooltip(event, d); })
+            .on("mousemove", moveTooltip)
+            .on("mouseout", hideTooltip);
+        
+        circles.call(d3.drag().on("start", dragStarted).on("drag", dragging).on("end", dragEnded));
+        
+        labelGroup.selectAll(".label")
+            .data(nodes)
+            .enter()
+            .append("text")
+            .attr("class", "label")
+            .attr("x", d => d.x)
+            .attr("y", d => d.y)
+            .style("font-size", d => `${Math.max(20, Math.min(35, d.scaledRadius / 2.5))}px`)
+            .style("fill", "#000000")
+            .style("font-weight", "bold")
+            .text(d => {
+                switch(d.id) {
+                    case "overwhelmingly positive": return "O positive";
+                    case "very positive": return "Very positive";
+                    case "mostly positive": return "M positive";
+                    case "mixed": return "Mixed";
+                    case "mostly negative": return "MN";
+                    case "very negative": return "VN";
+                    case "overwhelmingly negative": return "ON";
+                    default: return d.id.substring(0, 2).toUpperCase();
+                }
+            });
+    }
+    
+    function drawArcs() {
+        linkGroup.selectAll("path").remove();
+        
+        const arcGroups = new Map();
+        
+        if (currentFilter === 'both' || currentFilter === 'ascending') {
+            linksAscending.forEach(link => {
+                const key = `${link.source}|${link.target}`;
+                if (!arcGroups.has(key)) arcGroups.set(key, { ascending: null, descending: null });
+                arcGroups.get(key).ascending = link;
+            });
+        }
+        
+        if (currentFilter === 'both' || currentFilter === 'descending') {
+            linksDescending.forEach(link => {
+                const key = `${link.source}|${link.target}`;
+                if (!arcGroups.has(key)) arcGroups.set(key, { ascending: null, descending: null });
+                arcGroups.get(key).descending = link;
+            });
+        }
+        
+        for (let [key, group] of arcGroups.entries()) {
+            const [sourceId, targetId] = key.split('|');
+            const sourceNode = nodes.find(n => n.id === sourceId);
+            const targetNode = nodes.find(n => n.id === targetId);
+            
+            if (!sourceNode || !targetNode) continue;
+            
+            const hasBoth = group.ascending && group.descending;
+            
+            if (group.ascending) {
+                // Ascending arcs curve upward/left
+                const offset = hasBoth ? -0.5 : 0;
+                drawParallelCurvedArc(sourceNode, targetNode, group.ascending.scaledThickness, "#07BC00", "arc-green", offset, true);
+            }
+            
+            if (group.descending) {
+                // Descending arcs curve downward/right
+                const offset = hasBoth ? 0.5 : 0;
+                drawParallelCurvedArc(sourceNode, targetNode, group.descending.scaledThickness, "#D02752", "arc-red", offset, false);
+            }
+        }
+    }
+    
+    function redrawArcs() {
+        drawArcs();
+        persistentGames.forEach(item => {
+            applyContinuousAnimation(item.game, item.colorIndex);
+        });
+    }
+    
+    function showSphereTooltip(event, node) {
+        if (tooltip) tooltip.remove();
+        tooltip = d3.select("body").append("div").attr("class", "custom-tooltip");
+        const displayName = node.id.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        
+        tooltip.html(`
+            <strong>${displayName}</strong><br>
+            Games: ${node.gameCount.toLocaleString()}<br>
+            Total Reviews: ${node.totalReviews.toLocaleString()}<br>
+            Recent Reviews: ${node.recentReviews.toLocaleString()}
+        `).style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 10) + "px").style("opacity", 1);
+    }
+    
+    function showArcTooltip(event, source, target, reviewCount, isAscending) {
+        if (tooltip) tooltip.remove();
+        tooltip = d3.select("body").append("div").attr("class", "custom-tooltip");
+        
+        const arrow = isAscending ? "↑" : "↓";
+        const color = isAscending ? "#07BC00" : "#D02752";
+        
+        // Get number of games for this specific arc
+        const key = `${source.id}|${target.id}`;
+        let gameCount = 0;
+        if (gamesData) {
+            gameCount = gamesData.filter(game => 
+                (game.totalCategory === source.id && game.recentCategory === target.id) ||
+                (game.totalCategory === target.id && game.recentCategory === source.id)
+            ).length;
+        }
+        
+        tooltip.html(`
+            <strong style="color: ${color};">${arrow} ${source.id} → ${target.id}</strong><br>
+            Recent Reviews: ${reviewCount.toLocaleString()}<br>
+            Number of Games: ${gameCount}
+        `).style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 10) + "px").style("opacity", 1);
+    }
+    
+    function moveTooltip(event) {
+        if (tooltip) tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 10) + "px");
+    }
+    
+    function hideTooltip() {
+        if (tooltip) { tooltip.remove(); tooltip = null; }
+    }
+    
+    function clearAllGames() {
+        // Remove all animations first
+        persistentGames.forEach(game => {
+            removeHighlightForGame(game);
+        });
+        
+        // Clear the array
+        persistentGames = [];
+        
+        // Clear all animation overlay paths
+        if (animationGroup) {
+            animationGroup.selectAll("*").remove();
+        }
+        
+        // Reset all spheres to default state
+        nodeGroup.selectAll(".sphere").each(function() {
+            d3.select(this).classed("pulse-sphere-0", false);
+            d3.select(this).classed("pulse-sphere-1", false);
+            d3.select(this).classed("pulse-sphere-2", false);
+            d3.select(this).classed("pulse-sphere-3", false);
+            d3.select(this).classed("pulse-sphere-4", false);
+            d3.select(this).attr("stroke", SPHERE_COLORS).attr("stroke-width", 2);
+        });
+        
+        // Clear search input and results
+        document.getElementById('gameSearch').value = '';
+        document.getElementById('autocompleteList').innerHTML = '';
+        document.getElementById('autocompleteList').style.display = 'none';
+        
+        updatePersistentGamesList();
+        updateSearchResults();
+    }
+    
+    function resetPositions() {
+        const radius = Math.min(width, height) * 0.38;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        
+        nodes.forEach((node, idx) => {
+            const angle = (idx / nodes.length) * Math.PI * 2;
+            node.x = centerX + Math.cos(angle) * radius;
+            node.y = centerY + Math.sin(angle) * radius;
+        });
+        
+        nodeGroup.selectAll(".sphere").attr("cx", d => d.x).attr("cy", d => d.y);
+        labelGroup.selectAll(".label").attr("x", d => d.x).attr("y", d => d.y);
+        redrawArcs();
+        
+        document.getElementById('searchResult').innerHTML = '<span style="color: #6bcf7f;">🔄 Positions reset</span>';
+        setTimeout(() => { if (document.getElementById('searchResult').innerHTML.includes('reset')) document.getElementById('searchResult').innerHTML = ''; }, 2000);
+    }
+    
+    autoLoadCSV();
+</script>
+</body>
+</html>

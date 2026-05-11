@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Steam Data Visualizations</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background: #1B1B1B;
+            font-family: 'Source Sans Pro', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            max-width: 1200px;
+        }
+        h1 {
+            color: #EFDFC0;
+            font-family: 'Consolas', monospace;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 40px;
+            font-size: 18px;
+        }
+        .viz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .viz-card {
+            background: #2a2a2a;
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(239,223,192,0.2);
+            text-decoration: none;
+            display: block;
+            color: inherit;
+        }
+        .viz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-color: #EFDFC0;
+        }
+        .viz-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        .viz-title {
+            color: #EFDFC0;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .viz-desc {
+            color: #aaa;
+            font-size: 14px;
+        }
+        .note {
+            margin-top: 50px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Steam Data Visualizations</h1>
+        <div class="subtitle">Interactive exploration of Steam game data</div>
+        <div class="viz-grid">
+            <a href="1arc_graph.html" class="viz-card">
+                <div class="viz-icon">📊</div>
+                <div class="viz-title">Arc Graph</div>
+                <div class="viz-desc">Gamer reviews flow visualization</div>
+            </a>
+            <a href="2ccu_graph.html" class="viz-card">
+                <div class="viz-icon">📈</div>
+                <div class="viz-title">CCU Graph</div>
+                <div class="viz-desc">Player retention analysis</div>
+            </a>
+            <a href="3dial_graph.html" class="viz-card">
+                <div class="viz-icon">🥧</div>
+                <div class="viz-title">Dial Graph</div>
+                <div class="viz-desc">Best of the best game discovery</div>
+            </a>
+            <a href="4treemap.html" class="viz-card">
+                <div class="viz-icon">🌳</div>
+                <div class="viz-title">Treemap</div>
+                <div class="viz-desc">Publisher & developer distribution</div>
+            </a>
+        </div>
+        <div class="note">💡 Click any visualization to explore the data</div>
+    </div>
+</body>
+</html>
