@@ -1,0 +1,8 @@
+Сбор id по названию видеоигр: https://chat.deepseek.com/share/b935djvl267t0r7m35
+Сбор данных со страницы Steam с помощью playwright: https://chat.deepseek.com/share/rezac3mwqpz7rsoh6m
+Сбор данных по Steam API и SteamSpy API: https://chat.deepseek.com/share/07x9fnne668t9b29am
+Визуализация ARC диаграммы: https://chat.deepseek.com/share/9wmasys8xpvy9tpkvj
+Визуализация Dial диаграммы: https://chat.deepseek.com/share/mzsqpmxj0z170s3vds
+Визуализация линейного CCU графика: https://chat.deepseek.com/share/ludlf7nikbse885j4v
+Визуализация Treemap: https://chat.deepseek.com/share/z263x90orocmwacfip
+Публикация проекта: https://chat.deepseek.com/share/sy1ie5bdayjc5kbpr2
