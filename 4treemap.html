@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Publishers and Developers Distribution</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Language support -->
+    <script src="language.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -19,6 +21,38 @@
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+        
+        /* Language Selector Styles */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: rgba(239, 223, 192, 0.1);
+            border: 1px solid rgba(239, 223, 192, 0.3);
+            color: #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        .lang-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+            border-color: #EFDFC0;
         }
 
         .dashboard {
@@ -77,25 +111,6 @@
             gap: 12px;
             border: 1px solid #D98D00;
             transition: 0.2s;
-        }
-
-        .upload-area label {
-            background: #D98D00;
-            color: #1B1B1B;
-            padding: 6px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .upload-area label:hover {
-            background: #c47d00;
-        }
-
-        #csv-file-input {
-            display: none;
         }
 
         .file-name {
@@ -504,49 +519,54 @@
     </style>
 </head>
 <body>
+
+<!-- Language Selector -->
+<div class="language-selector">
+    <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
+    <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+</div>
+
 <div class="dashboard">
     <div class="header">
-        <h1>Indie Publishers Hold Their Ground Against AAA</h1>
-        <p>Publishers and Developers Distribution on Steam</p>
+        <h1 data-i18n="treemap_title">Indie Publishers Hold Their Ground Against AAA</h1>
+        <p data-i18n="treemap_subtitle">Publishers and Developers Distribution on Steam</p>
     </div>
 
     <div class="controls">
         <div class="upload-area">
-            <label for="csv-file-input">📂 Upload CSV</label>
-            <input type="file" id="csv-file-input" accept=".csv">
-            <span id="file-name-display" class="file-name">No file</span>
+            <span id="file-name-display" class="file-name" data-i18n="loading">Loading data...</span>
         </div>
         <div class="stats-badge">
-            🧾 <span id="pub-count">0</span> publishers &nbsp;|&nbsp; 🎮 <span id="game-count">0</span> games
+            🧾 <span id="pub-count">0</span> <span data-i18n="publishers">publishers</span> &nbsp;|&nbsp; 🎮 <span id="game-count">0</span> <span data-i18n="games">games</span>
         </div>
         <div class="search-section">
             <div class="search-container">
-                <input type="text" id="search-input" class="search-input" placeholder="🔍 Search game, publisher, developer... (up to 5 items)" autocomplete="off">
+                <input type="text" id="search-input" class="search-input" data-i18n="search_placeholder" placeholder="🔍 Search game, publisher, developer... (up to 5 items)" autocomplete="off">
                 <div id="autocomplete-list" class="autocomplete-list" style="display: none;"></div>
             </div>
             <div class="search-tags" id="search-tags"></div>
             <div class="search-hint">💡 Add up to 5 items to compare publishers side by side</div>
         </div>
         <div class="control-group">
-            <label>🧩 Tiling:</label>
+            <label data-i18n="tiling">🧩 Tiling:</label>
             <select id="tiling-algorithm" class="control-select">
                 <option value="treemapSquarify">treemapSquarify</option>
                 <option value="treemapBinary" selected>treemapBinary</option>
             </select>
         </div>
         <div class="control-group">
-            <label>📊 Sorting:</label>
+            <label data-i18n="sorting">📊 Sorting:</label>
             <select id="sort-order" class="control-select">
-                <option value="desc" selected>Descending (largest first)</option>
-                <option value="asc">Ascending (smallest first)</option>
+                <option value="desc" selected data-i18n="descending">Descending (largest first)</option>
+                <option value="asc" data-i18n="ascending">Ascending (smallest first)</option>
             </select>
         </div>
         <div class="layer-control">
             <div class="layer-status">
                 <span class="layer-indicator" id="layer-label">📌 Layer 1 · Top 40</span>
-                <button id="back-to-layer1-btn" class="layer-btn" style="display: none;">← Back to Layer 1</button>
+                <button id="back-to-layer1-btn" class="layer-btn" style="display: none;" data-i18n="back_to_layer">← Back to Layer 1</button>
             </div>
-            <button id="back-to-treemap-btn" class="back-from-dendro" style="display: none;">← Back to Treemap</button>
+            <button id="back-to-treemap-btn" class="back-from-dendro" style="display: none;" data-i18n="back_to_treemap">← Back to Treemap</button>
         </div>
     </div>
 
@@ -554,24 +574,24 @@
         <div id="treemap-view" style="display: block;">
             <div class="treemap-wrapper" id="treemap-container">
                 <div class="empty-state">
-                    📁 Upload CSV file with Steam data<br>
-                    <span style="font-size:0.7rem;">Required columns: estimated_owners, rating, game_name, developer, publisher</span>
+                    📁 Loading data...<br>
+                    <span style="font-size:0.7rem;">Please wait while data loads</span>
                 </div>
             </div>
         </div>
         <div id="dendro-view" style="display: none;">
             <div class="dendro-header">
                 <div class="dendro-scale-control">
-                    <span>🔍 Zoom:</span>
+                    <span data-i18n="zoom">🔍 Zoom:</span>
                     <input type="range" id="dendro-scale-slider" class="scale-slider" min="0.5" max="1.8" step="0.01" value="1">
                     <span id="scale-value" style="font-size:14px; min-width: 40px;">1.0x</span>
                 </div>
                 <div class="color-legend">
-                    <span>Game Rating</span>
+                    <span data-i18n="game_rating">Game Rating</span>
                     <div class="color-gradient"></div>
-                    <span>Low → High</span>
+                    <span data-i18n="low_to_high">Low → High</span>
                 </div>
-                <button id="close-dendro-btn" class="layer-btn">✕ Close</button>
+                <button id="close-dendro-btn" class="layer-btn" data-i18n="close">✕ Close</button>
             </div>
             <div class="dendro-wrapper" id="dendro-container"></div>
         </div>
@@ -996,13 +1016,11 @@
         let g, treeLayout, links, nodes, nodeGroups;
         
         if (useLeftOrientation) {
-            // Left-oriented horizontal dendrogram - aligned to left
             const marginLeft = 50;
             const marginTop = 50;
             const treeWidth = width - marginLeft - 50;
             const treeHeight = height - marginTop - 50;
             
-            // Apply zoom scale to the tree dimensions
             const scaledWidth = treeWidth * scale;
             const scaledHeight = treeHeight * scale;
             
@@ -1012,11 +1030,9 @@
             
             const root = treeLayout(hierarchy);
             
-            // Create a group that can be zoomed
             g = svg.append("g")
                 .attr("transform", `translate(${marginLeft}, ${marginTop})`);
             
-            // Draw links
             links = root.links().filter(link => link.source.depth >= 0);
             g.selectAll(".dendro-link")
                 .data(links)
@@ -1040,7 +1056,6 @@
                 .attr("class", "dendro-node")
                 .attr("transform", d => `translate(${d.y}, ${d.x})`);
             
-            // Circles for left orientation (same as before)
             nodeGroups.append("circle")
                 .attr("r", d => {
                     if (d.depth === 1) {
@@ -1102,8 +1117,7 @@
                     cleanupTooltip();
                 });
             
-            // Text labels for left orientation
-             nodeGroups.append("text")
+            nodeGroups.append("text")
                 .attr("dy", "0.35em")
                 .attr("x", 12)
                 .attr("text-anchor", "start")
@@ -1122,7 +1136,6 @@
                     return name;
                 });
         } else {
-            // Original circular dendrogram
             treeLayout = d3.tree()
                 .size([360, Math.max(radius, 100)])
                 .separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth);
@@ -1444,58 +1457,6 @@
         document.getElementById("file-name-display").innerText = fileName;
     }
     
-    function autoLoadCSV() {
-        const csvPath = '4_treemap.csv';
-        fetch(csvPath)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(csvText => {
-                console.log('CSV loaded automatically from data/4_treemap.csv');
-                const parsed = parseCSVToObjects(csvText);
-                if (parsed.length === 0) {
-                    console.warn("No valid data parsed from CSV");
-                    document.getElementById("file-name-display").innerText = "Auto-load failed";
-                    return;
-                }
-                rawGameData = parsed;
-                buildSearchIndex();
-                searchItems = [];
-                updateSearchTags();
-                currentLayer = 1;
-                renderTreemap();
-                document.getElementById("file-name-display").innerText = "data/4_treemap.csv (auto-loaded)";
-                document.getElementById("pub-count").innerText = top40Publishers.length;
-                document.getElementById("game-count").innerText = rawGameData.length;
-            })
-            .catch(error => {
-                console.error('Error loading CSV:', error);
-                document.getElementById("file-name-display").innerHTML = `<span style="color: #ff9f4a;">⚠️ Could not auto-load data/4_treemap.csv</span>`;
-                const treemapContainer = document.getElementById("treemap-container");
-                if (treemapContainer) {
-                    treemapContainer.innerHTML = `<div class="empty-state">
-                        ⚠️ Could not auto-load data/4_treemap.csv<br>
-                        <span style="font-size:0.7rem;">Error: ${error.message}</span><br><br>
-                        📁 Please use the "Upload CSV" button above to select the file manually
-                    </div>`;
-                }
-            });
-    }
-
-    function setupFileUpload() {
-        const fileInput = document.getElementById("csv-file-input");
-        fileInput.addEventListener("change", (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => loadAndRenderFromCSV(ev.target.result, file.name);
-            reader.readAsText(file, "UTF-8");
-        });
-    }
-    
     function setupSearch() {
         const searchInput = document.getElementById("search-input");
         const autocompleteList = document.getElementById("autocomplete-list");
@@ -1543,7 +1504,6 @@
             currentScale = parseFloat(e.target.value);
             scaleValue.textContent = currentScale.toFixed(2) + "x";
             if (currentView === "dendrogram" && selectedPublisher) {
-                // Clear and redraw with new scale
                 drawCircularDendrogram(selectedPublisher, currentScale);
             }
         });
@@ -1551,14 +1511,58 @@
         document.getElementById("sort-order").addEventListener("change", (e) => { currentSortOrder = e.target.value; if (currentView === "treemap") renderTreemap(); });
     }
     
+    // Auto-load CSV function
+    function autoLoadCSV() {
+        const csvPath = '4_treemap.csv';
+        fetch(csvPath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(csvText => {
+                console.log('CSV loaded automatically from 4_treemap.csv');
+                const parsed = parseCSVToObjects(csvText);
+                if (parsed.length === 0) {
+                    console.warn("No valid data parsed from CSV");
+                    document.getElementById("file-name-display").innerText = "Auto-load failed";
+                    return;
+                }
+                rawGameData = parsed;
+                buildSearchIndex();
+                searchItems = [];
+                updateSearchTags();
+                currentLayer = 1;
+                renderTreemap();
+                if (typeof t === 'function') {
+                    document.getElementById("file-name-display").innerHTML = `✅ ${rawGameData.length} ${t('games_loaded')}`;
+                } else {
+                    document.getElementById("file-name-display").innerText = `✅ ${rawGameData.length} games loaded`;
+                }
+                document.getElementById("pub-count").innerText = top40Publishers.length;
+                document.getElementById("game-count").innerText = rawGameData.length;
+            })
+            .catch(error => {
+                console.error('Error loading CSV:', error);
+                document.getElementById("file-name-display").innerHTML = `<span style="color: #ff9f4a;">⚠️ Error loading 4_treemap.csv: ${error.message}</span>`;
+                const treemapContainer = document.getElementById("treemap-container");
+                if (treemapContainer) {
+                    treemapContainer.innerHTML = `<div class="empty-state">
+                        ⚠️ Could not auto-load 4_treemap.csv<br>
+                        <span style="font-size:0.7rem;">Error: ${error.message}</span><br><br>
+                        📁 Please check that the file exists in the same folder
+                    </div>`;
+                }
+            });
+    }
+    
     window.removeSearchItem = removeSearchItem;
     window.clearAllSearchItems = clearAllSearchItems;
     
     document.addEventListener("DOMContentLoaded", () => {
-        setupFileUpload();
         setupNavigation();
         setupSearch();
-        // Auto-load CSV when page loads
         autoLoadCSV();
     });
 </script>
