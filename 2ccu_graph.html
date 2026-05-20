@@ -6,6 +6,8 @@
     <title>D3.js Interactive: Video Game Player Retention Analysis</title>
     <!-- D3.js library -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Language support -->
+    <script src="language.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap');
         
@@ -23,11 +25,43 @@
             min-height: 100vh;
         }
         
+        /* Language Selector Styles */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: rgba(239, 223, 192, 0.1);
+            border: 1px solid rgba(239, 223, 192, 0.3);
+            color: #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        .lang-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+            border-color: #EFDFC0;
+        }
+        
         .dashboard-container {
             max-width: 1600px;
             margin: 0 auto;
             background: #1B1B1B;
-            padding-bottom: 100px; /* Add padding to prevent content from hiding behind fixed element */
+            padding-bottom: 100px;
         }
 
         .main-title {
@@ -54,36 +88,6 @@
             background: #2a2a2a;
             border: 2px dashed #EFDFC0;
             margin-bottom: 0;
-        }
-
-        .file-label {
-            background: #EFDFC0;
-            color: #1B1B1B;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Source Sans Pro', sans-serif;
-        }
-
-        .file-label:hover {
-            background: #d4c4a0;
-            transform: translateY(-2px);
-        }
-
-        #file-input {
-            display: none;
-        }
-
-        .upload-info, .status-badge {
-            font-size: 14px;
-            font-family: 'Source Sans Pro', monospace;
-            color: #EFDFC0;
-            background: #2a2a2a;
-            padding: 6px 14px;
-            border-radius: 6px;
         }
 
         .controls-row {
@@ -426,25 +430,6 @@
             font-family: 'Source Sans Pro', monospace;
         }
 
-        .footer-file-label {
-            background: #2a2a2a;
-            border: 1px solid #EFDFC0;
-            color: #EFDFC0;
-            padding: 6px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Source Sans Pro', monospace;
-            font-size: 12px;
-            transition: all 0.2s;
-            display: inline-block;
-        }
-
-        .footer-file-label:hover {
-            background: #EFDFC0;
-            color: #1B1B1B;
-            border-color: #EFDFC0;
-        }
-
         .footer-status {
             margin-top: 8px;
             font-size: 11px;
@@ -455,23 +440,29 @@
 </head>
 <body>
 <div class="dashboard-container">
-    <div class="main-title">Only a few games are successful at player retention</div>
-    <div class="sub-title">Change in % of player number during one year after CCU peak</div>
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
+        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+    </div>
+
+    <div class="main-title" data-i18n="ccu_title">Only a few games are successful at player retention</div>
+    <div class="sub-title" data-i18n="ccu_subtitle">Change in % of player number during one year after CCU peak</div>
 
     <div class="controls-row">
         <div class="search-section">
-            <div class="search-label">🎮 Search Games (max 5 highlights)</div>
+            <div class="search-label" data-i18n="search_game">🎮 Search Games (max 5 highlights)</div>
             <div class="search-input-container">
-                <input type="text" id="game-search-input" class="search-input" placeholder="Type game name...">
+                <input type="text" id="game-search-input" class="search-input" data-i18n="search_placeholder" placeholder="Type game name...">
                 <div id="game-suggestions" class="suggestions"></div>
             </div>
             <div id="highlighted-games" class="selected-items"></div>
         </div>
 
         <div class="search-section">
-            <div class="search-label">🎭 Filter by Genre (max 3 genres)</div>
+            <div class="search-label" data-i18n="filter_genre">🎭 Filter by Genre (max 3 genres)</div>
             <div class="search-input-container">
-                <input type="text" id="genre-search-input" class="search-input" placeholder="Type genre...">
+                <input type="text" id="genre-search-input" class="search-input" data-i18n="genre_placeholder" placeholder="Type genre...">
                 <div id="genre-suggestions" class="suggestions"></div>
             </div>
             <div id="selected-genres" class="selected-items"></div>
@@ -480,31 +471,31 @@
 
     <div class="filter-bar">
         <div class="filter-group">
-            <span>🎯 Filter by Player Type:</span>
+            <span data-i18n="player_type">🎯 Filter by Player Type:</span>
             <div class="filter-buttons" id="type-filter-buttons"></div>
-            <button id="reset-filter" class="reset-btn">✖ Show all player types</button>
+            <button id="reset-filter" class="reset-btn" data-i18n="reset_filters">✖ Show all player types</button>
         </div>
         
         <div class="display-mode-group">
-            <span>📊 Display Mode:</span>
+            <span data-i18n="display_mode">📊 Display Mode:</span>
             <div class="mode-buttons">
-                <button class="mode-btn" data-mode="lines">Lines Only</button>
-                <button class="mode-btn active" data-mode="both">Lines & Points</button>
-                <button class="mode-btn" data-mode="points">Points Only</button>
+                <button class="mode-btn" data-mode="lines" data-i18n="lines_only">Lines Only</button>
+                <button class="mode-btn active" data-mode="both" data-i18n="lines_points">Lines & Points</button>
+                <button class="mode-btn" data-mode="points" data-i18n="points_only">Points Only</button>
             </div>
         </div>
 
         <div class="aggregate-toggle-group">
-            <span>📈 Aggregate Mode:</span>
-            <button id="aggregate-toggle" class="aggregate-btn">Show Aggregate Lines</button>
+            <span data-i18n="aggregate_mode">📈 Aggregate Mode:</span>
+            <button id="aggregate-toggle" class="aggregate-btn" data-i18n="show_aggregate">Show Aggregate Lines</button>
         </div>
     </div>
 
     <div class="zoom-section">
-        <button class="zoom-btn" data-zoom="full">▸ Full Range (0-100%) ◂</button>
-        <button class="zoom-btn" data-zoom="high">▸ High Retention (67-100%) ◂</button>
-        <button class="zoom-btn" data-zoom="medium">▸ Medium Retention (34-66%) ◂</button>
-        <button class="zoom-btn" data-zoom="low">▸ Low Retention (0-33%) ◂</button>
+        <button class="zoom-btn" data-zoom="full" data-i18n="full_range">▸ Full Range (0-100%) ◂</button>
+        <button class="zoom-btn" data-zoom="high" data-i18n="high_retention">▸ High Retention (67-100%) ◂</button>
+        <button class="zoom-btn" data-zoom="medium" data-i18n="medium_retention">▸ Medium Retention (34-66%) ◂</button>
+        <button class="zoom-btn" data-zoom="low" data-i18n="low_retention">▸ Low Retention (0-33%) ◂</button>
     </div>
 
     <div class="chart-wrapper">
@@ -514,14 +505,8 @@
 </div>
 
 <footer class="footer">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-        <div>🔍 Hover on any line or point to see values • Aggregate mode shows % of games in each retention zone scaled to respective 33% section</div>
-        <label class="footer-file-label">
-            📂 Upload CSV
-            <input type="file" id="file-input" accept=".csv" style="display: none;">
-        </label>
-    </div>
-    <div id="file-status" class="footer-status">No file loaded</div>
+    <div>🔍 Hover on any line or point to see values • Aggregate mode shows % of games in each retention zone scaled to respective 33% section</div>
+    <div id="file-status" class="footer-status" data-i18n="loading">Loading data...</div>
 </footer>
 
 <script>
@@ -576,7 +561,6 @@
             low: Array(13).fill(0)
         };
         
-        // Only count games that have complete data (no missing values)
         const gamesWithCompleteData = filteredGames.filter(game => !game.hasMissingData);
         
         if (gamesWithCompleteData.length === 0) return null;
@@ -595,7 +579,6 @@
             });
         });
         
-        // Convert to percentages
         const totalGames = gamesWithCompleteData.length;
         ['high', 'medium', 'low'].forEach(zone => {
             aggregateData[zone] = aggregateData[zone].map(count => (count / totalGames) * 100);
@@ -604,16 +587,12 @@
         return aggregateData;
     }
     
-    // Function to map percentage value to Y coordinate based on zone
     function mapToZoneY(percentage, zone) {
         if (zone === 'high') {
-            // Map 0-100% to 67-100 range
             return 67 + (percentage / 100) * 33;
         } else if (zone === 'medium') {
-            // Map 0-100% to 34-66 range
             return 34 + (percentage / 100) * 32;
         } else {
-            // Map 0-100% to 0-33 range
             return (percentage / 100) * 33;
         }
     }
@@ -779,13 +758,10 @@
             .style("color", "#EFDFC0")
             .style("font-family", "'Source Sans Pro', monospace");
         
-        // Modify Y-axis based on aggregate mode and zoom range
         let yAxis;
         
         if (aggregateMode) {
-            // Check which zoom range is active
             if (currentZoomRange[0] === 67 && currentZoomRange[1] === 100) {
-                // High retention zoom - show 0-100% scale within 67-100 range
                 yAxis = d3.axisLeft(yScale).tickValues([67, 75, 83, 92, 100])
                     .tickFormat(d => {
                         if (d === 67) return "0%";
@@ -797,7 +773,6 @@
                     });
             } 
             else if (currentZoomRange[0] === 34 && currentZoomRange[1] === 66) {
-                // Medium retention zoom - show 0-100% scale within 34-66 range
                 yAxis = d3.axisLeft(yScale).tickValues([34, 42, 50, 58, 66])
                     .tickFormat(d => {
                         if (d === 34) return "0%";
@@ -809,7 +784,6 @@
                     });
             }
             else if (currentZoomRange[0] === 0 && currentZoomRange[1] === 33) {
-                // Low retention zoom - show 0-100% scale within 0-33 range
                 yAxis = d3.axisLeft(yScale).tickValues([0, 8, 16, 25, 33])
                     .tickFormat(d => {
                         if (d === 0) return "0%";
@@ -820,153 +794,17 @@
                         return "";
                     });
             }
-            else if (currentZoomRange[0] === 0 && currentZoomRange[1] === 100) {
-                // Full range - show all three zones with spaces
-                yAxis = d3.axisLeft(yScale).tickValues([0, 11, 22, 33, 34.5, 50, 65.5, 67, 80, 90, 100])
-                    .tickFormat(d => {
-                        // Low zone (0-33)
-                        if (d === 0) return "0%";
-                        if (d === 11) return "25%";
-                        if (d === 22) return "50%";
-                        if (d === 33) return "100%";
-                        
-                        // Space indicator
-                        if (d === 34.5) return "⌵";
-                        
-                        // Medium zone (34-66)
-                        if (d === 50) return "50%";
-                        if (d === 65.5) return "100%";
-                        
-                        // Space indicator
-                        if (d === 67) return "⌵";
-                        
-                        // High zone (67-100)
-                        if (d === 80) return "50%";
-                        if (d === 90) return "75%";
-                        if (d === 100) return "100%";
-                        return "";
-                    });
-            }
             else {
-                // Default fallback
                 yAxis = d3.axisLeft(yScale).ticks(8).tickFormat(d => d + "%");
             }
         } else {
-            // Normal Y-axis
             yAxis = d3.axisLeft(yScale).ticks(8).tickFormat(d => d + "%");
         }
         
-        const yAxisGroup = chartGroup.append("g")
+        chartGroup.append("g")
             .attr("class", "y-axis")
             .call(yAxis)
             .style("font-family", "'Source Sans Pro', monospace");
-        
-        // Color the Y-axis labels based on zones in aggregate mode
-        if (aggregateMode) {
-            if (currentZoomRange[0] === 67 && currentZoomRange[1] === 100) {
-                // High zoom - all labels in high zone color
-                yAxisGroup.selectAll(".tick text").attr("fill", AGGREGATE_COLORS[0]);
-            }
-            else if (currentZoomRange[0] === 34 && currentZoomRange[1] === 66) {
-                // Medium zoom - all labels in medium zone color
-                yAxisGroup.selectAll(".tick text").attr("fill", AGGREGATE_COLORS[1]);
-            }
-            else if (currentZoomRange[0] === 0 && currentZoomRange[1] === 33) {
-                // Low zoom - all labels in low zone color
-                yAxisGroup.selectAll(".tick text").attr("fill", AGGREGATE_COLORS[2]);
-            }
-            else if (currentZoomRange[0] === 0 && currentZoomRange[1] === 100) {
-                // Full range - color by zone
-                yAxisGroup.selectAll(".tick text").attr("fill", d => {
-                    // Low zone labels (0-33)
-                    if (d >= 0 && d <= 33) return AGGREGATE_COLORS[2];
-                    // Space indicators (34.5 and 67)
-                    if (d === 34.5 || d === 67) return "#EFDFC0";
-                    // Medium zone labels (34-66)
-                    if (d > 33 && d < 67) return AGGREGATE_COLORS[1];
-                    // High zone labels (67-100)
-                    if (d >= 67) return AGGREGATE_COLORS[0];
-                    return "#EFDFC0";
-                });
-            }
-        }
-        
-        // Add separator lines and background shading
-        if (currentZoomRange[0] === 0 && currentZoomRange[1] === 100) {
-            chartGroup.append("line")
-                .attr("x1", 0)
-                .attr("y1", yScale(66))
-                .attr("x2", innerWidth)
-                .attr("y2", yScale(66))
-                .attr("stroke", "#FA8112")
-                .attr("stroke-dasharray", "5,5")
-                .attr("stroke-width", 1)
-                .attr("opacity", 0.5);
-            
-            chartGroup.append("line")
-                .attr("x1", 0)
-                .attr("y1", yScale(33))
-                .attr("x2", innerWidth)
-                .attr("y2", yScale(33))
-                .attr("stroke", "#FA8112")
-                .attr("stroke-dasharray", "5,5")
-                .attr("stroke-width", 1)
-                .attr("opacity", 0.5);
-            
-            // Add zone background shading for aggregate mode in full range
-            if (aggregateMode) {
-                chartGroup.append("rect")
-                    .attr("x", 0)
-                    .attr("y", yScale(33))
-                    .attr("width", innerWidth)
-                    .attr("height", yScale(0) - yScale(33))
-                    .attr("fill", AGGREGATE_COLORS[2])
-                    .attr("opacity", 0.05);
-                
-                chartGroup.append("rect")
-                    .attr("x", 0)
-                    .attr("y", yScale(66))
-                    .attr("width", innerWidth)
-                    .attr("height", yScale(34) - yScale(66))
-                    .attr("fill", AGGREGATE_COLORS[1])
-                    .attr("opacity", 0.05);
-                
-                chartGroup.append("rect")
-                    .attr("x", 0)
-                    .attr("y", yScale(100))
-                    .attr("width", innerWidth)
-                    .attr("height", yScale(67) - yScale(100))
-                    .attr("fill", AGGREGATE_COLORS[0])
-                    .attr("opacity", 0.05);
-            }
-        } else if (aggregateMode && currentZoomRange[0] === 67 && currentZoomRange[1] === 100) {
-            // High zoom - add subtle background
-            chartGroup.append("rect")
-                .attr("x", 0)
-                .attr("y", yScale(100))
-                .attr("width", innerWidth)
-                .attr("height", yScale(67) - yScale(100))
-                .attr("fill", AGGREGATE_COLORS[0])
-                .attr("opacity", 0.08);
-        } else if (aggregateMode && currentZoomRange[0] === 34 && currentZoomRange[1] === 66) {
-            // Medium zoom - add subtle background
-            chartGroup.append("rect")
-                .attr("x", 0)
-                .attr("y", yScale(66))
-                .attr("width", innerWidth)
-                .attr("height", yScale(34) - yScale(66))
-                .attr("fill", AGGREGATE_COLORS[1])
-                .attr("opacity", 0.08);
-        } else if (aggregateMode && currentZoomRange[0] === 0 && currentZoomRange[1] === 33) {
-            // Low zoom - add subtle background
-            chartGroup.append("rect")
-                .attr("x", 0)
-                .attr("y", yScale(33))
-                .attr("width", innerWidth)
-                .attr("height", yScale(0) - yScale(33))
-                .attr("fill", AGGREGATE_COLORS[2])
-                .attr("opacity", 0.08);
-        }
         
         chartGroup.append("text")
             .attr("x", innerWidth / 2)
@@ -975,6 +813,7 @@
             .style("fill", "#EFDFC0")
             .style("font-size", "14px")
             .style("font-family", "'Source Sans Pro', monospace")
+            .attr("data-i18n", "months")
             .text("📆 Months →");
         
         chartGroup.append("text")
@@ -985,6 +824,7 @@
             .style("fill", "#EFDFC0")
             .style("font-size", "14px")
             .style("font-family", "'Source Sans Pro', monospace")
+            .attr("data-i18n", "player_retention")
             .text(aggregateMode ? "📊 Percentage of Games in Zone (0-100%)" : "📉 Player Retention (% of peak)");
     }
     
@@ -1015,17 +855,15 @@
                 ];
                 
                 zones.forEach(zone => {
-                    // Transform data to actual Y coordinates based on zone
                     const transformedData = zone.data.map(percentage => mapToZoneY(percentage, zone.zoneType));
                     
-                    // Create custom line generator for aggregate lines
                     const aggregateLineGenerator = d3.line()
                         .x((d, idx) => xScale(idx))
                         .y(d => yScale(d))
                         .defined(d => d !== null)
                         .curve(d3.curveMonotoneX);
                     
-                    const path = clipGroup.append("path")
+                    clipGroup.append("path")
                         .datum(transformedData)
                         .attr("class", "aggregate-line")
                         .attr("d", d => aggregateLineGenerator(d))
@@ -1034,61 +872,6 @@
                         .attr("stroke-width", 3)
                         .attr("stroke-opacity", 0.9)
                         .attr("stroke-linecap", "round");
-                    
-                    // Add hover for aggregate lines
-                    const hoverLine = chartGroup.append("path")
-                        .datum(transformedData)
-                        .attr("class", "aggregate-hover")
-                        .attr("d", d => aggregateLineGenerator(d))
-                        .attr("fill", "none")
-                        .attr("stroke", "transparent")
-                        .attr("stroke-width", 12)
-                        .attr("stroke-opacity", 0)
-                        .style("cursor", "pointer")
-                        .on("mouseenter", function() {
-                            d3.select(this.previousSibling).attr("stroke-width", 5);
-                        })
-                        .on("mousemove", function(event) {
-                            const mouseX = d3.pointer(event, chartGroup.node())[0];
-                            const xDate = xScale.invert(mouseX);
-                            let monthIndex = Math.round(xDate);
-                            monthIndex = Math.min(12, Math.max(0, monthIndex));
-                            const percentage = zone.data[monthIndex];
-                            const actualY = transformedData[monthIndex];
-                            
-                            tooltipDiv.style("opacity", 1)
-                                .html(`<strong>${zone.name}</strong><br>📆 ${monthLabels[monthIndex]}<br>📊 ${percentage.toFixed(1)}% of games<br>📈 Position: ${zone.yRange[0]}-${zone.yRange[1]}% range`)
-                                .style("left", (event.pageX + 12) + "px")
-                                .style("top", (event.pageY - 30) + "px");
-                        })
-                        .on("mouseleave", function() {
-                            d3.select(this.previousSibling).attr("stroke-width", 3);
-                            tooltipDiv.style("opacity", 0);
-                        });
-                    
-                    // Add data points with percentage labels
-                    transformedData.forEach((val, idx) => {
-                        if (val !== null && zone.data[idx] !== null) {
-                            const circle = clipGroup.append("circle")
-                                .attr("cx", xScale(idx))
-                                .attr("cy", yScale(val))
-                                .attr("r", 5)
-                                .attr("fill", zone.color)
-                                .attr("stroke", "#1B1B1B")
-                                .attr("stroke-width", 2)
-                                .attr("opacity", 0.9);
-                            
-                            // Add percentage label
-                            clipGroup.append("text")
-                                .attr("x", xScale(idx) + 8)
-                                .attr("y", yScale(val) - 5)
-                                .attr("fill", zone.color)
-                                .attr("font-size", "11px")
-                                .attr("font-family", "'Source Sans Pro', monospace")
-                                .attr("font-weight", "bold")
-                                .text(`${zone.data[idx].toFixed(1)}%`);
-                        }
-                    });
                 });
             }
         } else {
@@ -1101,7 +884,7 @@
                     const strokeWidth = isHighlighted ? 4.5 : 2;
                     const strokeOpacity = isHighlighted ? 1 : 0.6;
                     
-                    const path = clipGroup.append("path")
+                    clipGroup.append("path")
                         .datum(lineData)
                         .attr("class", "line-path")
                         .attr("d", d => lineGenerator(d))
@@ -1111,53 +894,12 @@
                         .attr("stroke-opacity", strokeOpacity)
                         .attr("stroke-linecap", "round")
                         .attr("stroke-dasharray", game.hasMissingData ? "6,4" : "none");
-                    
-                    // Add hover for lines
-                    const hoverLine = chartGroup.append("path")
-                        .datum(lineData)
-                        .attr("class", "line-hover")
-                        .attr("d", d => lineGenerator(d))
-                        .attr("fill", "none")
-                        .attr("stroke", "transparent")
-                        .attr("stroke-width", 12)
-                        .attr("stroke-opacity", 0)
-                        .style("cursor", "pointer")
-                        .on("mouseenter", function() {
-                            clipGroup.selectAll(".line-path").attr("stroke-width", 1.5).attr("stroke-opacity", 0.3);
-                            d3.select(this.parentNode.querySelectorAll(".line-path")[filteredGames.indexOf(game)])
-                                .attr("stroke-width", isHighlighted ? 6 : 4).attr("stroke-opacity", 1);
-                        })
-                        .on("mousemove", function(event) {
-                            const mouseX = d3.pointer(event, chartGroup.node())[0];
-                            const xDate = xScale.invert(mouseX);
-                            let monthIndex = Math.round(xDate);
-                            monthIndex = Math.min(12, Math.max(0, monthIndex));
-                            const retentionVal = lineData[monthIndex];
-                            const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
-                            
-                            tooltipDiv.style("opacity", 1)
-                                .html(`<strong>${game.gameName}</strong><br>🎭 Genres: ${genresDisplay}<br>🎮 Type: ${game.player_type}<br>📆 ${monthLabels[monthIndex]}<br>📊 Retention: ${retentionVal !== null ? retentionVal.toFixed(1) + '%' : 'N/A'}`)
-                                .style("left", (event.pageX + 12) + "px")
-                                .style("top", (event.pageY - 30) + "px");
-                        })
-                        .on("mouseleave", function() {
-                            clipGroup.selectAll(".line-path").attr("stroke-width", d => {
-                                const idx = Array.from(clipGroup.selectAll(".line-path").nodes()).indexOf(this.previousSibling);
-                                const gameName = filteredGames[idx]?.gameName;
-                                return highlightedGames.has(gameName) ? 4.5 : 2;
-                            }).attr("stroke-opacity", d => {
-                                const idx = Array.from(clipGroup.selectAll(".line-path").nodes()).indexOf(this.previousSibling);
-                                const gameName = filteredGames[idx]?.gameName;
-                                return highlightedGames.has(gameName) ? 1 : 0.6;
-                            });
-                            tooltipDiv.style("opacity", 0);
-                        });
                 }
                 
                 if (displayMode === "points" || displayMode === "both") {
                     lineData.forEach((val, idx) => {
                         if (val !== null && val >= currentZoomRange[0] && val <= currentZoomRange[1]) {
-                            const circle = clipGroup.append("circle")
+                            clipGroup.append("circle")
                                 .attr("cx", xScale(idx))
                                 .attr("cy", yScale(val))
                                 .attr("r", isHighlighted ? 6 : 4)
@@ -1166,23 +908,7 @@
                                 .attr("stroke-width", 2)
                                 .attr("opacity", 0.9)
                                 .attr("class", "data-circle")
-                                .style("cursor", "pointer")
-                                .on("mouseenter", function() {
-                                    d3.select(this).attr("r", isHighlighted ? 8 : 6);
-                                })
-                                .on("mousemove", function(event) {
-                                    const retentionVal = val;
-                                    const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
-                                    
-                                    tooltipDiv.style("opacity", 1)
-                                        .html(`<strong>${game.gameName}</strong><br>🎭 Genres: ${genresDisplay}<br>🎮 Type: ${game.player_type}<br>📆 ${monthLabels[idx]}<br>📊 Retention: ${retentionVal.toFixed(1)}%`)
-                                        .style("left", (event.pageX + 12) + "px")
-                                        .style("top", (event.pageY - 30) + "px");
-                                })
-                                .on("mouseleave", function() {
-                                    d3.select(this).attr("r", isHighlighted ? 6 : 4);
-                                    tooltipDiv.style("opacity", 0);
-                                });
+                                .style("cursor", "pointer");
                         }
                     });
                 }
@@ -1204,8 +930,6 @@
                 .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[1]};"></div><span>Medium Retention (34-66%) - % of games</span>`);
             legendDiv.append("div").attr("class", "legend-item")
                 .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[2]};"></div><span>Low Retention (0-33%) - % of games</span>`);
-            legendDiv.append("div").attr("class", "legend-item")
-                .html(`<span style="font-size:11px; opacity:0.8;">⚠️ Games with incomplete data excluded from aggregate</span>`);
         } else {
             legendDiv.append("span").attr("class", "legend-title").text("📊 Player Types:");
             
@@ -1225,18 +949,6 @@
                 legendDiv.append("div").attr("class", "legend-item")
                     .html(`<div class="circle-legend"></div><span>Monthly Data Point</span>`);
             }
-            
-            // Add dashed line information to legend
-            const hasDashedLines = filteredGames.some(game => game.hasMissingData);
-            if (hasDashedLines) {
-                legendDiv.append("div").attr("class", "legend-item")
-                    .html(`<div style="width:24px; height:2px; background: repeating-linear-gradient(90deg, #EFDFC0, #EFDFC0 6px, transparent 6px, transparent 12px);"></div><span>Incomplete Data (dashed line)</span>`);
-            }
-        }
-        
-        if (selectedGenres.size > 0) {
-            legendDiv.append("div").attr("class", "legend-item")
-                .html(`<span style="font-size:12px;">🎭 Genres: ${Array.from(selectedGenres).join(", ")}</span>`);
         }
         
         legendDiv.append("div").attr("class", "legend-item")
@@ -1434,10 +1146,14 @@
             aggregateMode = !aggregateMode;
             if (aggregateMode) {
                 this.classList.add("active");
-                this.textContent = "Hide Aggregate Lines";
+                this.setAttribute("data-i18n", "hide_aggregate");
+                if (typeof t === 'function') this.textContent = t('hide_aggregate');
+                else this.textContent = "Hide Aggregate Lines";
             } else {
                 this.classList.remove("active");
-                this.textContent = "Show Aggregate Lines";
+                this.setAttribute("data-i18n", "show_aggregate");
+                if (typeof t === 'function') this.textContent = t('show_aggregate');
+                else this.textContent = "Show Aggregate Lines";
             }
             applyFilters();
         });
@@ -1480,6 +1196,7 @@
         }
     }
     
+    // Auto-load CSV function
     function autoLoadCSV() {
         const csvPath = '2_ccu.csv';
         fetch(csvPath)
@@ -1490,9 +1207,10 @@
                 return response.text();
             })
             .then(csvText => {
-                console.log('CSV loaded automatically from data/2_ccu.csv');
+                console.log('CSV loaded automatically from 2_ccu.csv');
                 const statusDiv = document.getElementById("file-status");
-                statusDiv.textContent = "⏳ Loading auto CSV...";
+                if (typeof t === 'function') statusDiv.innerHTML = t('loading');
+                else statusDiv.textContent = "Loading CSV...";
                 
                 try {
                     const games = parseCSVAndBuild(csvText);
@@ -1518,7 +1236,8 @@
                     
                     const toggleBtn = document.getElementById("aggregate-toggle");
                     toggleBtn.classList.remove("active");
-                    toggleBtn.textContent = "Show Aggregate Lines";
+                    if (typeof t === 'function') toggleBtn.textContent = t('show_aggregate');
+                    else toggleBtn.textContent = "Show Aggregate Lines";
                     
                     renderFilterUI();
                     setupGameSearch();
@@ -1529,7 +1248,8 @@
                     applyFilters();
                     updateHighlightedGamesList();
                     updateSelectedGenresList();
-                    statusDiv.innerHTML = `✅ Auto-loaded ${rawData.length} games, ${allPlayerTypes.size} types, ${allGenres.size} genres`;
+                    if (typeof t === 'function') statusDiv.innerHTML = `✅ ${rawData.length} ${t('games_loaded')}`;
+                    else statusDiv.innerHTML = `✅ ${rawData.length} games loaded`;
                 } catch(err) {
                     statusDiv.innerHTML = `❌ Error: ${err.message}`;
                     console.error(err);
@@ -1541,66 +1261,9 @@
             .catch(error => {
                 console.error('Error loading CSV:', error);
                 const statusDiv = document.getElementById("file-status");
-                statusDiv.innerHTML = `<span style="color: #ff9f4a;">⚠️ Could not auto-load data/2_ccu.csv - ${error.message}</span><br>
-                                      <span style="font-size: 11px;">📁 Please use the "Upload CSV" button below to select the file manually</span>`;
+                statusDiv.innerHTML = `⚠️ Error loading 2_ccu.csv: ${error.message}`;
             });
     }
-    
-    document.getElementById("file-input").addEventListener("change", function(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const statusDiv = document.getElementById("file-status");
-        statusDiv.textContent = "⏳ Loading...";
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const csvContent = e.target.result;
-                const games = parseCSVAndBuild(csvContent);
-                rawData = games;
-                allPlayerTypes.clear();
-                rawData.forEach(g => allPlayerTypes.add(g.player_type));
-                activeTypes = [];
-                selectedGenres.clear();
-                highlightedGames.clear();
-                playerTypeColorMap.clear();
-                currentZoomRange = [0, 100];
-                displayMode = "both";
-                aggregateMode = false;
-                
-                document.querySelector(".mode-btn[data-mode='both']").classList.add("active");
-                document.querySelector(".mode-btn[data-mode='lines']").classList.remove("active");
-                document.querySelector(".mode-btn[data-mode='points']").classList.remove("active");
-                
-                document.querySelector(".zoom-btn[data-zoom='full']").classList.add("active");
-                document.querySelector(".zoom-btn[data-zoom='high']").classList.remove("active");
-                document.querySelector(".zoom-btn[data-zoom='medium']").classList.remove("active");
-                document.querySelector(".zoom-btn[data-zoom='low']").classList.remove("active");
-                
-                const toggleBtn = document.getElementById("aggregate-toggle");
-                toggleBtn.classList.remove("active");
-                toggleBtn.textContent = "Show Aggregate Lines";
-                
-                renderFilterUI();
-                setupGameSearch();
-                setupGenreSearch();
-                setupDisplayMode();
-                setupZoom();
-                setupAggregateToggle();
-                applyFilters();
-                updateHighlightedGamesList();
-                updateSelectedGenresList();
-                statusDiv.innerHTML = `✅ Loaded ${rawData.length} games, ${allPlayerTypes.size} types, ${allGenres.size} genres`;
-            } catch(err) {
-                statusDiv.innerHTML = `❌ Error: ${err.message}`;
-                console.error(err);
-                rawData = [];
-                filteredGames = [];
-                updateChart();
-            }
-        };
-        reader.readAsText(file);
-    });
     
     initChart();
     updateChart();
