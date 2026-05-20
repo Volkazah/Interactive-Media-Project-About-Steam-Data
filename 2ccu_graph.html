@@ -1022,10 +1022,10 @@
                         .attr("stroke-opacity", 0)
                         .style("cursor", "pointer")
                         .on("mouseenter", function() {
-                            // Dim all other lines
                             clipGroup.selectAll(".line-path").attr("stroke-width", 1.5).attr("stroke-opacity", 0.3);
                             // Highlight this line
-                            d3.select(this.previousSibling).attr("stroke-width", isHighlighted ? 6 : 4).attr("stroke-opacity", 1);
+                            d3.select(this.parentNode.querySelectorAll(".line-path")[filteredGames.indexOf(game)])
+                                .attr("stroke-width", isHighlighted ? 6 : 4).attr("stroke-opacity", 1);
                         })
                         .on("mousemove", function(event) {
                             const mouseX = d3.pointer(event, chartGroup.node())[0];
