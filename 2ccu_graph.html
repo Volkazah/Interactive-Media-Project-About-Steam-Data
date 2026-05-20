@@ -422,7 +422,7 @@
             font-size: 12px;
             text-align: center;
             color: #EFDFC0;
-            opacity: 0.7;
+            border-top: 1px solid #D98D00;
             font-family: 'Source Sans Pro', monospace;
         }
 
@@ -514,14 +514,8 @@
 </div>
 
 <footer class="footer">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-        <div>🔍 Hover on any line or point to see values • Aggregate mode shows % of games in each retention zone scaled to respective 33% section</div>
-        <label class="footer-file-label">
-            📂 Upload CSV
-            <input type="file" id="file-input" accept=".csv" style="display: none;">
-        </label>
-    </div>
-    <div id="file-status" class="footer-status">No file loaded</div>
+    <div>Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners</div>
+    <div id="file-status" class="footer-status">Loading data...</div>
 </footer>
 
 <script>
