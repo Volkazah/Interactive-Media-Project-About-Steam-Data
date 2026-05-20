@@ -528,16 +528,6 @@
             <div id="vis"></div>
         </div>
 
-        <!-- Floating upload panel - bottom left -->
-        <div class="upload-panel" id="uploadPanel">
-            <div class="upload-section" id="uploadSection">
-                <input type="file" id="csvFile" accept=".csv">
-                <label for="csvFile" class="upload-label">📁 Upload CSV File</label>
-                <div class="file-info">Click or drag & drop CSV file</div>
-            </div>
-            <div id="dataStats" class="stats-summary"></div>
-        </div>
-
         <!-- Bottom right panel for compared games -->
         <div class="games-panel" id="gamesPanel" style="display: none;">
             <div class="persistent-title">Compare up to 5 Games</div>
@@ -634,27 +624,6 @@
         reader.readAsText(file);
     }
     
-    uploadSection.addEventListener('click', (e) => {
-        if (e.target === uploadSection || e.target.classList.contains('upload-label') || e.target.classList.contains('file-info')) {
-            fileInput.click();
-        }
-    });
-    
-    uploadSection.addEventListener('dragover', (e) => { e.preventDefault(); uploadSection.classList.add('drag-over'); });
-    uploadSection.addEventListener('dragleave', () => { uploadSection.classList.remove('drag-over'); });
-    uploadSection.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadSection.classList.remove('drag-over');
-        const file = e.dataTransfer.files[0];
-        if (file && file.name.endsWith('.csv')) handleFileUpload(file);
-    });
-    
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-            handleFileUpload(e.target.files[0]);
-            fileInput.value = '';
-        }
-    });
     
     function normalizeCategory(category) {
         if (!category) return "unknown";
