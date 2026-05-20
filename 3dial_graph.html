@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Best of the Best | Game Discovery Engine</title>
+    <!-- Language support -->
+    <script src="language.js"></script>
     <style>
         * {
             margin: 0;
@@ -22,6 +24,38 @@
             font-family: 'Source Sans Pro', 'Inter', system-ui, sans-serif;
             padding: 10px;
         }
+        
+        /* Language Selector Styles */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: rgba(239, 223, 192, 0.1);
+            border: 1px solid rgba(239, 223, 192, 0.3);
+            color: #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        .lang-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+            border-color: #EFDFC0;
+        }
 
         .main-layout {
             display: flex;
@@ -37,11 +71,10 @@
         .main-wrapper {
             position: relative;
             width: min(80vw, 80vh, 800px);
-            margin: 20px auto 70px;   /* Reduced top margin since header has fixed height */
-            flex-shrink: 0;           /* Prevent shrinking */
+            margin: 20px auto 70px;
+            flex-shrink: 0;
         }
 
-        /* Vertical Year Selector */
         .vertical-selector {
             background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
             border-radius: 40px;
@@ -220,7 +253,7 @@
             margin-left: auto;
             margin-right: auto;
             padding: 0 40px;
-            min-height: 180px;        /* Fixed minimum height for up to 4 rows */
+            min-height: 180px;
             height: auto;
             display: flex;
             flex-direction: column;
@@ -236,8 +269,8 @@
             text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
             text-align: center;
             width: 100%;
-            white-space: nowrap;      /* Force single line */
-            overflow: visible;         /* Allow text to be visible */
+            white-space: nowrap;
+            overflow: visible;
         }
 
         .dynamic-title {
@@ -257,7 +290,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 140px;        /* Fixed minimum height for text content */
+            min-height: 140px;
             height: auto;
         }
 
@@ -284,7 +317,6 @@
             cursor: grabbing;
         }
 
-        /* Larger Center Card */
         .center-card {
             position: absolute;
             top: 50%;
@@ -319,7 +351,6 @@
             word-break: break-word;
             padding: 0 15px;
         }
-
 
         .legend {
             position: absolute;
@@ -359,7 +390,6 @@
             background: #EFDFC0;
             color: #1B1B1B;
         }
-        #csvInput { display: none; }
         
         .status-badge {
             position: fixed;
@@ -372,35 +402,6 @@
             font-family: 'Source Sans Pro', monospace;
             color: #EFDFC0;
             pointer-events: none;
-        }
-        
-        .warning-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            padding: 20px 30px;
-            border-radius: 20px;
-            text-align: center;
-            z-index: 200;
-            border: 1px solid #EFDFC0;
-            display: none;
-        }
-        
-        .warning-message.show {
-            display: block;
-        }
-        
-        .warning-message button {
-            margin-top: 15px;
-            padding: 8px 20px;
-            background: #EFDFC0;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            font-family: 'Source Sans Pro', monospace;
         }
         
         .reset-filters {
@@ -427,14 +428,14 @@
 
         @media (max-width: 1000px) {
             .header-text {
-                min-height: 160px;     /* Slightly smaller on mobile */
+                min-height: 160px;
                 padding: 0 20px;
                 margin-bottom: 20px;
             }
             
             .dynamic-title {
                 font-size: 24px;
-                min-height: 120px;     /* Smaller fixed height on mobile */
+                min-height: 120px;
                 padding: 0 15px;
                 line-height: 1.3;
             }
@@ -468,10 +469,16 @@
 </head>
 <body>
 
+<!-- Language Selector -->
+<div class="language-selector">
+    <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
+    <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+</div>
+
 <div class="main-layout">
     <div class="main-wrapper">
         <div class="header-text">
-            <div class="main-title">BEST OF THE BEST</div>
+            <div class="main-title" data-i18n="dial_title">BEST OF THE BEST</div>
             <div class="dynamic-title" id="dynamicTitle">Loading game data...</div>
         </div>
 
@@ -486,7 +493,7 @@
 
     <!-- Vertical Year Selector -->
     <div class="vertical-selector">
-        <h4>📅 YEAR</h4>
+        <h4 data-i18n="year">📅 YEAR</h4>
         <div class="year-wheel" id="yearWheel">
             <div class="year-items" id="yearItems"></div>
         </div>
@@ -497,26 +504,15 @@
     </div>
 
     <div class="toggle-panel">
-        <h3>🎮 CUSTOMIZE DIALS</h3>
+        <h3 data-i18n="customize_dials">🎮 CUSTOMIZE DIALS</h3>
         <div id="toggleContainer"></div>
     </div>
 </div>
 
 <div class="import-area">
-    <button class="reset-filters" id="resetBtn">⟳ Reset Filters</button>
-    <label class="import-btn" for="csvInput">📂 IMPORT CSV</label>
-    <input type="file" id="csvInput" accept=".csv">
+    <button class="reset-filters" id="resetBtn" data-i18n="reset_filters">⟳ Reset Filters</button>
 </div>
-<div class="status-badge" id="dataStatus">⚠️ No data — import CSV</div>
-
-<div class="warning-message" id="warningMsg">
-    <div>⚠️ Invalid CSV format</div>
-    <div style="font-size: 12px; margin-top: 10px;">Expected columns:<br>
-    game_name, release_year, recommendations_count, reviews, rating,<br>
-    median_playtime_hours, peak_players, steam_genres, player_type,<br>
-    supported_platforms, achievements_count, follows, price$</div>
-    <button onclick="this.parentElement.classList.remove('show')">OK</button>
-</div>
+<div class="status-badge" id="dataStatus" data-i18n="loading">Loading data...</div>
 
 <script>
     // ============================================================
@@ -574,7 +570,7 @@
         return true;
     }
 
-    // Metric options
+    // Metric options with translation keys
     const metricOptions = [
         'most recommended', 'high rated', 'most reviews', 'most achievements',
         'median playtime', 'peak CCU', 'most followers'
@@ -583,15 +579,6 @@
         'recommendations_count', 'rating', 'reviews', 'achievements_count',
         'median_playtime_hours', 'peak_players', 'follows'
     ];
-    const metricTextMap = {
-        'most recommended': 'has the most recommendations for',
-        'high rated': 'is the highest rated',
-        'most reviews': 'is the most reviewed',
-        'most achievements': 'has the most achievements',
-        'median playtime': 'has the highest median playtime',
-        'peak CCU': 'has the highest CCU peak',
-        'most followers': 'has the most followers'
-    };
 
     // Genre options
     const genreOptions = ['any', 'simulation', 'strategy', 'action', 'RPG', 'racing', 'indie', 'adventure', 'casual', 'sports'];
@@ -625,7 +612,7 @@
         if (count === 0) return [];
         
         const ringGap = 0.015;
-        const maxRadius = 1;  // Almost touches canvas edge
+        const maxRadius = 1;
         const minRadius = 0.22;
         const availableSpan = maxRadius - minRadius;
         const totalGaps = (count - 1) * ringGap;
@@ -730,34 +717,6 @@
             });
         }
         return games;
-    }
-    
-    function autoLoadCSV() {
-        const csvPath = '3_dial.csv';
-        fetch(csvPath)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(csvText => {
-                console.log('CSV loaded automatically from data/3_dial.csv');
-                const parsed = parseCSVtoGames(csvText);
-                if (parsed.length === 0) { 
-                    document.getElementById('warningMsg').classList.add('show');
-                    document.getElementById('dataStatus').innerHTML = '⚠️ CSV parsed but no valid games found';
-                    return; 
-                }
-                gamesDataset = parsed;
-                resetAllRings();
-                document.getElementById('dataStatus').innerHTML = `✅ Auto-loaded ${parsed.length.toLocaleString()} games from data/3_dial.csv`;
-            })
-            .catch(error => {
-                console.error('Error loading CSV:', error);
-                document.getElementById('dataStatus').innerHTML = `⚠️ Could not auto-load data/3_dial.csv - ${error.message}<br>📁 Please use "IMPORT CSV" button to select file manually`;
-                // Keep the manual upload option available as fallback
-            });
     }
 
     // ========== Filter functions ==========
@@ -867,7 +826,11 @@
         const priceRing = RINGS.find(r => r.name === 'price');
         
         const metricOption = metricRing?.options[metricRing.currentIdx] || 'high rated';
-        const metricText = metricTextMap[metricOption] || 'is the best';
+        let metricText = 'is the best';
+        if (typeof t === 'function') {
+            const metricKey = metricOption.replace(/ /g, '_');
+            metricText = t(metricKey) || metricText;
+        }
         
         const genreOption = genreRing?.options[genreRing.currentIdx] || 'any';
         const isSpecificGenre = genreOption !== 'any';
@@ -889,7 +852,6 @@
         const yearOption = currentYearFilter;
         const isSpecificYear = yearOption !== 'Any';
         
-        // Build the text parts array for better handling
         const textParts = [];
         textParts.push(`«${currentBestGame.name}» ${metricText}`);
         
@@ -921,22 +883,19 @@
             textParts.push('of all time');
         }
         
-        // Join with spaces
         return textParts.join(' ');
     }
-    // Function to scale text to fit container
+    
     function fitTextToContainer(text, containerWidth, containerHeight, fontSize, fontFamily) {
-        // Create temporary canvas to measure text
         const tempCanvas = document.createElement('canvas');
         const tempCtx = tempCanvas.getContext('2d');
         tempCtx.font = `${fontSize}px '${fontFamily}'`;
         
         let currentFontSize = fontSize;
         let textWidth = tempCtx.measureText(text).width;
-        const maxWidth = containerWidth * 0.9; // 90% of container width
-        const maxHeight = containerHeight * 0.8; // 80% of container height
+        const maxWidth = containerWidth * 0.9;
+        const maxHeight = containerHeight * 0.8;
         
-        // Scale down until text fits
         while ((textWidth > maxWidth || currentFontSize > maxHeight) && currentFontSize > 12) {
             currentFontSize = currentFontSize - 2;
             tempCtx.font = `${currentFontSize}px '${fontFamily}'`;
@@ -959,16 +918,13 @@
         const gameName = currentBestGame.name;
         const centerElement = document.getElementById('centerGameName');
         
-        // Get container dimensions
         const centerCard = document.querySelector('.center-card');
         const containerWidth = centerCard.offsetWidth;
         const containerHeight = centerCard.offsetHeight;
         
-        // Calculate appropriate font size
-        const baseFontSize = 28; // Starting font size in pixels
+        const baseFontSize = 28;
         const calculatedFontSize = fitTextToContainer(gameName, containerWidth, containerHeight, baseFontSize, 'Source Sans Pro');
         
-        // Apply the calculated font size
         centerElement.style.fontSize = `${calculatedFontSize}px`;
         centerElement.innerHTML = gameName;
         
@@ -991,15 +947,12 @@
             const angleStep = (Math.PI * 2) / segments;
             const startOffset = -Math.PI / 2 + ring.rotationAngle;
             
-            // Find which segment is at the top (12 o'clock position)
-            // This uses the actual angle of each segment's midpoint
             let activeSegmentIdx = 0;
             let smallestDistance = Infinity;
-            const targetAngle = -Math.PI / 2; // Top position
+            const targetAngle = -Math.PI / 2;
             
             for (let i = 0; i < segments; i++) {
                 const midAngle = startOffset + i * angleStep + angleStep / 2;
-                // Normalize angles to compare properly
                 let diff = Math.abs(midAngle - targetAngle);
                 diff = Math.min(diff, Math.abs(diff - Math.PI * 2));
                 if (diff < smallestDistance) {
@@ -1008,7 +961,6 @@
                 }
             }
             
-            // Update currentIdx if changed
             if (ring.currentIdx !== activeSegmentIdx) {
                 ring.currentIdx = activeSegmentIdx;
                 if (!dragging && !updateScheduled) {
@@ -1019,7 +971,6 @@
                 }
             }
             
-            // Draw all segments
             for (let i = 0; i < segments; i++) {
                 const start = startOffset + i * angleStep;
                 const end = start + angleStep;
@@ -1035,7 +986,6 @@
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
                 
-                // Draw text with larger font (40px equivalent)
                 const midAngle = start + angleStep / 2;
                 const textRadius = (inner + outer) / 2;
                 const x = centerX + Math.cos(midAngle) * textRadius;
@@ -1043,7 +993,6 @@
                 
                 ctx.save();
                 ctx.translate(x, y);
-                // Rotate to follow the circle's curve
                 ctx.rotate(midAngle + Math.PI/2);
                 ctx.fillStyle = isActive ? '#1B1B1B' : ring.colors.inactiveText;
                 ctx.font = `500 ${Math.max(14, centerX * 0.035)}px 'Source Sans Pro', sans-serif`;
@@ -1051,11 +1000,15 @@
                 ctx.textBaseline = "middle";
                 let label = ring.options[i];
                 if (label === 'single&multi-player') label = 'Single & Multi';
+                if (typeof t === 'function' && ring.name === 'metric') {
+                    const translationKey = label.replace(/ /g, '_');
+                    const translated = t(translationKey);
+                    if (translated && translated !== translationKey) label = translated;
+                }
                 ctx.fillText(label, 0, 0);
                 ctx.restore();
             }
             
-            // Draw ring borders
             ctx.beginPath();
             ctx.arc(centerX, centerY, outer, 0, Math.PI*2);
             ctx.strokeStyle = 'rgba(0,0,0,0.15)';
@@ -1065,7 +1018,6 @@
             ctx.stroke();
         }
         
-        // Top indicator triangle
         const topY = centerY - centerX * 0.88;
         ctx.beginPath();
         ctx.moveTo(centerX - 8, topY);
@@ -1231,7 +1183,6 @@
         e.preventDefault();
         const currentAngle = getAngleFromEvent(e);
         let delta = currentAngle - dragStartAngle;
-        // Normalize delta to prevent huge jumps
         if (delta > Math.PI) delta -= Math.PI * 2;
         if (delta < -Math.PI) delta += Math.PI * 2;
         RINGS[activeRingIdx].rotationAngle = dragStartRotation + delta;
@@ -1271,7 +1222,15 @@
             const item = document.createElement('div');
             item.className = 'toggle-item';
             item.onclick = () => toggleRing(ring.name);
-            item.innerHTML = `<span class="toggle-label">${ring.label}</span><div class="toggle-switch ${visibleRings[ring.name] ? 'active' : ''}"></div>`;
+            let label = ring.label;
+            if (typeof t === 'function') {
+                const labelKey = ring.name === 'metric' ? 'metric' : 
+                                ring.name === 'genre' ? 'genre' :
+                                ring.name === 'player' ? 'player_type_label' :
+                                ring.name === 'os' ? 'supported_os' : 'price';
+                label = t(labelKey) || label;
+            }
+            item.innerHTML = `<span class="toggle-label">${label}</span><div class="toggle-switch ${visibleRings[ring.name] ? 'active' : ''}"></div>`;
             container.appendChild(item);
         });
     }
@@ -1289,22 +1248,36 @@
         drawRings();
     }
 
-    // CSV loading
-    document.getElementById('csvInput').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            const parsed = parseCSVtoGames(ev.target.result);
-            if (parsed.length === 0) { document.getElementById('warningMsg').classList.add('show'); return; }
-            gamesDataset = parsed;
-            resetAllRings();
-            document.getElementById('dataStatus').innerHTML = `✅ ${parsed.length.toLocaleString()} games loaded`;
-        };
-        reader.readAsText(file, 'UTF-8');
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', resetAllRings);
+    // Auto-load CSV
+    function autoLoadCSV() {
+        const csvPath = '3_dial.csv';
+        fetch(csvPath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(csvText => {
+                console.log('CSV loaded automatically from 3_dial.csv');
+                const parsed = parseCSVtoGames(csvText);
+                if (parsed.length === 0) { 
+                    document.getElementById('dataStatus').innerHTML = '⚠️ CSV parsed but no valid games found';
+                    return; 
+                }
+                gamesDataset = parsed;
+                resetAllRings();
+                if (typeof t === 'function') {
+                    document.getElementById('dataStatus').innerHTML = `✅ ${parsed.length.toLocaleString()} ${t('games_loaded')}`;
+                } else {
+                    document.getElementById('dataStatus').innerHTML = `✅ ${parsed.length.toLocaleString()} games loaded`;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading CSV:', error);
+                document.getElementById('dataStatus').innerHTML = `⚠️ Error loading 3_dial.csv: ${error.message}`;
+            });
+    }
 
     // Initialize
     updateToggleUI();
@@ -1320,6 +1293,8 @@
     window.addEventListener('touchmove', onDragMove);
     window.addEventListener('touchend', onDragEnd);
     canvas.style.cursor = 'grab';
+    
+    document.getElementById('resetBtn').addEventListener('click', resetAllRings);
     
     // Auto-load CSV when page loads
     autoLoadCSV();
