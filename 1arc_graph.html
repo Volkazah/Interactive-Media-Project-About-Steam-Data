@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steam Games - Gamer Reviews Flow Visualization</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="language.js"></script>
     <style>
         * {
             margin: 0;
@@ -178,6 +179,38 @@
 
         .clear-btn:hover {
             background: rgba(231, 76, 60, 0.8);
+        }
+
+        /* Language Selector Styles */
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .lang-btn {
+            background: rgba(239, 223, 192, 0.1);
+            border: 1px solid rgba(239, 223, 192, 0.3);
+            color: #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .lang-btn:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+        
+        .lang-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+            border-color: #EFDFC0;
         }
 
         /* Main content area */
@@ -500,27 +533,31 @@
 </head>
 <body>
 <div class="container">
+    <div class="language-selector">
+        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
+        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+    </div>
     <div class="title-section">
-        <div class="main-title">Gamers do change their opinion about videogames</div>
-        <div class="sub-title">and often not in a better way</div>
-        <div class="sub-title" style="font-size: 36px; margin-top: 10px;">distribution change in gamer's reviews across 3139 top reviewed games in April 2026</div>
+        <div class="main-title" data-i18n="arc_title">Gamers do change their opinion about videogames</div>
+        <div class="sub-title" data-i18n="arc_subtitle">and often not in a better way</div>
+        <div class="sub-title" style="font-size: 36px; margin-top: 10px;" data-i18n="arc_description">distribution change in gamer's reviews across 3139 top reviewed games in April 2026</div>
     </div>
 
     <!-- Top controls bar -->
     <div class="top-controls" id="topControls" style="display: none;">
         <div class="search-container">
-            <input type="text" id="gameSearch" placeholder="Search game..." autocomplete="off">
+            <input type="text" id="gameSearch" data-i18n="search_placeholder" placeholder="Search game..." autocomplete="off">
             <div id="autocompleteList" class="autocomplete-items"></div>
         </div>
         
         <div class="filter-section">
-            <button id="filterBoth" class="filter-btn active">Both</button>
-            <button id="filterAscending" class="filter-btn">Ascending ↑</button>
-            <button id="filterDescending" class="filter-btn">Descending ↓</button>
+            <button id="filterBoth" class="filter-btn active" data-i18n="filter_both">Both</button>
+            <button id="filterAscending" class="filter-btn" data-i18n="filter_ascending">Ascending ↑</button>
+            <button id="filterDescending" class="filter-btn" data-i18n="filter_descending">Descending ↓</button>
         </div>
         
-        <button id="resetBtn" class="reset-btn">🔄 Reset Positions</button>
-        <button id="clearAllBtn" class="clear-btn">🗑 Clear All</button>
+        <button id="resetBtn" class="reset-btn" data-i18n="reset_positions">🔄 Reset Positions</button>
+        <button id="clearAllBtn" class="clear-btn" data-i18n="clear_all">🗑 Clear All</button>
     </div>
 
     <div class="main-content">
@@ -534,10 +571,10 @@
         
         <!-- Bottom right panel for compared games -->
         <div class="games-panel" id="gamesPanel" style="display: none;">
-            <div class="persistent-title">Compare up to 5 Games</div>
+            <div class="persistent-title" data-i18n="compare_games">Compare up to 5 Games</div>
             <div class="games-list" id="gamesList"></div>
             <div id="searchResult" class="search-result"></div>
-            <div class="drag-instruction">💡 Drag spheres • Hover for details</div>
+            <div class="drag-instruction" data-i18n="drag_instruction">💡 Drag spheres • Hover for details</div>
             <div class="scale-info" id="scaleInfo"></div>
         </div>
     </div>
@@ -887,6 +924,20 @@
             }, 300);
         }
     }
+    // Function to update dynamically created content after language change
+    function updateDynamicTranslations() {
+        // Update the search result text if there are active games
+        if (typeof updateSearchResults === 'function') {
+            updateSearchResults();
+        }
+        
+        // Update any other dynamically generated text
+        const dataStats = document.getElementById('dataStats');
+        if (dataStats && dataStats.innerHTML.includes('games loaded')) {
+            const gameCount = gamesData.length;
+            dataStats.innerHTML = `✅ ${gameCount.toLocaleString()} ${t('games_loaded')}`;
+        }
+    }
     
     function updateSearchResults() {
         const searchResult = document.getElementById('searchResult');
@@ -899,11 +950,26 @@
             <div class="result-item" style="border-left-color: ${ANIMATION_COLORS[item.colorIndex]};">
                 <strong>${item.game.name}</strong><br>
                 <span style="font-size: 12px; color: #aaa;">${item.game.totalCategory} → ${item.game.recentCategory}</span><br>
-                <span style="font-size: 12px; color: #6bcf7f;">📊 ${item.game.recentNumber.toLocaleString()} recent reviews</span>
+                <span style="font-size: 12px; color: #6bcf7f;" data-i18n="recent_reviews">📊 ${item.game.recentNumber.toLocaleString()} recent reviews</span>
             </div>
         `).join('');
     }
+        function saveLanguagePreference(lang) {
+        localStorage.setItem('preferred_language', lang);
+    }
     
+    // Modify the language selector click handlers (add this after the language.js loads)
+    document.addEventListener('DOMContentLoaded', () => {
+        // Existing code...
+        
+        // Add click handlers for language buttons
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lang = btn.dataset.lang;
+                saveLanguagePreference(lang);
+            });
+        });
+    });
     function setFilter(filter) {
         currentFilter = filter;
         
@@ -978,7 +1044,7 @@
             
             if (gamesData.length === 0) throw new Error("No valid game data found");
             
-            document.getElementById('dataStats').innerHTML = `✅ ${gamesData.length.toLocaleString()} games loaded`;
+            document.getElementById('dataStats').innerHTML = `✅ ${gamesData.length.toLocaleString()} ${t('games_loaded')}`;;
             document.getElementById('topControls').style.display = 'flex';
             document.getElementById('gamesPanel').style.display = 'block';
             document.getElementById('visContainer').classList.add('active');
