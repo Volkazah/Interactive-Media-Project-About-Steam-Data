@@ -1051,58 +1051,6 @@
             alert(errorText);
         }
     }
-    
-    function autoLoadCSV() {
-    // Try multiple possible paths for flexibility
-        const possiblePaths = [
-            '6_radar.csv',           // Same directory
-            './6_radar.csv',         // Explicit current directory
-            '/6_radar.csv',          // Root relative
-            'data/6_radar.csv'       // Common data folder
-        ];
-        
-        function tryLoadCSV(index) {
-            if (index >= possiblePaths.length) {
-                console.error('Could not load CSV from any path');
-                const fileNameSpan = document.getElementById("file-name-display");
-                if (fileNameSpan) {
-                    fileNameSpan.innerHTML = `⚠️ Please upload CSV manually`;
-                    fileNameSpan.style.color = "#D98D00";
-                }
-                return;
-            }
-            
-            const csvPath = possiblePaths[index];
-            console.log(`Attempting to load CSV from: ${csvPath}`);
-            
-            fetch(csvPath)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    // Check if content looks like CSV
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && !contentType.includes('text/csv') && !contentType.includes('text/plain')) {
-                        console.warn(`Unexpected content type: ${contentType}`);
-                    }
-                    return response.text();
-                })
-                .then(csvText => {
-                    // Validate it's actually CSV content
-                    if (!csvText.trim().startsWith('game_name') && !csvText.includes('game_name')) {
-                        throw new Error('File does not appear to be a valid CSV (missing game_name column)');
-                    }
-                    console.log(`CSV loaded successfully from ${csvPath}, size: ${csvText.length} bytes`);
-                    loadDataFromCSV(csvText, '6_radar.csv');
-                })
-                .catch(error => {
-                    console.warn(`Failed to load from ${csvPath}:`, error.message);
-                    tryLoadCSV(index + 1);
-                });
-        }
-        
-        tryLoadCSV(0);
-    }
 
     
     function handleCSVUpload(file) {
@@ -1205,6 +1153,57 @@
     }
     
     init();
+    function autoLoadCSV() {
+    // Try multiple possible paths for flexibility
+        const possiblePaths = [
+            '6_radar.csv',           // Same directory
+            './6_radar.csv',         // Explicit current directory
+            '/6_radar.csv',          // Root relative
+            'data/6_radar.csv'       // Common data folder
+        ];
+        
+        function tryLoadCSV(index) {
+            if (index >= possiblePaths.length) {
+                console.error('Could not load CSV from any path');
+                const fileNameSpan = document.getElementById("file-name-display");
+                if (fileNameSpan) {
+                    fileNameSpan.innerHTML = `⚠️ Please upload CSV manually`;
+                    fileNameSpan.style.color = "#D98D00";
+                }
+                return;
+            }
+            
+            const csvPath = possiblePaths[index];
+            console.log(`Attempting to load CSV from: ${csvPath}`);
+            
+            fetch(csvPath)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    // Check if content looks like CSV
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && !contentType.includes('text/csv') && !contentType.includes('text/plain')) {
+                        console.warn(`Unexpected content type: ${contentType}`);
+                    }
+                    return response.text();
+                })
+                .then(csvText => {
+                    // Validate it's actually CSV content
+                    if (!csvText.trim().startsWith('game_name') && !csvText.includes('game_name')) {
+                        throw new Error('File does not appear to be a valid CSV (missing game_name column)');
+                    }
+                    console.log(`CSV loaded successfully from ${csvPath}, size: ${csvText.length} bytes`);
+                    loadDataFromCSV(csvText, '6_radar.csv');
+                })
+                .catch(error => {
+                    console.warn(`Failed to load from ${csvPath}:`, error.message);
+                    tryLoadCSV(index + 1);
+                });
+        }
+        
+        tryLoadCSV(0);
+    }
     
     // Auto-load CSV when page loads
     autoLoadCSV();
