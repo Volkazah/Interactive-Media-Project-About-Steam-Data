@@ -1538,8 +1538,8 @@
         });
     }
     
-    function autoLoadCSV() {
-        // FIXED: CSV is in the same folder, not in 'data/' subfolder
+   function autoLoadCSV() {
+    // FIXED: CSV is in the same folder
         const csvPath = '2_ccu.csv';
         
         console.log('Auto-loading CSV from:', csvPath);
@@ -1578,7 +1578,7 @@
                     
                     const toggleBtn = document.getElementById("aggregate-toggle");
                     toggleBtn.classList.remove("active");
-                    toggleBtn.textContent = t('show_aggregate', "Show Aggregate Lines");
+                    toggleBtn.textContent = "Show Aggregate Lines";
                     
                     renderFilterUI();
                     setupGameSearch();
@@ -1586,12 +1586,18 @@
                     setupDisplayMode();
                     setupZoom();
                     setupAggregateToggle();
+                    
+                    // CRITICAL FIX: Call applyFilters AFTER data is loaded
                     applyFilters();
                     updateHighlightedGamesList();
                     updateSelectedGenresList();
                     
-                    const gamesLoadedMsg = t('games_loaded', 'games loaded');
-                    console.log(`✅ Auto-loaded ${rawData.length} ${gamesLoadedMsg}`);
+                    const gamesLoadedMsg = `${rawData.length} games loaded`;
+                    console.log(`✅ Auto-loaded ${gamesLoadedMsg}`);
+                    
+                    // Also update the chart directly if needed
+                    updateChart();
+                    
                 } catch(err) {
                     console.error('Error parsing CSV:', err);
                     rawData = [];
@@ -1605,8 +1611,8 @@
             });
     }
     
+    // Don't call updateChart() before data loads - just initialize the chart container
     initChart();
-    updateChart();
     
     // Auto-load when page loads
     autoLoadCSV();
@@ -1618,10 +1624,11 @@
                 applyFilters();
             } else {
                 initChart();
-                updateChart();
+                // Don't call updateChart() here if no data
             }
         }, 100);
     });
+    
 </script>
 </body>
 </html>
