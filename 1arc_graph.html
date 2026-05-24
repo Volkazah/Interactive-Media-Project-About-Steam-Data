@@ -553,14 +553,14 @@
     
     function autoLoadCSV() {
     // Absolute path using your repository name
-        const csvPath = '/Interactive-Media-Project-About-Steam-Data/1_arc.csv';
+        const csvPath = '/Interactive-Media-Project-About-Steam-Data/arc.csv';
         
         console.log('🔄 Auto-loading CSV from absolute path:', csvPath);
         
         // Show loading message
         const dataStats = document.getElementById('dataStats');
         if (dataStats) {
-            dataStats.innerHTML = '⏳ Loading 1_arc.csv...';
+            dataStats.innerHTML = '⏳ Loading arc.csv...';
         }
         
         fetch(csvPath)
@@ -574,26 +574,26 @@
             .then(csvText => {
                 console.log('✅ CSV loaded successfully, size:', csvText.length, 'bytes');
                 console.log('📄 First line:', csvText.split('\n')[0].substring(0, 100));
-                loadDataFromCSV(csvText, '1_arc.csv');
+                loadDataFromCSV(csvText, 'arc.csv');
             })
             .catch(error => {
                 console.error('❌ Error loading CSV:', error);
                 
                 // Fallback: Try relative path
                 console.log('Trying fallback: relative path');
-                fetch('1_arc.csv')
+                fetch('arc.csv')
                     .then(response => {
                         if (!response.ok) throw new Error(`HTTP ${response.status}`);
                         return response.text();
                     })
                     .then(csvText => {
                         console.log('✅ Fallback successful! CSV loaded from relative path');
-                        loadDataFromCSV(csvText, '1_arc.csv');
+                        loadDataFromCSV(csvText, 'arc.csv');
                     })
                     .catch(fallbackError => {
                         console.error('❌ Fallback also failed:', fallbackError);
                         if (dataStats) {
-                            dataStats.innerHTML = `<span class="error">❌ Cannot find 1_arc.csv. Tried absolute path: ${csvPath} and relative path: 1_arc.csv</span>`;
+                            dataStats.innerHTML = `<span class="error">❌ Cannot find arc.csv. Tried absolute path: ${csvPath} and relative path: arc.csv</span>`;
                         }
                         // Show error in visualization area
                         const visDiv = document.getElementById('vis');
@@ -601,7 +601,7 @@
                             visDiv.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:400px; color:#ff6b6b; font-family:monospace; flex-direction:column; text-align:center; padding:20px;">
                                 <div style="font-size:48px; margin-bottom:16px;">📁</div>
                                 <div><strong>CSV File Not Found</strong></div>
-                                <div style="font-size:13px; margin-top:10px; color:#aaa;">Expected file: <code style="background:#333; padding:2px 6px; border-radius:4px;">1_arc.csv</code></div>
+                                <div style="font-size:13px; margin-top:10px; color:#aaa;">Expected file: <code style="background:#333; padding:2px 6px; border-radius:4px;">arc.csv</code></div>
                                 <div style="font-size:12px; margin-top:8px;">Make sure the file is in the root folder of the repository.</div>
                                 <div style="font-size:11px; margin-top:5px;">Tried: ${csvPath}</div>
                             </div>`;
