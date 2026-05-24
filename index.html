@@ -17,7 +17,8 @@
         }
         .container {
             text-align: center;
-            max-width: 1200px;
+            max-width: 1400px;
+            width: 100%;
         }
         h1 {
             color: #EFDFC0;
@@ -32,14 +33,14 @@
         }
         .viz-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
             margin-top: 40px;
         }
         .viz-card {
             background: #2a2a2a;
             border-radius: 16px;
-            padding: 30px 20px;
+            padding: 20px;
             text-align: center;
             transition: transform 0.3s, box-shadow 0.3s;
             border: 1px solid rgba(239,223,192,0.2);
@@ -52,9 +53,18 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             border-color: #EFDFC0;
         }
-        .viz-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
+        .viz-preview {
+            width: 100%;
+            height: 160px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            background: #1B1B1B;
+            overflow: hidden;
+        }
+        .viz-preview svg {
+            width: 100%;
+            height: 100%;
+            display: block;
         }
         .viz-title {
             color: #EFDFC0;
@@ -65,11 +75,26 @@
         .viz-desc {
             color: #aaa;
             font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .viz-stats {
+            display: inline-block;
+            background: rgba(239,223,192,0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #D98D00;
         }
         .note {
             margin-top: 50px;
             color: #666;
             font-size: 12px;
+        }
+        
+        /* Animation for subtle hover effect on SVGs */
+        .viz-card:hover .viz-preview svg {
+            filter: drop-shadow(0 0 4px rgba(217, 141, 0, 0.3));
+            transition: filter 0.3s;
         }
     </style>
 </head>
@@ -78,28 +103,270 @@
         <h1>🎮 Steam Data Visualizations</h1>
         <div class="subtitle">Interactive exploration of Steam game data</div>
         <div class="viz-grid">
+            
+            <!-- 1. ARC GRAPH - Flow visualization between categories -->
             <a href="1arc_graph.html" class="viz-card">
-                <div class="viz-icon">📊</div>
+                <div class="viz-preview">
+                    <svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid meet">
+                        <!-- Background -->
+                        <rect width="300" height="160" fill="#1B1B1B" rx="8"/>
+                        
+                        <!-- Nodes (circles) arranged in a circle -->
+                        <circle cx="80" cy="50" r="18" fill="#E7BB66" stroke="#D98D00" stroke-width="1.5"/>
+                        <circle cx="150" cy="35" r="22" fill="#EED196" stroke="#D98D00" stroke-width="1.5"/>
+                        <circle cx="220" cy="50" r="16" fill="#F0D9A8" stroke="#D98D00" stroke-width="1.5"/>
+                        <circle cx="240" cy="100" r="14" fill="#FDDEA0" stroke="#D98D00" stroke-width="1.5"/>
+                        <circle cx="200" cy="130" r="20" fill="#FFE7B6" stroke="#D98D00" stroke-width="1.5"/>
+                        <circle cx="130" cy="135" r="17" fill="#E7BB66" stroke="#D98D00" stroke-width="1.5"/>
+                        <circle cx="60" cy="100" r="15" fill="#EED196" stroke="#D98D00" stroke-width="1.5"/>
+                        
+                        <!-- Flow arcs (curved lines) between nodes -->
+                        <path d="M80 50 Q110 20 150 35" fill="none" stroke="#07BC00" stroke-width="2" stroke-dasharray="4,4" opacity="0.6"/>
+                        <path d="M150 35 Q190 20 220 50" fill="none" stroke="#D02752" stroke-width="2" stroke-dasharray="4,4" opacity="0.6"/>
+                        <path d="M220 50 Q250 80 240 100" fill="none" stroke="#07BC00" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6"/>
+                        <path d="M240 100 Q220 130 200 130" fill="none" stroke="#D02752" stroke-width="2.5" stroke-dasharray="4,4" opacity="0.6"/>
+                        <path d="M200 130 Q160 145 130 135" fill="none" stroke="#07BC00" stroke-width="2" stroke-dasharray="4,4" opacity="0.6"/>
+                        <path d="M130 135 Q90 135 60 100" fill="none" stroke="#D02752" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6"/>
+                        <path d="M60 100 Q50 70 80 50" fill="none" stroke="#07BC00" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6"/>
+                        
+                        <!-- Labels -->
+                        <text x="80" y="54" text-anchor="middle" fill="#000" font-size="7" font-weight="bold">OP</text>
+                        <text x="150" y="39" text-anchor="middle" fill="#000" font-size="7" font-weight="bold">VP</text>
+                        <text x="220" y="54" text-anchor="middle" fill="#000" font-size="7" font-weight="bold">MP</text>
+                        <text x="240" y="104" text-anchor="middle" fill="#000" font-size="7" font-weight="bold">MIX</text>
+                        <text x="200" y="134" text-anchor="middle" fill="#000" font-size="7" font-weight="bold">MN</text>
+                        <text x="130" y="139" text-anchor="middle" fill="#000" font-size="7" font-weight="bold">VN</text>
+                        <text x="60" y="104" text-anchor="middle" fill="#000" font-size="7" font-weight="bold">ON</text>
+                    </svg>
+                </div>
                 <div class="viz-title">Arc Graph</div>
                 <div class="viz-desc">Gamer reviews flow visualization</div>
+                <span class="viz-stats">3139 games</span>
             </a>
+            
+            <!-- 2. CCU GRAPH - Line chart with retention curves -->
             <a href="2ccu_graph.html" class="viz-card">
-                <div class="viz-icon">📈</div>
+                <div class="viz-preview">
+                    <svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid meet">
+                        <rect width="300" height="160" fill="#1B1B1B" rx="8"/>
+                        
+                        <!-- Grid lines -->
+                        <line x1="50" y1="20" x2="280" y2="20" stroke="#333" stroke-width="0.5"/>
+                        <line x1="50" y1="55" x2="280" y2="55" stroke="#333" stroke-width="0.5"/>
+                        <line x1="50" y1="90" x2="280" y2="90" stroke="#333" stroke-width="0.5"/>
+                        <line x1="50" y1="125" x2="280" y2="125" stroke="#333" stroke-width="0.5"/>
+                        
+                        <!-- Retention curves (declining lines) -->
+                        <!-- High retention game -->
+                        <path d="M60 30 Q120 35 180 45 Q220 55 270 70" fill="none" stroke="#1DCD9F" stroke-width="2.5" opacity="0.8"/>
+                        <!-- Medium retention game -->
+                        <path d="M60 40 Q120 60 180 80 Q220 95 270 110" fill="none" stroke="#FFD933" stroke-width="2" opacity="0.7"/>
+                        <!-- Low retention game -->
+                        <path d="M60 55 Q120 85 180 110 Q220 125 270 135" fill="none" stroke="#D02752" stroke-width="2" opacity="0.8"/>
+                        <!-- Dashed line (incomplete data) -->
+                        <path d="M60 35 Q120 55 180 70 Q220 80 270 95" fill="none" stroke="#9929EA" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6"/>
+                        
+                        <!-- Data points -->
+                        <circle cx="60" cy="30" r="2.5" fill="#1DCD9F"/>
+                        <circle cx="180" cy="45" r="2.5" fill="#1DCD9F"/>
+                        <circle cx="270" cy="70" r="2.5" fill="#1DCD9F"/>
+                        
+                        <!-- Axes -->
+                        <line x1="50" y1="20" x2="50" y2="140" stroke="#EFDFC0" stroke-width="1"/>
+                        <line x1="50" y1="140" x2="280" y2="140" stroke="#EFDFC0" stroke-width="1"/>
+                        
+                        <!-- Axis labels -->
+                        <text x="50" y="152" text-anchor="middle" fill="#EFDFC0" font-size="7">M1</text>
+                        <text x="110" y="152" text-anchor="middle" fill="#EFDFC0" font-size="7">M4</text>
+                        <text x="165" y="152" text-anchor="middle" fill="#EFDFC0" font-size="7">M7</text>
+                        <text x="220" y="152" text-anchor="middle" fill="#EFDFC0" font-size="7">M10</text>
+                        <text x="275" y="152" text-anchor="middle" fill="#EFDFC0" font-size="7">M13</text>
+                        
+                        <!-- Y-axis label -->
+                        <text x="30" y="80" text-anchor="middle" fill="#EFDFC0" font-size="7" transform="rotate(-90, 30, 80)">Retention %</text>
+                    </svg>
+                </div>
                 <div class="viz-title">CCU Graph</div>
                 <div class="viz-desc">Player retention analysis</div>
+                <span class="viz-stats">13 months data</span>
             </a>
+            
+            <!-- 3. DIAL GRAPH - Concentric ring selector -->
             <a href="3dial_graph.html" class="viz-card">
-                <div class="viz-icon">🥧</div>
+                <div class="viz-preview">
+                    <svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid meet">
+                        <rect width="300" height="160" fill="#1B1B1B" rx="8"/>
+                        
+                        <!-- Concentric rings at center -->
+                        <g transform="translate(150, 80)">
+                            <!-- Outer ring - Metric -->
+                            <circle cx="0" cy="0" r="58" fill="none" stroke="#FFE7B6" stroke-width="12"/>
+                            <circle cx="0" cy="0" r="58" fill="none" stroke="#FA8112" stroke-width="12" stroke-dasharray="25, 360"/>
+                            <text x="0" y="-58" text-anchor="middle" fill="#000" font-size="7" font-weight="bold">METRIC</text>
+                            <text x="55" y="-25" text-anchor="middle" fill="#000" font-size="7">RATING</text>
+                            
+                            <!-- Second ring - Genre -->
+                            <circle cx="0" cy="0" r="44" fill="none" stroke="#F0D9A8" stroke-width="10"/>
+                            <circle cx="0" cy="0" r="44" fill="none" stroke="#FA8112" stroke-width="10" stroke-dasharray="40, 360"/>
+                            <text x="0" y="-44" text-anchor="middle" fill="#000" font-size="7" font-weight="bold">GENRE</text>
+                            <text x="40" y="-15" text-anchor="middle" fill="#000" font-size="6">ACTION</text>
+                            
+                            <!-- Third ring - Player Type -->
+                            <circle cx="0" cy="0" r="32" fill="none" stroke="#EED196" stroke-width="9"/>
+                            <circle cx="0" cy="0" r="32" fill="none" stroke="#FA8112" stroke-width="9" stroke-dasharray="30, 360"/>
+                            <text x="0" y="-32" text-anchor="middle" fill="#000" font-size="6" font-weight="bold">PLAYER</text>
+                            
+                            <!-- Inner ring - OS -->
+                            <circle cx="0" cy="0" r="22" fill="none" stroke="#E7BB66" stroke-width="8"/>
+                            <circle cx="0" cy="0" r="22" fill="none" stroke="#FA8112" stroke-width="8" stroke-dasharray="20, 360"/>
+                            <text x="0" y="-22" text-anchor="middle" fill="#000" font-size="6">OS</text>
+                            
+                            <!-- Center -->
+                            <circle cx="0" cy="0" r="14" fill="#2a2a2a" stroke="#EFDFC0" stroke-width="1.5"/>
+                            <text x="0" y="2" text-anchor="middle" fill="#EFDFC0" font-size="6">TOP</text>
+                        </g>
+                        
+                        <!-- Top indicator triangle -->
+                        <polygon points="145,18 150,10 155,18" fill="#EFDFC0"/>
+                    </svg>
+                </div>
                 <div class="viz-title">Dial Graph</div>
                 <div class="viz-desc">Best of the best game discovery</div>
+                <span class="viz-stats">Interactive rings</span>
             </a>
+            
+            <!-- 4. TREEMAP - Nested rectangles -->
             <a href="4treemap.html" class="viz-card">
-                <div class="viz-icon">🌳</div>
+                <div class="viz-preview">
+                    <svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid meet">
+                        <rect width="300" height="160" fill="#1B1B1B" rx="8"/>
+                        
+                        <!-- Treemap rectangles (nested areas) -->
+                        <!-- Large publisher -->
+                        <rect x="15" y="15" width="130" height="90" fill="#D98D00" rx="3" opacity="0.9"/>
+                        <text x="25" y="35" fill="#000" font-size="9" font-weight="bold">Ubisoft</text>
+                        <text x="25" y="50" fill="#000" font-size="7">156 games</text>
+                        <text x="25" y="62" fill="#000" font-size="6">42 devs</text>
+                        
+                        <!-- Medium publisher -->
+                        <rect x="150" y="15" width="135" height="45" fill="#E7BB66" rx="3" opacity="0.85"/>
+                        <text x="160" y="32" fill="#000" font-size="8" font-weight="bold">EA</text>
+                        <text x="160" y="45" fill="#000" font-size="6">98 games</text>
+                        
+                        <!-- Another medium publisher -->
+                        <rect x="150" y="65" width="135" height="40" fill="#EED196" rx="3" opacity="0.8"/>
+                        <text x="160" y="80" fill="#000" font-size="8" font-weight="bold">Bethesda</text>
+                        <text x="160" y="93" fill="#000" font-size="6">67 games</text>
+                        
+                        <!-- Small publishers -->
+                        <rect x="15" y="110" width="60" height="35" fill="#F0D9A8" rx="3" opacity="0.75"/>
+                        <text x="20" y="125" fill="#000" font-size="7">CDPR</text>
+                        <text x="20" y="136" fill="#000" font-size="5">12 games</text>
+                        
+                        <rect x="80" y="110" width="65" height="35" fill="#FDDEA0" rx="3" opacity="0.7"/>
+                        <text x="85" y="125" fill="#000" font-size="7">Valve</text>
+                        <text x="85" y="136" fill="#000" font-size="5">8 games</text>
+                        
+                        <!-- Others group -->
+                        <rect x="150" y="110" width="135" height="35" fill="#FFE7B6" rx="3" opacity="0.6"/>
+                        <text x="160" y="125" fill="#000" font-size="7">Others</text>
+                        <text x="160" y="136" fill="#000" font-size="6">245 publishers</text>
+                    </svg>
+                </div>
                 <div class="viz-title">Treemap</div>
                 <div class="viz-desc">Publisher & developer distribution</div>
+                <span class="viz-stats">40+ publishers</span>
             </a>
+            
+            <!-- 5. SPIRAL GRAPH - Temporal spiral pattern -->
+            <a href="5spiral.html" class="viz-card">
+                <div class="viz-preview">
+                    <svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid meet">
+                        <rect width="300" height="160" fill="#1B1B1B" rx="8"/>
+                        
+                        <!-- Spiral path -->
+                        <g transform="translate(150, 80)">
+                            <!-- Main spiral (Archimedean spiral) -->
+                            <path d="M0 0 
+                                     C5 -5, 15 -10, 25 -8 
+                                     C40 -5, 50 5, 55 18 
+                                     C60 30, 55 45, 45 55 
+                                     C35 65, 20 68, 5 62 
+                                     C-15 55, -30 40, -35 20 
+                                     C-40 0, -32 -20, -15 -35 
+                                     C5 -50, 30 -55, 50 -45" 
+                                  fill="none" stroke="#D98D00" stroke-width="2.5" opacity="0.9"/>
+                            
+                            <!-- Data points along the spiral -->
+                            <circle cx="5" cy="-5" r="3" fill="#FA8112" opacity="0.8"/>
+                            <circle cx="25" cy="-8" r="4" fill="#FA8112" opacity="0.9"/>
+                            <circle cx="55" cy="18" r="5" fill="#FA8112" opacity="0.9"/>
+                            <circle cx="45" cy="55" r="4.5" fill="#FA8112" opacity="0.85"/>
+                            <circle cx="5" cy="62" r="3.5" fill="#FA8112" opacity="0.8"/>
+                            <circle cx="-35" cy="20" r="4" fill="#FA8112" opacity="0.9"/>
+                            <circle cx="-15" cy="-35" r="3" fill="#FA8112" opacity="0.8"/>
+                            <circle cx="50" cy="-45" r="4.5" fill="#FA8112" opacity="0.85"/>
+                            
+                            <!-- Center point -->
+                            <circle cx="0" cy="0" r="4" fill="#EFDFC0" stroke="#D98D00" stroke-width="1.5"/>
+                        </g>
+                        
+                        <!-- Labels -->
+                        <text x="20" y="20" fill="#EFDFC0" font-size="7" opacity="0.7">Start</text>
+                        <text x="240" y="25" fill="#EFDFC0" font-size="7" opacity="0.7">Time →</text>
+                    </svg>
+                </div>
+                <div class="viz-title">Spiral Graph</div>
+                <div class="viz-desc">Temporal data spiral visualization</div>
+                <span class="viz-stats">Time series</span>
+            </a>
+            
+            <!-- 6. RADAR CHART - Multi-dimensional comparison -->
+            <a href="6radar.html" class="viz-card">
+                <div class="viz-preview">
+                    <svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid meet">
+                        <rect width="300" height="160" fill="#1B1B1B" rx="8"/>
+                        
+                        <!-- Radar chart at center -->
+                        <g transform="translate(150, 80)">
+                            <!-- Background grid (hexagon) -->
+                            <!-- Outer hexagon -->
+                            <polygon points="0,-45 39,-22 39,22 0,45 -39,22 -39,-22" fill="none" stroke="#333" stroke-width="0.8"/>
+                            <!-- Middle hexagon -->
+                            <polygon points="0,-30 26,-15 26,15 0,30 -26,15 -26,-15" fill="none" stroke="#333" stroke-width="0.5"/>
+                            <!-- Inner hexagon -->
+                            <polygon points="0,-15 13,-7.5 13,7.5 0,15 -13,7.5 -13,-7.5" fill="none" stroke="#333" stroke-width="0.5"/>
+                            
+                            <!-- Axis lines -->
+                            <line x1="0" y1="-45" x2="0" y2="45" stroke="#444" stroke-width="0.5"/>
+                            <line x1="-39" y1="-22" x2="39" y2="22" stroke="#444" stroke-width="0.5"/>
+                            <line x1="-39" y1="22" x2="39" y2="-22" stroke="#444" stroke-width="0.5"/>
+                            
+                            <!-- Game 1 data (high performer) -->
+                            <polygon points="0,-40 35,-20 35,18 0,40 -35,20 -35,-18" 
+                                     fill="#FA8112" fill-opacity="0.3" stroke="#FA8112" stroke-width="1.5"/>
+                            
+                            <!-- Game 2 data (medium performer) -->
+                            <polygon points="0,-25 20,-12 25,10 0,28 -22,12 -20,-15" 
+                                     fill="#1DCD9F" fill-opacity="0.25" stroke="#1DCD9F" stroke-width="1.5" stroke-dasharray="3,3"/>
+                            
+                            <!-- Axis labels -->
+                            <text x="0" y="-50" text-anchor="middle" fill="#EFDFC0" font-size="6">Rating</text>
+                            <text x="50" y="-20" text-anchor="middle" fill="#EFDFC0" font-size="6">Sales</text>
+                            <text x="50" y="25" text-anchor="middle" fill="#EFDFC0" font-size="6">Players</text>
+                            <text x="0" y="55" text-anchor="middle" fill="#EFDFC0" font-size="6">Retention</text>
+                            <text x="-50" y="25" text-anchor="middle" fill="#EFDFC0" font-size="6">Reviews</text>
+                            <text x="-50" y="-20" text-anchor="middle" fill="#EFDFC0" font-size="6">Hours</text>
+                        </g>
+                    </svg>
+                </div>
+                <div class="viz-title">Radar Chart</div>
+                <div class="viz-desc">Multi-dimensional game comparison</div>
+                <span class="viz-stats">Compare games</span>
+            </a>
+            
         </div>
-        <div class="note">💡 Click any visualization to explore the data</div>
+        <div class="note">💡 Hover over cards • Click to explore • Language switcher available on each page</div>
     </div>
 </body>
 </html>
