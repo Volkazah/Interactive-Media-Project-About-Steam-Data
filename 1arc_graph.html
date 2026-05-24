@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Steam Games - Gamer Reviews Flow Visualization</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
@@ -17,63 +17,70 @@
             background-color: #1B1B1B;
             color: #EFDFC0;
             min-height: 100vh;
-            overflow: hidden;
-        }
-
-        .container {
+            padding: 20px;
             display: flex;
-            flex-direction: column;
-            height: 100vh;
-            position: relative;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Header with titles */
-        .title-section {
+        .dashboard {
+            max-width: 1600px;
+            width: 100%;
+            background: #1B1B1B;
+            border-radius: 28px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .header {
+            background: #1B1B1B;
+            color: #EFDFC0;
+            padding: 1.2rem 2rem;
+            border-bottom: 3px solid #D98D00;
             text-align: center;
-            padding: 20px 20px 10px 20px;
-            flex-shrink: 0;
         }
 
         .main-title {
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 60px;
+            font-family: 'Consolas', 'Source Sans Pro', monospace;
+            font-size: 38px;
             color: #EFDFC0;
-            font-weight: bold;
-            letter-spacing: 2px;
+            font-weight: 400;
+            letter-spacing: -0.3px;
+            margin: 0;
         }
 
         .sub-title {
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 46px;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 26px;
             color: #EFDFC0;
-            font-weight: bold;
-            letter-spacing: 1px;
-            margin-top: 5px;
+            opacity: 0.75;
+            margin-top: 8px;
         }
 
-        /* Top controls bar */
-        .top-controls {
+        .controls {
+            padding: 1.5rem 2rem;
+            background: #1B1B1B;
+            border-bottom: 1px solid #D98D00;
             display: flex;
+            flex-wrap: wrap;
+            align-items: center;
             justify-content: center;
             gap: 20px;
-            padding: 10px 20px;
-            flex-shrink: 0;
-            background: rgba(27, 27, 27, 0.8);
-            border-bottom: 1px solid rgba(239, 223, 192, 0.2);
         }
 
         .search-container {
             position: relative;
-            width: 300px;
+            width: 350px;
         }
 
         #gameSearch {
             width: 100%;
-            padding: 10px 15px;
-            font-size: 14px;
-            border: 1px solid rgba(239, 223, 192, 0.3);
-            border-radius: 25px;
-            background: rgba(239, 223, 192, 0.1);
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 1px solid #D98D00;
+            border-radius: 40px;
+            background: #2a2a2a;
             color: #EFDFC0;
             outline: none;
             transition: all 0.3s;
@@ -81,13 +88,8 @@
         }
 
         #gameSearch:focus {
-            background: rgba(239, 223, 192, 0.2);
             border-color: #EFDFC0;
-        }
-
-        #gameSearch::placeholder {
-            color: #888;
-            font-size: 12px;
+            box-shadow: 0 0 0 2px rgba(239,223,192,0.2);
         }
 
         .autocomplete-items {
@@ -96,109 +98,112 @@
             left: 0;
             right: 0;
             background: #2a2a2a;
-            border-radius: 8px;
-            max-height: 200px;
+            border-radius: 12px;
+            max-height: 250px;
             overflow-y: auto;
             z-index: 1000;
             margin-top: 4px;
-            border: 1px solid rgba(239, 223, 192, 0.2);
+            border: 1px solid #D98D00;
         }
 
         .autocomplete-item {
-            padding: 10px 15px;
+            padding: 12px 18px;
             cursor: pointer;
             transition: background 0.2s;
             font-size: 14px;
-            border-bottom: 1px solid rgba(239, 223, 192, 0.1);
+            border-bottom: 1px solid rgba(239,223,192,0.1);
             color: #EFDFC0;
-        }
-
-        .autocomplete-item:hover {
-            background: rgba(239, 223, 192, 0.2);
-        }
-
-        .autocomplete-item strong {
-            color: #FFD933;
         }
 
         .filter-section {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
         }
 
         .filter-btn {
-            padding: 8px 20px;
-            font-size: 13px;
-            background: rgba(239, 223, 192, 0.1);
-            border: 1px solid rgba(239, 223, 192, 0.2);
-            border-radius: 25px;
+            padding: 8px 24px;
+            font-size: 20px;
+            background: #2a2a2a;
+            border: 1px solid #D98D00;
+            border-radius: 40px;
             cursor: pointer;
             transition: all 0.2s;
             font-family: 'Source Sans Pro', monospace;
             color: #EFDFC0;
         }
 
-        .filter-btn.active {
-            background: rgba(239, 223, 192, 0.3);
-            border-color: #EFDFC0;
-        }
-
-        .filter-btn:hover {
-            background: rgba(239, 223, 192, 0.2);
-        }
-
-        .reset-btn {
-            padding: 8px 20px;
-            font-size: 13px;
-            background: rgba(243, 156, 18, 0.5);
-            border: 1px solid rgba(243, 156, 18, 0.5);
-            border-radius: 25px;
+        .reset-btn, .clear-btn {
+            padding: 8px 24px;
+            font-size: 20px;
+            background: #2a2a2a;
+            border: 1px solid #D98D00;
+            border-radius: 40px;
             cursor: pointer;
-            transition: all 0.2s;
             font-family: 'Source Sans Pro', monospace;
             color: #EFDFC0;
         }
 
-        .reset-btn:hover {
-            background: rgba(243, 156, 18, 0.8);
+        .info-panel {
+            background: #2a2a2a;
+            border-radius: 16px;
+            padding: 15px 20px;
+            margin: 0 20px 20px 20px;
+            border: 1px solid #D98D00;
+            display: none;
         }
 
-        .clear-btn {
-            padding: 8px 20px;
-            font-size: 13px;
-            background: rgba(231, 76, 60, 0.5);
-            border: 1px solid rgba(231, 76, 60, 0.5);
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.2s;
+        .info-title {
+            font-size: 18px;
+            color: #D98D00;
+            margin-bottom: 12px;
+            font-weight: bold;
             font-family: 'Source Sans Pro', monospace;
-            color: #EFDFC0;
         }
 
-        .clear-btn:hover {
-            background: rgba(231, 76, 60, 0.8);
-        }
-
-        /* Main content area */
-        .main-content {
-            flex: 1;
+        .info-games-list {
             display: flex;
-            position: relative;
-            min-height: 0;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
-        /* Graph container */
+        .info-game-item {
+            padding: 10px;
+            background: #1B1B1B;
+            border-radius: 16px;
+            border-left: 3px solid;
+        }
+
+        .info-game-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .info-game-details {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 3px;
+        }
+
+        .info-game-reviews {
+            font-size: 16px;
+            color: #6bcf7f;
+        }
+
         .vis-container {
-            flex: 1;
-            background: transparent;
-            border-radius: 0;
-            overflow: auto;
+            padding: 0.4rem 0.5rem;
+            background: #1B1B1B;
             position: relative;
+            min-height: 280px;
         }
 
-        .vis-container.active {
-            display: block;
+        #vis {
+            width: 100%;
+            height: 100%;
+            min-height: 250px;
         }
 
         svg {
@@ -208,183 +213,74 @@
             cursor: grab;
             width: 100%;
             height: 100%;
+            border-radius: 16px;
         }
 
-        svg:active {
-            cursor: grabbing;
-        }
-
-        /* Floating controls panel - bottom left (only upload) */
         .upload-panel {
             position: absolute;
             bottom: 20px;
             left: 20px;
-            background: rgba(27, 27, 27, 0.95);
+            background: #2a2a2a;
             backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 12px 16px;
-            border: 1px solid rgba(239, 223, 192, 0.2);
+            border-radius: 16px;
+            padding: 10px 14px;
+            border: 1px solid #D98D00;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             z-index: 100;
-            min-width: 180px;
+            min-width: 160px;
         }
 
         .upload-section {
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            padding: 6px;
+            padding: 5px;
             border-radius: 8px;
-            background: rgba(239, 223, 192, 0.1);
-        }
-
-        .upload-section:hover {
-            background: rgba(239, 223, 192, 0.2);
-        }
-
-        #csvFile {
-            display: none;
         }
 
         .upload-label {
             cursor: pointer;
             display: block;
-            font-size: 12px;
+            font-size: 13px;
             color: #EFDFC0;
             font-weight: bold;
         }
 
         .file-info {
-            margin-top: 4px;
-            font-size: 9px;
+            margin-top: 3px;
+            font-size: 8px;
             color: #aaa;
         }
 
         #dataStats {
-            font-size: 10px;
+            font-size: 9px;
             color: #6bcf7f;
             text-align: center;
-            margin-top: 8px;
-            padding-top: 6px;
-            border-top: 1px solid rgba(239, 223, 192, 0.1);
-        }
-
-        /* Bottom right panel for compared games */
-        .games-panel {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(27, 27, 27, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 15px 18px;
-            border: 1px solid rgba(239, 223, 192, 0.2);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            min-width: 320px;
-            max-width: 400px;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .persistent-title {
-            font-size: 12px;
-            color: #aaa;
-            margin-bottom: 10px;
-            text-align: center;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-
-        .games-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            justify-content: flex-start;
-            max-height: none;
-            overflow-y: visible;
-        }
-
-        .game-tag {
-            border-radius: 20px;
-            padding: 4px 10px;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid;
-        }
-
-        .game-tag span:first-child {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .remove-game {
-            cursor: pointer;
-            font-weight: bold;
-            opacity: 0.7;
-            font-size: 12px;
-            margin-left: 4px;
-        }
-
-        .search-result {
-            font-size: 12px;
-            margin-top: 5px;
-            padding: 8px;
-            border-radius: 8px;
-            background: rgba(0,0,0,0.3);
-            flex: 1;
-            overflow-y: auto;
-            min-height: 200px;
-            max-height: 400px;
-        }
-
-        .result-item {
-            padding: 8px 0;
-            font-size: 12px;
-            border-left: 3px solid;
-            padding-left: 10px;
-            margin: 5px 0;
-            line-height: 1.4;
-        }
-
-        .result-item strong {
-            font-size: 13px;
+            margin-top: 6px;
+            padding-top: 4px;
+            border-top: 1px solid #D98D00;
         }
 
         .drag-instruction {
-            font-size: 10px;
-            color: #888;
-            text-align: center;
-            margin-top: 10px;
-            flex-shrink: 0;
+            display: none;
         }
 
         .scale-info {
-            font-size: 9px;
+            font-size: 16px;
             text-align: center;
             margin-top: 8px;
             padding-top: 6px;
-            border-top: 1px solid rgba(239, 223, 192, 0.1);
+            border-top: 1px solid rgba(217, 141, 0, 0.3);
             color: #888;
-            flex-shrink: 0;
         }
 
-        /* Graph text styles */
         .label {
-            font-family: 'Source Sans Pro', sans-serif;
-            font-size: 35px;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 30px;
             font-weight: 600;
             text-anchor: middle;
             dominant-baseline: middle;
-            fill: #EFDFC0;
+            fill: #000000;
             text-shadow: none;
             pointer-events: none;
             user-select: none;
@@ -400,7 +296,6 @@
             stroke-width: 3 !important;
         }
 
-        /* Animation colors */
         @keyframes continuousPulse0 {
             0%, 100% { filter: drop-shadow(0 0 2px #E19898); stroke: #E19898; }
             50% { filter: drop-shadow(0 0 15px #E19898); stroke: #E19898; }
@@ -461,10 +356,10 @@
             backdrop-filter: blur(8px);
             color: #EFDFC0;
             padding: 8px 14px;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 12px;
             pointer-events: none;
-            border: 1px solid #EFDFC0;
+            border-left: 3px solid #D98D00;
             z-index: 1000;
             font-family: 'Source Sans Pro', monospace;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
@@ -472,42 +367,28 @@
             line-height: 1.4;
         }
 
-        .custom-tooltip strong {
-            color: #FFD933;
-        }
-
         .error {
             color: #ff6b6b;
         }
 
-        /* Scrollbar */
-        .autocomplete-items::-webkit-scrollbar,
-        .games-list::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .autocomplete-items::-webkit-scrollbar-track,
-        .games-list::-webkit-scrollbar-track {
-            background: #333;
-        }
-
-        .autocomplete-items::-webkit-scrollbar-thumb,
-        .games-list::-webkit-scrollbar-thumb {
-            background: #EFDFC0;
-            border-radius: 2px;
+        footer {
+            background: #1B1B1B;
+            padding: 10px 24px;
+            text-align: center;
+            font-size: 10px;
+            color: #EFDFC0;
+            border-top: 1px solid #D98D00;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="title-section">
-        <div class="main-title">Gamers do change their opinion about videogames</div>
-        <div class="sub-title">and often not in a better way</div>
-        <div class="sub-title" style="font-size: 36px; margin-top: 10px;">distribution change in gamer's reviews across 3139 top reviewed games in April 2026</div>
+<div class="dashboard">
+    <div class="header">
+        <div class="main-title">Gamers do change their opinion about videogames and often not in a better way</div>
+        <div class="sub-title" style="font-size: 14px; margin-top: 5px;">distribution change in gamer's reviews across 3139 top reviewed games in April 2026</div>
     </div>
 
-    <!-- Top controls bar -->
-    <div class="top-controls" id="topControls" style="display: none;">
+    <div class="controls" id="topControls" style="display: none;">
         <div class="search-container">
             <input type="text" id="gameSearch" placeholder="Search game..." autocomplete="off">
             <div id="autocompleteList" class="autocomplete-items"></div>
@@ -519,34 +400,34 @@
             <button id="filterDescending" class="filter-btn">Descending ↓</button>
         </div>
         
-        <button id="resetBtn" class="reset-btn">🔄 Reset Positions</button>
-        <button id="clearAllBtn" class="clear-btn">🗑 Clear All</button>
+        <button id="resetBtn" class="reset-btn">Reset Positions</button>
+        <button id="clearAllBtn" class="clear-btn">Clear All</button>
     </div>
 
-    <div class="main-content">
-        <div class="vis-container" id="visContainer">
-            <div id="vis"></div>
-        </div>
+    <div class="info-panel" id="infoPanel">
+        <div class="info-title">Highlighted Games</div>
+        <div class="info-games-list" id="infoGamesList"></div>
+    </div>
 
-        <!-- Floating upload panel - bottom left -->
+    <div class="vis-container" id="visContainer">
+        <div id="vis"></div>
+
         <div class="upload-panel" id="uploadPanel">
             <div class="upload-section" id="uploadSection">
                 <input type="file" id="csvFile" accept=".csv">
-                <label for="csvFile" class="upload-label">📁 Upload CSV File</label>
+                <label for="csvFile" class="upload-label">Upload CSV File</label>
                 <div class="file-info">Click or drag & drop CSV file</div>
             </div>
             <div id="dataStats" class="stats-summary"></div>
         </div>
 
-        <!-- Bottom right panel for compared games -->
-        <div class="games-panel" id="gamesPanel" style="display: none;">
-            <div class="persistent-title">Compare up to 5 Games</div>
-            <div class="games-list" id="gamesList"></div>
-            <div id="searchResult" class="search-result"></div>
-            <div class="drag-instruction">💡 Drag spheres • Hover for details</div>
-            <div class="scale-info" id="scaleInfo"></div>
-        </div>
+        <div class="drag-instruction">Drag spheres • Hover for details</div>
+        <div class="scale-info" id="scaleInfo"></div>
     </div>
+
+    <footer>
+        Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.
+    </footer>
 </div>
 
 <script>
@@ -598,20 +479,23 @@
     let persistentGames = [];
     let tooltip = null;
     let currentFilter = "both";
+    let animationInterval = null;
+    let pulseQueues = {};
     
-    let minSphereRadius = 15;
-    let maxSphereRadius = 120;
-    let minArcThickness = 2;
-    let maxArcThickness = 12;
+    let minSphereRadius = 20;
+    let maxSphereRadius = 130;
+    let minArcThickness = 1;
+    let maxArcThickness = 14;
     
     const uploadSection = document.getElementById('uploadSection');
     const fileInput = document.getElementById('csvFile');
-    
+
+
     function handleFileUpload(file) {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = function(event) { loadDataFromCSV(event.target.result, file.name); };
-        reader.onerror = function() { document.getElementById('dataStats').innerHTML = '<span class="error">❌ Error reading file</span>'; };
+        reader.onerror = function() { document.getElementById('dataStats').innerHTML = '<span class="error">Error reading file</span>'; };
         reader.readAsText(file);
     }
     
@@ -685,20 +569,69 @@
         });
     }
     
+    function startGlobalAnimationRestart() {
+        if (animationInterval) clearInterval(animationInterval);
+        
+        animationInterval = setInterval(() => {
+            persistentGames.forEach(item => {
+                restartAnimationForGame(item.game, item.colorIndex);
+            });
+        }, 7000);
+    }
+    
+    function restartAnimationForGame(game, colorIndex) {
+        const color = ANIMATION_COLORS[colorIndex];
+        const isAscending = CATEGORY_ORDER[game.totalCategory] < CATEGORY_ORDER[game.recentCategory];
+        
+        if (animationGroup) {
+            animationGroup.selectAll(`.anim-arc-${colorIndex}`).remove();
+        }
+        
+        let baseArc = null;
+        if (isAscending) {
+            baseArc = linkGroup.selectAll(".arc-green").filter(function() {
+                const source = d3.select(this).attr("data-source");
+                const target = d3.select(this).attr("data-target");
+                return (source === game.totalCategory && target === game.recentCategory);
+            });
+        } else {
+            baseArc = linkGroup.selectAll(".arc-red").filter(function() {
+                const source = d3.select(this).attr("data-source");
+                const target = d3.select(this).attr("data-target");
+                return (source === game.totalCategory && target === game.recentCategory);
+            });
+        }
+        
+        if (baseArc.size() > 0) {
+            const pathData = baseArc.attr("d");
+            const thickness = parseFloat(baseArc.attr("stroke-width"));
+            
+            if (!animationGroup) {
+                animationGroup = svg.append("g").attr("class", "animations");
+            }
+            
+            animationGroup.append("path")
+                .attr("d", pathData)
+                .attr("fill", "none")
+                .attr("stroke", color)
+                .attr("stroke-width", thickness + 3)
+                .attr("opacity", 0.6)
+                .attr("stroke-dasharray", "12 20")
+                .attr("class", `anim-arc-${colorIndex} flow-arc-${colorIndex}`)
+                .attr("data-source", game.totalCategory)
+                .attr("data-target", game.recentCategory);
+        }
+    }
+    
     function addGameToPersistent(gameName) {
         const game = gamesData.find(g => g.name.toLowerCase() === gameName.toLowerCase());
         if (!game) return;
-        
-        // Check if game already exists
         if (persistentGames.find(p => p.game.name === game.name)) return;
         
-        // Prevent adding 6th game - show warning and return
         if (persistentGames.length >= 5) {
-            document.getElementById('searchResult').innerHTML = '<span style="color: #ff9f4a;">⚠️ Maximum 5 games can be compared at once. Remove a game first.</span>';
+            document.getElementById('infoPanel').innerHTML = '<div class="info-title">Maximum 5 games can be compared at once. Remove a game first.</div>';
             setTimeout(() => {
-                if (document.getElementById('searchResult').innerHTML.includes('Maximum')) {
-                    document.getElementById('searchResult').innerHTML = '';
-                }
+                updateInfoPanel();
             }, 3000);
             return;
         }
@@ -706,67 +639,151 @@
         const colorIndex = persistentGames.length;
         persistentGames.push({ game, colorIndex });
         
-        updatePersistentGamesList();
-        updateSearchResults();
+        updateInfoPanel();
         applyContinuousAnimation(game, colorIndex);
+        
+        if (!animationInterval) {
+            startGlobalAnimationRestart();
+        }
+    }
+    
+    function updateInfoPanel() {
+        const infoPanel = document.getElementById('infoPanel');
+        const infoGamesList = document.getElementById('infoGamesList');
+        
+        if (persistentGames.length === 0) {
+            infoPanel.style.display = 'none';
+            return;
+        }
+        
+        infoPanel.style.display = 'block';
+        infoGamesList.innerHTML = persistentGames.map(item => `
+            <div class="info-game-item" style="border-left-color: ${ANIMATION_COLORS[item.colorIndex]};">
+                <div class="info-game-name" style="color: ${ANIMATION_COLORS[item.colorIndex]};">${item.game.name}</div>
+                <div class="info-game-details">${item.game.totalCategory} → ${item.game.recentCategory}</div>
+                <div class="info-game-reviews">${item.game.recentNumber.toLocaleString()} recent reviews</div>
+                <div class="info-game-details" style="font-size: 10px;">Total reviews: ${item.game.totalNumber.toLocaleString()}</div>
+                <button class="remove-game-btn" data-name="${item.game.name}" style="margin-top: 5px; padding: 2px 8px; font-size: 10px; background: #D98D00; border: none; border-radius: 12px; color: #1B1B1B; cursor: pointer;">Remove</button>
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.remove-game-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const gameName = btn.getAttribute('data-name');
+                const index = persistentGames.findIndex(p => p.game.name === gameName);
+                if (index !== -1) {
+                    removeGameFromPersistent(index);
+                }
+            });
+        });
     }
     
     function removeGameFromPersistent(index) {
         const removed = persistentGames[index];
         if (removed) {
-            // Remove animation for this specific game
-            removeHighlightForGame(removed);
+            if (animationGroup) {
+                animationGroup.selectAll("*").remove();
+            }
             
-            // Remove from array
-            persistentGames.splice(index, 1);
-            
-            // Re-index remaining games and reapply animations with new colors
-            persistentGames.forEach((game, idx) => {
-                game.colorIndex = idx;
-                // Remove old animation classes
-                nodeGroup.selectAll(".sphere").each(function() {
-                    const category = d3.select(this).attr("data-category");
-                    if (category === game.game.totalCategory || category === game.game.recentCategory) {
-                        d3.select(this).classed(`pulse-sphere-${idx + 1}`, false);
-                        d3.select(this).classed(`pulse-sphere-${idx}`, false);
-                    }
-                });
-                if (animationGroup) {
-                    animationGroup.selectAll(`.anim-arc-${idx + 1}`).remove();
-                    animationGroup.selectAll(`.anim-arc-${idx}`).remove();
-                }
-                // Reapply with new color index
-                applyContinuousAnimation(game.game, idx);
+            nodeGroup.selectAll(".sphere").each(function() {
+                d3.select(this).classed("pulse-sphere-0", false);
+                d3.select(this).classed("pulse-sphere-1", false);
+                d3.select(this).classed("pulse-sphere-2", false);
+                d3.select(this).classed("pulse-sphere-3", false);
+                d3.select(this).classed("pulse-sphere-4", false);
+                d3.select(this).attr("stroke", (d) => SPHERE_COLORS[d.id] || SPHERE_COLORS).attr("stroke-width", 2);
+                d3.select(this).style("filter", null);
             });
             
-            updatePersistentGamesList();
-            updateSearchResults();
+            persistentGames.splice(index, 1);
+            
+            persistentGames.forEach((game, idx) => {
+                game.colorIndex = idx;
+            });
+            
+            persistentGames.forEach((game) => {
+                applyContinuousAnimation(game.game, game.colorIndex);
+            });
+            
+            if (animationInterval) {
+                clearInterval(animationInterval);
+                animationInterval = null;
+            }
+            if (persistentGames.length > 0) {
+                startGlobalAnimationRestart();
+            }
+            
+            updateInfoPanel();
         }
     }
     
     function removeHighlightForGame(persistentGame) {
         const { game, colorIndex } = persistentGame;
         
-        // Remove pulse animation from spheres
         nodeGroup.selectAll(".sphere").each(function() {
             const category = d3.select(this).attr("data-category");
             if (category === game.totalCategory || category === game.recentCategory) {
-                // Remove all possible pulse classes
+                d3.select(this).attr("stroke", (d) => SPHERE_COLORS[d.id] || SPHERE_COLORS).attr("stroke-width", 2);
                 d3.select(this).classed(`pulse-sphere-${colorIndex}`, false);
-                d3.select(this).classed(`pulse-sphere-0`, false);
-                d3.select(this).classed(`pulse-sphere-1`, false);
-                d3.select(this).classed(`pulse-sphere-2`, false);
-                d3.select(this).classed(`pulse-sphere-3`, false);
-                d3.select(this).classed(`pulse-sphere-4`, false);
-                d3.select(this).attr("stroke", SPHERE_COLORS).attr("stroke-width", 2);
+                for(let i = 0; i < 5; i++) {
+                    d3.select(this).classed(`pulse-sphere-${i}`, false);
+                }
             }
         });
         
-        // Remove animation overlay arcs
+        if (window.activeGradients) {
+            window.activeGradients.forEach(gradId => {
+                svg.select(`#${gradId}`).remove();
+            });
+            window.activeGradients = [];
+        }
+        
         if (animationGroup) {
             animationGroup.selectAll(`.anim-arc-${colorIndex}`).remove();
-            // Also remove any orphaned animation arcs
-            animationGroup.selectAll(".anim-arc-0, .anim-arc-1, .anim-arc-2, .anim-arc-3, .anim-arc-4").remove();
+        }
+    }
+    
+    function startPulseQueue(sphereId, colorIndex, color) {
+        if (!pulseQueues[sphereId]) {
+            pulseQueues[sphereId] = [];
+            pulseQueues[sphereId].isPlaying = false;
+        }
+        
+        pulseQueues[sphereId].push({ colorIndex, color });
+        
+        if (!pulseQueues[sphereId].isPlaying) {
+            processPulseQueue(sphereId);
+        }
+    }
+    
+    function processPulseQueue(sphereId) {
+        if (!pulseQueues[sphereId] || pulseQueues[sphereId].length === 0) {
+            if (pulseQueues[sphereId]) pulseQueues[sphereId].isPlaying = false;
+            return;
+        }
+        
+        pulseQueues[sphereId].isPlaying = true;
+        const currentPulse = pulseQueues[sphereId].shift();
+        
+        const sphere = nodeGroup.selectAll(".sphere").filter(function() {
+            return d3.select(this).attr("data-category") === sphereId;
+        });
+        
+        if (sphere.size() > 0) {
+            sphere.style("filter", `drop-shadow(0 0 15px ${currentPulse.color})`);
+            sphere.attr("stroke-width", 6);
+            
+            setTimeout(() => {
+                sphere.style("filter", null);
+                sphere.attr("stroke-width", 4);
+                
+                setTimeout(() => {
+                    processPulseQueue(sphereId);
+                }, 500);
+            }, 800);
+        } else {
+            processPulseQueue(sphereId);
         }
     }
     
@@ -774,11 +791,52 @@
         const color = ANIMATION_COLORS[colorIndex];
         const isAscending = CATEGORY_ORDER[game.totalCategory] < CATEGORY_ORDER[game.recentCategory];
         
+        const sphereColors = {};
+        
         nodeGroup.selectAll(".sphere").each(function() {
             const category = d3.select(this).attr("data-category");
             if (category === game.totalCategory || category === game.recentCategory) {
-                d3.select(this).classed(`pulse-sphere-${colorIndex}`, true);
-                d3.select(this).attr("stroke", color);
+                if (!sphereColors[category]) {
+                    sphereColors[category] = [];
+                }
+                sphereColors[category].push(color);
+            }
+        });
+        
+        Object.keys(sphereColors).forEach(category => {
+            const colors = sphereColors[category];
+            const sphere = nodeGroup.selectAll(".sphere").filter(function() {
+                return d3.select(this).attr("data-category") === category;
+            });
+            
+            if (colors.length === 1) {
+                sphere.attr("stroke", colors[0])
+                    .attr("stroke-width", 4)
+                    .classed(`pulse-sphere-${colorIndex}`, true);
+            } else if (colors.length > 1) {
+                const gradientId = `gradient-${category.replace(/\s/g, '-')}-${Date.now()}`;
+                const gradient = svg.append("defs")
+                    .append("linearGradient")
+                    .attr("id", gradientId)
+                    .attr("gradientUnits", "userSpaceOnUse")
+                    .attr("x1", "0%").attr("y1", "0%")
+                    .attr("x2", "100%").attr("y2", "100%");
+                
+                const step = 100 / colors.length;
+                colors.forEach((col, idx) => {
+                    gradient.append("stop")
+                        .attr("offset", `${idx * step}%`)
+                        .attr("stop-color", col);
+                    gradient.append("stop")
+                        .attr("offset", `${(idx + 1) * step}%`)
+                        .attr("stop-color", col);
+                });
+                
+                sphere.attr("stroke", `url(#${gradientId})`)
+                    .attr("stroke-width", 5);
+                
+                if (!window.activeGradients) window.activeGradients = [];
+                window.activeGradients.push(gradientId);
             }
         });
         
@@ -839,79 +897,6 @@
         }
     }
     
-    function updatePersistentGamesList() {
-        const gamesList = document.getElementById('gamesList');
-        gamesList.innerHTML = persistentGames.map((item, idx) => `
-            <div class="game-tag" data-index="${idx}" style="border-color: ${ANIMATION_COLORS[item.colorIndex]}; background: ${ANIMATION_COLORS[item.colorIndex]}20;">
-                <span style="background: ${ANIMATION_COLORS[item.colorIndex]};"></span>
-                <span style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.game.name.length > 18 ? item.game.name.substring(0, 18) + '...' : item.game.name}</span>
-                <span class="remove-game" data-index="${idx}">✖</span>
-            </div>
-        `).join('');
-        
-        document.querySelectorAll('.game-tag').forEach(tag => {
-            tag.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('remove-game')) {
-                    const index = parseInt(tag.getAttribute('data-index'));
-                    const item = persistentGames[index];
-                    if (item) {
-                        flashConnection(item.game, item.colorIndex);
-                    }
-                }
-            });
-        });
-        
-        document.querySelectorAll('.remove-game').forEach(removeBtn => {
-            removeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const index = parseInt(removeBtn.getAttribute('data-index'));
-                removeGameFromPersistent(index);
-            });
-        });
-    }
-    
-    function flashConnection(game, colorIndex) {
-        const color = ANIMATION_COLORS[colorIndex];
-        
-        nodeGroup.selectAll(".sphere").each(function() {
-            const category = d3.select(this).attr("data-category");
-            if (category === game.totalCategory || category === game.recentCategory) {
-                const sphere = d3.select(this);
-                sphere.style("filter", `drop-shadow(0 0 20px ${color})`);
-                setTimeout(() => {
-                    sphere.style("filter", null);
-                }, 300);
-            }
-        });
-        
-        if (animationGroup) {
-            animationGroup.selectAll(`.anim-arc-${colorIndex}`)
-                .attr("stroke-width", 8)
-                .attr("opacity", 1);
-            setTimeout(() => {
-                animationGroup.selectAll(`.anim-arc-${colorIndex}`)
-                    .attr("stroke-width", null)
-                    .attr("opacity", 0.6);
-            }, 300);
-        }
-    }
-    
-    function updateSearchResults() {
-        const searchResult = document.getElementById('searchResult');
-        if (persistentGames.length === 0) {
-            searchResult.innerHTML = '';
-            return;
-        }
-        
-        searchResult.innerHTML = persistentGames.map(item => `
-            <div class="result-item" style="border-left-color: ${ANIMATION_COLORS[item.colorIndex]};">
-                <strong>${item.game.name}</strong><br>
-                <span style="font-size: 12px; color: #aaa;">${item.game.totalCategory} → ${item.game.recentCategory}</span><br>
-                <span style="font-size: 12px; color: #6bcf7f;">📊 ${item.game.recentNumber.toLocaleString()} recent reviews</span>
-            </div>
-        `).join('');
-    }
-    
     function setFilter(filter) {
         currentFilter = filter;
         
@@ -926,7 +911,7 @@
         redrawArcs();
         
         persistentGames.forEach(item => {
-            applyContinuousAnimation(item.game, item.colorIndex);
+            restartAnimationForGame(item.game, item.colorIndex);
         });
     }
     
@@ -986,9 +971,8 @@
             
             if (gamesData.length === 0) throw new Error("No valid game data found");
             
-            document.getElementById('dataStats').innerHTML = `✅ ${gamesData.length.toLocaleString()} games loaded`;
+            document.getElementById('dataStats').innerHTML = `${gamesData.length.toLocaleString()} games loaded`;
             document.getElementById('topControls').style.display = 'flex';
-            document.getElementById('gamesPanel').style.display = 'block';
             document.getElementById('visContainer').classList.add('active');
             
             processGameData();
@@ -1009,7 +993,7 @@
             
         } catch (error) {
             console.error("Error loading CSV:", error);
-            document.getElementById('dataStats').innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            document.getElementById('dataStats').innerHTML = `<span class="error">Error: ${error.message}</span>`;
         }
     }
     
@@ -1057,8 +1041,8 @@
         const container = document.getElementById('vis');
         container.innerHTML = '';
         
-        width = Math.max(1400, window.innerWidth - 50);
-        height = Math.max(650, window.innerHeight - 200);
+        width = Math.max(500, window.innerWidth - 200);
+        height = Math.max(250, window.innerHeight - 400);
         
         svg = d3.select("#vis")
             .append("svg")
@@ -1099,8 +1083,7 @@
                 recentReviews: categoryRecentTotals[cat] || 0,
                 gameCount: categoryGameCounts[cat] || 0,
                 x: centerX + Math.cos(angle) * radius,
-                y: centerY + Math.sin(angle) * radius,
-                fill: SPHERE_COLORS[cat] || SPHERE_COLORS
+                y: centerY + Math.sin(angle) * radius
             };
         });
         
@@ -1137,7 +1120,7 @@
         const totalAscending = linksAscending.reduce((sum, l) => sum + l.value, 0);
         const totalDescending = linksDescending.reduce((sum, l) => sum + l.value, 0);
         
-        document.getElementById('scaleInfo').innerHTML = `🟢 Asc: ${totalAscending.toLocaleString()} | 🔴 Desc: ${totalDescending.toLocaleString()}`;
+        document.getElementById('scaleInfo').innerHTML = `<span>Ascending: </span><span style="color: #07BC00; font-weight: bold;">${totalAscending.toLocaleString()}</span> | <span>Descending: </span><span style="color: #D02752; font-weight: bold;">${totalDescending.toLocaleString()}</span>`;
         
         drawArcsAndNodes();
     }
@@ -1164,7 +1147,7 @@
     function dragEnded(event) {
         redrawArcs();
         persistentGames.forEach(item => {
-            applyContinuousAnimation(item.game, item.colorIndex);
+            restartAnimationForGame(item.game, item.colorIndex);
         });
     }
     
@@ -1173,27 +1156,15 @@
         const dy = targetNode.y - sourceNode.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        // Perpendicular direction for parallel offset
         const perpX = -dy / distance;
         const perpY = dx / distance;
-        
-        // Offset amount for parallel curves (when both arcs exist)
         const parallelOffset = offsetMultiplier * 25;
-        
-        // Midpoint with parallel offset
         const midX = (sourceNode.x + targetNode.x) / 2 + perpX * parallelOffset;
         const midY = (sourceNode.y + targetNode.y) / 2 + perpY * parallelOffset;
         
-        // Additional curvature - makes arcs more curved
-        const curvatureAmount = 0.6;
-        const curveX = (targetNode.x - sourceNode.x) * curvatureAmount;
-        const curveY = (targetNode.y - sourceNode.y) * curvatureAmount;
-        
-        // Control point with both parallel offset and curvature
         let cx = midX + (dy * 0.4);
         let cy = midY - (dx * 0.4);
         
-        // Adjust curvature based on distance
         if (distance < 200) {
             cx = midX + (dy * 0.6);
             cy = midY - (dx * 0.6);
@@ -1212,7 +1183,6 @@
             .attr("class", className)
             .attr("data-source", sourceNode.id)
             .attr("data-target", targetNode.id)
-            .attr("data-value", value)
             .on("mouseover", function(event) {
                 const key = `${sourceNode.id}|${targetNode.id}`;
                 let reviewCount = 0;
@@ -1239,9 +1209,9 @@
             .attr("cx", d => d.x)
             .attr("cy", d => d.y)
             .attr("r", d => d.scaledRadius)
-            .attr("fill", d => SPHERE_COLORS[d.id] || SPHERE_COLORS)
+            .attr("fill", d => SPHERE_COLORS[d.id])
             .attr("opacity", 1)
-            .attr("stroke", SPHERE_COLORS)
+            .attr("stroke", d => SPHERE_COLORS[d.id])
             .attr("stroke-width", 2)
             .attr("data-category", d => d.id)
             .on("mouseover", function(event, d) { showSphereTooltip(event, d); })
@@ -1257,19 +1227,60 @@
             .attr("class", "label")
             .attr("x", d => d.x)
             .attr("y", d => d.y)
-            .style("font-size", d => `${Math.max(20, Math.min(35, d.scaledRadius / 2.5))}px`)
+            .style("font-size", d => {
+                if (d.id === "very negative") {
+                    return "7px";
+                }
+                if (d.id === "mostly negative") {
+                    return "9px";
+                }
+                if (d.id === "mixed") {
+                    return "30px";
+                }
+                if (d.id === "overwhelmingly negative") {
+                    return "6px";
+                }
+                if (d.id === "overwhelmingly positive") {
+                    return "28px";
+                }
+                if (d.id === "very positive") {
+                    return "32px";
+                }
+                return "19px";
+            })
             .style("fill", "#000000")
-            .style("font-weight", "bold")
-            .text(d => {
-                switch(d.id) {
-                    case "overwhelmingly positive": return "O positive";
-                    case "very positive": return "Very positive";
-                    case "mostly positive": return "M positive";
-                    case "mixed": return "Mixed";
-                    case "mostly negative": return "MN";
-                    case "very negative": return "VN";
-                    case "overwhelmingly negative": return "ON";
-                    default: return d.id.substring(0, 2).toUpperCase();
+            .style("font-weight", "normal")
+            .style("text-anchor", "middle")
+            .style("dominant-baseline", "middle")
+            .each(function(d) {
+                d3.select(this).selectAll("*").remove();
+                
+                if (d.id === "overwhelmingly positive") {
+                    d3.select(this)
+                        .append("tspan")
+                        .attr("dx", 0)
+                        .attr("dy", "-0.6em")
+                        .text("overwhelmingly");
+                    d3.select(this)
+                        .append("tspan")
+                        .attr("dx", "-5em")
+                        .attr("dy", "1.2em")
+                        .text("positive");
+                } 
+                else if (d.id === "overwhelmingly negative") {
+                    d3.select(this)
+                        .append("tspan")
+                        .attr("dx", 0)
+                        .attr("dy", "-0.6em")
+                        .text("overwhelmingly");
+                    d3.select(this)
+                        .append("tspan")
+                        .attr("dx", "-5em")
+                        .attr("dy", "1.2em")
+                        .text("negative");
+                }
+                else {
+                    d3.select(this).text(d.id);
                 }
             });
     }
@@ -1305,13 +1316,11 @@
             const hasBoth = group.ascending && group.descending;
             
             if (group.ascending) {
-                // Ascending arcs curve upward/left
                 const offset = hasBoth ? -0.5 : 0;
                 drawParallelCurvedArc(sourceNode, targetNode, group.ascending.scaledThickness, "#07BC00", "arc-green", offset, true);
             }
             
             if (group.descending) {
-                // Descending arcs curve downward/right
                 const offset = hasBoth ? 0.5 : 0;
                 drawParallelCurvedArc(sourceNode, targetNode, group.descending.scaledThickness, "#D02752", "arc-red", offset, false);
             }
@@ -1321,7 +1330,7 @@
     function redrawArcs() {
         drawArcs();
         persistentGames.forEach(item => {
-            applyContinuousAnimation(item.game, item.colorIndex);
+            restartAnimationForGame(item.game, item.colorIndex);
         });
     }
     
@@ -1345,7 +1354,6 @@
         const arrow = isAscending ? "↑" : "↓";
         const color = isAscending ? "#07BC00" : "#D02752";
         
-        // Get number of games for this specific arc
         const key = `${source.id}|${target.id}`;
         let gameCount = 0;
         if (gamesData) {
@@ -1371,36 +1379,32 @@
     }
     
     function clearAllGames() {
-        // Remove all animations first
-        persistentGames.forEach(game => {
-            removeHighlightForGame(game);
-        });
-        
-        // Clear the array
-        persistentGames = [];
-        
-        // Clear all animation overlay paths
         if (animationGroup) {
             animationGroup.selectAll("*").remove();
         }
         
-        // Reset all spheres to default state
-        nodeGroup.selectAll(".sphere").each(function() {
+        if (animationInterval) {
+            clearInterval(animationInterval);
+            animationInterval = null;
+        }
+        
+        nodeGroup.selectAll(".sphere").each(function(d) {
             d3.select(this).classed("pulse-sphere-0", false);
             d3.select(this).classed("pulse-sphere-1", false);
             d3.select(this).classed("pulse-sphere-2", false);
             d3.select(this).classed("pulse-sphere-3", false);
             d3.select(this).classed("pulse-sphere-4", false);
-            d3.select(this).attr("stroke", SPHERE_COLORS).attr("stroke-width", 2);
+            d3.select(this).attr("stroke", SPHERE_COLORS[d.id]).attr("stroke-width", 2);
+            d3.select(this).style("filter", null);
         });
         
-        // Clear search input and results
+        persistentGames = [];
+        
         document.getElementById('gameSearch').value = '';
         document.getElementById('autocompleteList').innerHTML = '';
         document.getElementById('autocompleteList').style.display = 'none';
         
-        updatePersistentGamesList();
-        updateSearchResults();
+        updateInfoPanel();
     }
     
     function resetPositions() {
@@ -1417,10 +1421,8 @@
         nodeGroup.selectAll(".sphere").attr("cx", d => d.x).attr("cy", d => d.y);
         labelGroup.selectAll(".label").attr("x", d => d.x).attr("y", d => d.y);
         redrawArcs();
-        
-        document.getElementById('searchResult').innerHTML = '<span style="color: #6bcf7f;">🔄 Positions reset</span>';
-        setTimeout(() => { if (document.getElementById('searchResult').innerHTML.includes('reset')) document.getElementById('searchResult').innerHTML = ''; }, 2000);
     }
+    
     function autoLoadCSV() {
         const csvPath = '1_arc.csv';  // Path to your CSV file
         fetch(csvPath)
