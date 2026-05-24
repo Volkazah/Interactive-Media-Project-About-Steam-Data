@@ -1053,26 +1053,64 @@
     }
     
     function autoLoadCSV() {
-        const csvPath = '6_radar.csv';
+    // Absolute path with your repository name
+        const csvPath = '/Interactive-Media-Project-About-Steam-Data/6_radar.csv';
+        
+        console.log('🔄 Auto-loading CSV from:', csvPath);
+        
+        // Show loading state
+        const fileNameSpan = document.getElementById("file-name-display");
+        if (fileNameSpan) {
+            fileNameSpan.innerHTML = '⏳ Loading...';
+        }
+        
         fetch(csvPath)
             .then(response => {
+                console.log('📡 Response status:', response.status);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 return response.text();
             })
             .then(csvText => {
-                console.log('CSV loaded automatically from 6_radar.csv');
+                console.log('✅ CSV loaded, size:', csvText.length);
                 loadDataFromCSV(csvText, '6_radar.csv');
             })
             .catch(error => {
-                console.error('Error loading CSV:', error);
-                const fileNameSpan = document.getElementById("file-name-display");
-                if (fileNameSpan) {
-                    fileNameSpan.innerHTML = `⚠️ Error loading 6_radar.csv`;
-                }
+                console.error('❌ Error loading CSV:', error);
+                
+                // Try fallback with relative path
+                console.log('Trying fallback: relative path');
+                fetch('6_radar.csv')
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        return response.text();
+                    })
+                    .then(csvText => {
+                        console.log('✅ Fallback successful!');
+                        loadDataFromCSV(csvText, '6_radar.csv');
+                    })
+                    .catch(fallbackError => {
+                        console.error('❌ Fallback failed:', fallbackError);
+                        if (fileNameSpan) {
+                            fileNameSpan.innerHTML = `⚠️ Cannot find 6_radar.csv`;
+                        }
+                        
+                        // Show error in radar grid
+                        const radarGrid = document.getElementById("radarGrid");
+                        if (radarGrid) {
+                            radarGrid.innerHTML = `<div class="empty-state">
+                                <div style="font-size:48px; margin-bottom:16px;">📁</div>
+                                <div><strong>CSV File Not Found</strong></div>
+                                <div style="font-size:14px; margin-top:8px; color:#aaa;">Expected file: <code style="background:#333; padding:2px 6px; border-radius:4px;">6_radar.csv</code></div>
+                                <div style="font-size:12px; margin-top:5px;">Tried: ${csvPath}</div>
+                                <button onclick="document.getElementById('csv-file-input').click()" style="margin-top:16px; background:#D98D00; color:#1B1B1B; border:none; padding:8px 24px; border-radius:40px; cursor:pointer;">📂 Upload CSV Manually</button>
+                            </div>`;
+                        }
+                    });
             });
     }
+
     
     function handleCSVUpload(file) {
         if (!file) return;
