@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Steam Spiral Pricing | Condegram Style</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Language support -->
+    <script src="language.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1B1B1B;
+            color: #EFDFC0;
+            font-family: 'Source Sans Pro', sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Language Selector Styles */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: rgba(239, 223, 192, 0.1);
+            border: 1px solid rgba(239, 223, 192, 0.3);
+            color: #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        .lang-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+            border-color: #EFDFC0;
+        }
+
+        .dashboard {
+            max-width: 1600px;
+            width: 100%;
+            background: #1B1B1B;
+            border-radius: 28px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .header {
+            background: #1B1B1B;
+            color: #EFDFC0;
+            padding: 1.2rem 2rem;
+            border-bottom: 3px solid #D98D00;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-weight: 400;
+            font-size: 42px;
+            letter-spacing: -0.3px;
+            font-family: 'Consolas', 'Source Sans Pro', monospace;
+            color: #EFDFC0;
+        }
+
+        .header p {
+            margin: 0.4rem 0 0;
+            opacity: 0.75;
+            font-size: 18px;
+            font-family: 'Source Sans Pro', monospace;
+            color: #EFDFC0;
+            font-weight: 400;
+        }
+
+        .controls {
+            padding: 1rem 2rem;
+            background: #1B1B1B;
+            border-bottom: 1px solid #D98D00;
+        }
+
+        .filters-container {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            align-items: stretch;
+            margin-bottom: 1.5rem;
+        }
+
+        .genre-panel {
+            flex: 1;
+            min-width: 400px;
+        }
+
+        .right-panels {
+            flex: 1;
+            display: flex;
+            gap: 1.5rem;
+            min-width: 400px;
+        }
+
+        .toggle-panel {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(239,223,192,0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-panels .toggle-panel {
+            flex: 1;
+        }
+
+        .toggle-panel h3 {
+            color: #EFDFC0;
+            font-size: 20px;
+            font-family: 'Consolas', monospace;
+            margin-bottom: 15px;
+            text-align: center;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(239,223,192,0.3);
+            padding-bottom: 8px;
+        }
+
+        .genre-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px 12px;
+            flex: 1;
+            align-content: start;
+        }
+
+        .toggle-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(239,223,192,0.15);
+            cursor: pointer;
+            gap: 12px;
+        }
+
+        .toggle-item:hover {
+            background: rgba(239,223,192,0.05);
+        }
+
+        .toggle-label {
+            color: #EFDFC0;
+            font-family: 'Source Sans Pro', sans-serif;
+            font-weight: 500;
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        .genre-label {
+            font-size: 18px;
+        }
+
+        .large-label {
+            font-size: 22px;
+        }
+
+        .toggle-label.long-label {
+            font-size: 14px;
+        }
+
+        .large-label.long-label {
+            font-size: 20px;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 22px;
+            background: #3a3a3a;
+            border-radius: 30px;
+            position: relative;
+            transition: 0.2s;
+            cursor: pointer;
+            border: 1px solid rgba(239,223,192,0.3);
+            flex-shrink: 0;
+        }
+
+        .toggle-switch.active {
+            background: #EFDFC0;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #1B1B1B;
+            border-radius: 50%;
+            top: 2px;
+            left: 3px;
+            transition: 0.2s;
+        }
+
+        .toggle-switch.active::after {
+            left: 23px;
+            background: #1B1B1B;
+        }
+
+        .reset-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .reset-btn {
+            background: #D98D00;
+            color: #1B1B1B;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: 0.2s;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .reset-btn:hover {
+            background: #c47d00;
+            transform: scale(1.02);
+        }
+
+        .toggle-panel.small {
+            padding: 12px 20px;
+        }
+
+        .toggle-panel.small h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+        }
+
+        .search-input {
+            background: #2F2F2F;
+            border: 1px solid #D98D00;
+            color: #EFDFC0;
+            font-family: 'Source Sans Pro', sans-serif;
+            padding: 8px 12px;
+            border-radius: 24px;
+            font-size: 0.85rem;
+            width: 200px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #EFDFC0;
+            box-shadow: 0 0 0 2px rgba(239,223,192,0.2);
+        }
+
+        .suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #2A2A2A;
+            border: 1px solid #D98D00;
+            border-radius: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestions-list.active {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #EFDFC0;
+            border-bottom: 1px solid rgba(239,223,192,0.1);
+        }
+
+        .suggestion-item:hover {
+            background: #D98D00;
+            color: #1B1B1B;
+        }
+
+        .selected-games {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .selected-game-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .remove-game {
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+
+        .remove-game:hover {
+            opacity: 0.7;
+        }
+
+        .info-text {
+            font-size: 0.75rem;
+            background: #2A2A2A;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            text-align: center;
+            width: fit-content;
+            margin: 0 auto;
+            color: #EFDFC0;
+            font-family: 'Source Sans Pro', monospace;
+        }
+
+        .vis-container {
+            padding: 0.5rem 1.5rem 1.2rem 1.5rem;
+            background: #1B1B1B;
+        }
+
+        #spiral-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        svg {
+            background-color: #1B1B1B;
+            display: block;
+            margin: 0 auto;
+            border-radius: 20px;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: #2a2a2a;
+            backdrop-filter: blur(12px);
+            color: #EFDFC0;
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 15px;
+            padding: 10px 16px;
+            border-radius: 16px;
+            border-left: 4px solid #D98D00;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 100;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.8rem;
+            margin: 1rem auto;
+            background: #2a2a2a;
+            padding: 0.5rem 1rem;
+            border-radius: 36px;
+            width: fit-content;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            color: #EFDFC0;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        .status-msg {
+            text-align: center;
+            padding: 0.4rem;
+            font-style: italic;
+            color: #EFDFC0aa;
+            font-size: 0.8rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 0;
+            padding: 16px 24px;
+            background: #1B1B1B;
+            border-top: 1px solid #D98D00;
+        }
+
+        .file-label {
+            background: #D98D00;
+            color: #1B1B1B;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .file-label:hover {
+            background: #c47d00;
+            transform: scale(1.02);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            opacity: 0.6;
+            text-align: center;
+        }
+        
+        .spiral-path {
+            stroke: #D98D00;
+            stroke-width: 2.5;
+            fill: none;
+            opacity: 0.7;
+        }
+        
+        .year-label {
+            font-family: 'Consolas', monospace;
+            fill: #EFDFC0;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            dominant-baseline: middle;
+            text-anchor: middle;
+            paint-order: stroke;
+            stroke: #1B1B1B;
+            stroke-width: 2px;
+        }
+        
+        .year-label-large {
+            font-size: 14px;
+        }
+        
+        .year-separator {
+            stroke: #EFDFC0;
+            stroke-width: 2;
+            opacity: 0.8;
+        }
+        
+        .center-text {
+            font-family: 'Consolas', monospace;
+            fill: #EFDFC0;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+        
+        .center-subtext {
+            font-size: 9px;
+            fill: #EFDFC0aa;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
+        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+    </div>
+
+    <div class="header">
+        <h1 data-i18n="spiral_title">How prices for videogames on Steam changed for the last 30 years</h1>
+        <p data-i18n="spiral_subtitle">Games distribution between price categories throughout the years and genres</p>
+    </div>
+
+    <div class="controls">
+        <div class="filters-container">
+            <div class="toggle-panel genre-panel">
+                <h3 data-i18n="spiral_genre">Genre</h3>
+                <div id="genreGrid" class="genre-grid"></div>
+            </div>
+            
+            <div class="right-panels">
+                <div class="toggle-panel">
+                    <h3 data-i18n="spiral_player_type">Player Type</h3>
+                    <div id="playerTypeList" class="toggle-list"></div>
+                </div>
+                <div class="toggle-panel">
+                    <h3 data-i18n="spiral_supported_os">Supported OS</h3>
+                    <div id="platformList" class="toggle-list"></div>
+                </div>
+            </div>
+        </div>
+        <div class="reset-container">
+            <div class="toggle-panel small">
+                <h3 data-i18n="spiral_search_games">Search Games</h3>
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <input type="text" id="gameSearchInput" class="search-input" data-i18n="spiral_search_placeholder" placeholder="Type game name...">
+                        <div id="suggestionsList" class="suggestions-list"></div>
+                    </div>
+                    <div id="selectedGamesList" class="selected-games"></div>
+                </div>
+            </div>
+            <button id="resetFiltersBtn" class="reset-btn" data-i18n="spiral_reset_filters">⟳ Reset All Filters</button>
+        </div>
+        <div class="info-text" data-i18n="spiral_hover_hint">Hover over bars → see detailed game count & price info | Highlighted games color entire bars</div>
+    </div>
+
+    <div class="vis-container">
+        <div id="spiral-container"></div>
+        <div class="legend" id="priceLegend"></div>
+        <div class="status-msg" id="statusMsg" data-i18n="spiral_no_data">No data loaded. Please upload a CSV file below.</div>
+    </div>
+
+    <div class="footer">
+        <label class="file-label">
+            <span data-i18n="spiral_upload_csv">Upload CSV File</span>
+            <input type="file" id="csvUpload" accept=".csv">
+        </label>
+        <footer>Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.</footer>
+    </div>
+</div>
+
+<script>
+    const PRICE_BINS = [
+        { label: "Free", min: -Infinity, max: 0, key: "Free" },
+        { label: "<5$", min: 0, max: 5 },
+        { label: "<10$", min: 5, max: 10 },
+        { label: "<15$", min: 10, max: 15 },
+        { label: "<20$", min: 15, max: 20 },
+        { label: "<30$", min: 20, max: 30 },
+        { label: "<40$", min: 30, max: 40 },
+        { label: ">40$", min: 40, max: Infinity }
+    ];
+
+    const HIGHLIGHT_COLORS = ['#E19898', '#1DCD9F', '#FFD933', '#9929EA', '#4924FF'];
+    
+    let originalGames = [];
+    let filteredGames = [];
+    let genreSet = new Set(), playerSet = new Set(), platformSet = new Set();
+    let activeGenres = new Set();
+    let activePlayerTypes = new Set();
+    let activePlatforms = new Set();
+    let selectedGames = new Map();
+
+    function categorizePrice(priceVal) {
+        if (priceVal === undefined || priceVal === null || priceVal === '') return ">40$";
+        let priceNum;
+        if (typeof priceVal === 'string') {
+            let lower = priceVal.trim().toLowerCase();
+            if (lower === 'free' || lower === 'free to play') return "Free";
+            priceNum = parseFloat(priceVal.replace('$', '').trim());
+        } else {
+            priceNum = priceVal;
+        }
+        if (isNaN(priceNum)) return ">40$";
+        if (priceNum === 0) return "Free";
+        for (let bin of PRICE_BINS) {
+            if (bin.label === "Free") continue;
+            if (priceNum >= bin.min && priceNum < bin.max) return bin.label;
+            if (bin.label === ">40$" && priceNum >= 40) return ">40$";
+        }
+        return ">40$";
+    }
+
+    function parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        let i = 0;
+        
+        while (i < line.length) {
+            const char = line[i];
+            if (char === '"') {
+                if (inQuotes && line[i+1] === '"') {
+                    current += '"';
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (char === ',' && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+            i++;
+        }
+        result.push(current.trim());
+        return result;
+    }
+
+    function parseCSVRow(row, headers) {
+        const getValue = (possibleNames) => {
+            for (let name of possibleNames) {
+                const index = headers.findIndex(h => h === name);
+                if (index !== -1 && row[index] !== undefined && row[index] !== "") {
+                    return row[index];
+                }
+            }
+            return "";
+        };
+        
+        const splitValues = (str) => {
+            if (!str || str === '') return [];
+            return str.split(',').map(s => s.trim().toLowerCase()).filter(s => s.length > 0);
+        };
+        
+        const priceValue = getValue(['price$', 'price', 'Price$', 'Price']);
+        const genresValue = getValue(['steam_genres', 'Steam Genres', 'genres']);
+        const playerTypeValue = getValue(['player_type', 'Player Type', 'playertype']);
+        const platformsValue = getValue(['supported_platforms', 'Supported Platforms', 'platforms']);
+        
+        return {
+            game_name: getValue(['game_name', 'Game Name', 'game name']) || "unknown",
+            release_year: parseInt(getValue(['release_year', 'Release Year', 'year'])),
+            priceRaw: priceValue,
+            steam_genres: splitValues(genresValue),
+            player_type: splitValues(playerTypeValue),
+            supported_platforms: splitValues(platformsValue)
+        };
+    }
+
+    function isLongLabel(text) {
+        return text.length > 18;
+    }
+
+    function renderGenreGrid() {
+        const container = document.getElementById('genreGrid');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        const sortedGenres = Array.from(genreSet).sort();
+        
+        const anyDiv = document.createElement('div');
+        anyDiv.className = 'toggle-item';
+        const anyLabel = document.createElement('span');
+        anyLabel.className = 'toggle-label genre-label';
+        anyLabel.textContent = 'Any';
+        const anyToggle = document.createElement('div');
+        anyToggle.className = 'toggle-switch';
+        if (activeGenres.has('ANY')) {
+            anyToggle.classList.add('active');
+        }
+        
+        anyToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (activeGenres.has('ANY')) {
+                activeGenres.clear();
+                anyToggle.classList.remove('active');
+            } else {
+                activeGenres.clear();
+                activeGenres.add('ANY');
+                anyToggle.classList.add('active');
+                document.querySelectorAll('#genreGrid .toggle-switch').forEach(toggle => {
+                    if (toggle !== anyToggle) {
+                        toggle.classList.remove('active');
+                    }
+                });
+            }
+            applyFilters();
+        });
+        
+        anyDiv.appendChild(anyLabel);
+        anyDiv.appendChild(anyToggle);
+        container.appendChild(anyDiv);
+        
+        sortedGenres.forEach(genre => {
+            const div = document.createElement('div');
+            div.className = 'toggle-item';
+            const label = document.createElement('span');
+            label.className = 'toggle-label genre-label';
+            if (isLongLabel(genre)) {
+                label.classList.add('long-label');
+            }
+            label.textContent = genre;
+            const toggle = document.createElement('div');
+            toggle.className = 'toggle-switch';
+            if (activeGenres.has(genre)) {
+                toggle.classList.add('active');
+            }
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (activeGenres.has(genre)) {
+                    activeGenres.delete(genre);
+                    toggle.classList.remove('active');
+                    if (activeGenres.size === 0) {
+                        activeGenres.add('ANY');
+                        anyToggle.classList.add('active');
+                    }
+                } else {
+                    activeGenres.add(genre);
+                    toggle.classList.add('active');
+                    if (activeGenres.has('ANY')) {
+                        activeGenres.delete('ANY');
+                        anyToggle.classList.remove('active');
+                    }
+                }
+                applyFilters();
+            });
+            div.appendChild(label);
+            div.appendChild(toggle);
+            container.appendChild(div);
+        });
+    }
+
+    function renderTogglePanel(containerId, itemsSet, activeSet, labelSizeClass = 'large-label') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        const sortedItems = Array.from(itemsSet).sort();
+        sortedItems.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'toggle-item';
+            const label = document.createElement('span');
+            label.className = `toggle-label ${labelSizeClass}`;
+            if (isLongLabel(item)) {
+                label.classList.add('long-label');
+            }
+            label.textContent = item;
+            const toggle = document.createElement('div');
+            toggle.className = 'toggle-switch';
+            if (activeSet.has(item)) {
+                toggle.classList.add('active');
+            }
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (activeSet.has(item)) {
+                    activeSet.delete(item);
+                    toggle.classList.remove('active');
+                } else {
+                    activeSet.add(item);
+                    toggle.classList.add('active');
+                }
+                applyFilters();
+            });
+            div.appendChild(label);
+            div.appendChild(toggle);
+            container.appendChild(div);
+        });
+    }
+
+    function updateFilterSets() {
+        genreSet.clear(); playerSet.clear(); platformSet.clear();
+        originalGames.forEach(g => {
+            g.steam_genres.forEach(gen => genreSet.add(gen));
+            g.player_type.forEach(pt => playerSet.add(pt));
+            g.supported_platforms.forEach(plat => platformSet.add(plat));
+        });
+        
+        if (activeGenres.size === 0) {
+            activeGenres.add('ANY');
+        }
+        if (activePlayerTypes.size === 0) {
+            playerSet.forEach(p => activePlayerTypes.add(p));
+        }
+        if (activePlatforms.size === 0) {
+            platformSet.forEach(p => activePlatforms.add(p));
+        }
+        
+        renderGenreGrid();
+        renderTogglePanel('playerTypeList', playerSet, activePlayerTypes, 'large-label');
+        renderTogglePanel('platformList', platformSet, activePlatforms, 'large-label');
+    }
+
+    function getSuggestions(query) {
+        if (!query || query.length < 1) return [];
+        
+        const lowerQuery = query.toLowerCase();
+        const suggestions = [];
+        
+        for (const game of filteredGames) {
+            if (game.game_name.toLowerCase().includes(lowerQuery)) {
+                if (!selectedGames.has(game.game_name)) {
+                    suggestions.push(game.game_name);
+                }
+                if (suggestions.length >= 10) break;
+            }
+        }
+        
+        return suggestions;
+    }
+
+    function updateSuggestions() {
+        const query = document.getElementById('gameSearchInput').value;
+        const suggestions = getSuggestions(query);
+        const suggestionsList = document.getElementById('suggestionsList');
+        
+        if (suggestions.length > 0 && query.length > 0) {
+            suggestionsList.innerHTML = '';
+            suggestions.forEach(suggestion => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = suggestion;
+                div.onclick = () => selectGame(suggestion);
+                suggestionsList.appendChild(div);
+            });
+            suggestionsList.classList.add('active');
+        } else {
+            suggestionsList.classList.remove('active');
+        }
+    }
+
+    function selectGame(gameName) {
+        if (selectedGames.size >= 5) {
+            const maxGamesMsg = typeof t === 'function' ? t('spiral_max_games') : 'Maximum 5 games can be highlighted. Remove a game first.';
+            document.getElementById('statusMsg').innerHTML = maxGamesMsg;
+            return;
+        }
+        
+        if (!selectedGames.has(gameName)) {
+            const colorIndex = selectedGames.size;
+            selectedGames.set(gameName, colorIndex);
+            updateSelectedGamesDisplay();
+            renderSpiralCondegram();
+        }
+        
+        document.getElementById('gameSearchInput').value = '';
+        document.getElementById('suggestionsList').classList.remove('active');
+    }
+
+    function removeGame(gameName) {
+        selectedGames.delete(gameName);
+        const newIndex = new Map();
+        let idx = 0;
+        for (const [name, _] of selectedGames) {
+            newIndex.set(name, idx++);
+        }
+        selectedGames.clear();
+        for (const [name, _] of newIndex) {
+            selectedGames.set(name, _);
+        }
+        updateSelectedGamesDisplay();
+        renderSpiralCondegram();
+    }
+
+    function updateSelectedGamesDisplay() {
+        const container = document.getElementById('selectedGamesList');
+        container.innerHTML = '';
+        
+        for (const [gameName, colorIndex] of selectedGames) {
+            const tag = document.createElement('div');
+            tag.className = 'selected-game-tag';
+            tag.style.backgroundColor = HIGHLIGHT_COLORS[colorIndex % HIGHLIGHT_COLORS.length];
+            tag.style.color = '#1B1B1B';
+            tag.style.fontFamily = "'Source Sans Pro', sans-serif";
+            tag.style.fontWeight = '300';
+            tag.innerHTML = `${gameName} <span class="remove-game" onclick="removeGame('${gameName.replace(/'/g, "\\'")}')">✕</span>`;
+            container.appendChild(tag);
+        }
+    }
+
+    function applyFilters() {
+        filteredGames = originalGames.filter(game => {
+            if (activeGenres.has('ANY')) {
+            } else if (activeGenres.size > 0) {
+                const hasGenre = game.steam_genres.some(genre => activeGenres.has(genre));
+                if (!hasGenre) return false;
+            }
+            if (activePlayerTypes.size > 0) {
+                const hasPlayerType = game.player_type.some(pt => activePlayerTypes.has(pt));
+                if (!hasPlayerType) return false;
+            }
+            if (activePlatforms.size > 0) {
+                const hasPlatform = game.supported_platforms.some(plat => activePlatforms.has(plat));
+                if (!hasPlatform) return false;
+            }
+            return true;
+        });
+        
+        const showingText = typeof t === 'function' ? t('spiral_showing_games') : 'Showing';
+        const gamesText = typeof t === 'function' ? t('spiral_games') : 'games (of';
+        const totalText = typeof t === 'function' ? t('spiral_total') : 'total)';
+        const filtersActiveText = typeof t === 'function' ? t('spiral_filters_active') : 'Filters active.';
+        const noMatchText = typeof t === 'function' ? t('spiral_no_match') : 'No games match.';
+        
+        document.getElementById('statusMsg').innerHTML = `${showingText} ${filteredGames.length} ${gamesText} ${originalGames.length} ${totalText} | ${filtersActiveText}`;
+        if (filteredGames.length === 0) document.getElementById('statusMsg').innerHTML += ` ${noMatchText}`;
+        renderSpiralCondegram();
+    }
+
+    function getYearColor(yearIndex, totalYears) {
+        const t = yearIndex / (totalYears - 1);
+        const r = Math.floor(255 + t * (217 - 255));
+        const g = Math.floor(255 + t * (141 - 255));
+        const b = Math.floor(255 + t * (0 - 255));
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    function renderSpiralCondegram() {
+        if (!filteredGames.length) {
+            const noDataMsg = typeof t === 'function' ? t('spiral_no_data') : 'No data. Upload CSV or adjust filters.';
+            d3.select("#spiral-container").html(`<div style="text-align:center; padding:3rem;">${noDataMsg}</div>`);
+            d3.select("#priceLegend").html("");
+            return;
+        }
+
+        let yearsSet = new Set(filteredGames.map(g => g.release_year).filter(y => !isNaN(y) && y > 1990 && y < 2030));
+        if (yearsSet.size === 0) return;
+        let maxYear = Math.max(...yearsSet);
+        let startYear = maxYear - 29;
+        let yearsList = [];
+        for (let i = 0; i < 30; i++) yearsList.push(startYear + i);
+        
+        let yearData = yearsList.map(year => {
+            let gamesInYear = filteredGames.filter(g => g.release_year === year);
+            let catCounts = {};
+            PRICE_BINS.forEach(bin => { catCounts[bin.label] = 0; });
+            gamesInYear.forEach(g => {
+                let cat = categorizePrice(g.priceRaw);
+                if (catCounts.hasOwnProperty(cat)) catCounts[cat] += 1;
+                else catCounts[cat] = 1;
+            });
+            let total = gamesInYear.length;
+            return { year, counts: catCounts, totalGames: total };
+        });
+        
+        let barsData = [];
+        yearData.forEach((yd, yIdx) => {
+            PRICE_BINS.forEach((bin, catIdx) => {
+                let count = yd.counts[bin.label] || 0;
+                if (count > 0) {
+                    barsData.push({
+                        year: yd.year,
+                        priceLabel: bin.label,
+                        count: count,
+                        yearIdx: yIdx,
+                        categoryIdx: catIdx,
+                        totalInYear: yd.totalGames,
+                        yearIndex: yIdx
+                    });
+                }
+            });
+        });
+        
+        if (barsData.length === 0) {
+            const noPriceMsg = typeof t === 'function' ? t('spiral_no_price_data') : 'No price data available for selected filters.';
+            d3.select("#spiral-container").html(`<div style="text-align:center; padding:3rem;">${noPriceMsg}</div>`);
+            return;
+        }
+        
+        const width = 1140, height = 900;
+        const margin = { top: 20, bottom: 20, left: 60, right: 60 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+        const centerX = innerWidth / 2, centerY = innerHeight / 2;
+        const maxRadius = Math.min(innerWidth, innerHeight) / 2 - 15;
+        const minRadius = 40;
+        const numSpirals = 2.8;
+        const startAngle = -Math.PI / 2;
+        
+        const radiusScale = d3.scaleLinear().domain([0, 1]).range([minRadius, maxRadius]);
+        const angle = (t) => startAngle + t * 2 * Math.PI * numSpirals;
+        
+        const points = d3.range(0, 1.001, 0.001).map(t => ({
+            x: Math.cos(angle(t)) * radiusScale(t),
+            y: Math.sin(angle(t)) * radiusScale(t)
+        }));
+        
+        d3.select("#spiral-container").selectAll("svg").remove();
+        const svg = d3.select("#spiral-container")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .style("overflow", "visible")
+            .append("g")
+            .attr("transform", `translate(${margin.left + centerX},${margin.top + centerY - 70})`);
+        
+        const lineGenerator = d3.line()
+            .x(d => d.x)
+            .y(d => d.y)
+            .curve(d3.curveCardinal);
+        const spiralPath = svg.append("path")
+            .datum(points)
+            .attr("d", lineGenerator)
+            .attr("class", "spiral-path")
+            .attr("fill", "none");
+        
+        const spiralPathNode = spiralPath.node();
+        const spiralLength = spiralPathNode.getTotalLength();
+        
+        barsData.sort((a,b) => {
+            if (a.year !== b.year) return a.year - b.year;
+            return a.categoryIdx - b.categoryIdx;
+        });
+        
+        const N = barsData.length;
+        const segmentLength = spiralLength / N;
+        const barWidth = segmentLength * 0.85;
+        
+        const maxCount = d3.max(barsData, d => d.count);
+        const barHeightScale = d3.scaleLinear()
+            .domain([0, maxCount])
+            .range([3, (maxRadius - minRadius) / numSpirals * 0.7]);
+        
+        const tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+        
+        let yearBoundaries = [];
+        let currentYear = barsData[0].year;
+        let yearStartIdx = 0;
+        
+        for (let i = 0; i < barsData.length; i++) {
+            if (barsData[i].year !== currentYear) {
+                yearBoundaries.push({ 
+                    year: currentYear, 
+                    startIdx: yearStartIdx, 
+                    endIdx: i - 1,
+                    totalGames: barsData[yearStartIdx].totalInYear,
+                    yearIdx: barsData[yearStartIdx].yearIdx
+                });
+                currentYear = barsData[i].year;
+                yearStartIdx = i;
+            }
+        }
+        yearBoundaries.push({ 
+            year: currentYear, 
+            startIdx: yearStartIdx, 
+            endIdx: barsData.length - 1,
+            totalGames: barsData[yearStartIdx].totalInYear,
+            yearIdx: barsData[yearStartIdx].yearIdx
+        });
+        
+        barsData.forEach((bar, idx) => {
+            const startDist = idx * segmentLength;
+            const endDist = startDist + barWidth;
+            
+            const startPoint = spiralPathNode.getPointAtLength(startDist);
+            const endPoint = spiralPathNode.getPointAtLength(endDist);
+            const midDist = startDist + barWidth/2;
+            
+            const pointA = spiralPathNode.getPointAtLength(Math.max(0, midDist - 3));
+            const pointB = spiralPathNode.getPointAtLength(Math.min(spiralLength, midDist + 3));
+            const tangentAngle = Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x);
+            const radialAngle = Math.atan2(startPoint.y, startPoint.x);
+            let outwardNormal = tangentAngle + Math.PI / 2;
+            const dotProduct = Math.cos(outwardNormal - radialAngle);
+            if (dotProduct < 0) {
+                outwardNormal += Math.PI;
+            }
+            
+            const barHeight = barHeightScale(bar.count);
+            const dx = endPoint.x - startPoint.x;
+            const dy = endPoint.y - startPoint.y;
+            const rectWidth = Math.hypot(dx, dy);
+            const barLengthAngle = outwardNormal;
+            const perpAngle = barLengthAngle + Math.PI / 2;
+            const halfWidth = rectWidth / 2;
+            const midX = (startPoint.x + endPoint.x) / 2;
+            const midY = (startPoint.y + endPoint.y) / 2;
+            
+            const baseCorner1 = {
+                x: midX + Math.cos(perpAngle) * halfWidth,
+                y: midY + Math.sin(perpAngle) * halfWidth
+            };
+            const baseCorner2 = {
+                x: midX - Math.cos(perpAngle) * halfWidth,
+                y: midY - Math.sin(perpAngle) * halfWidth
+            };
+            const topCorner1 = {
+                x: baseCorner1.x + Math.cos(barLengthAngle) * barHeight,
+                y: baseCorner1.y + Math.sin(barLengthAngle) * barHeight
+            };
+            const topCorner2 = {
+                x: baseCorner2.x + Math.cos(barLengthAngle) * barHeight,
+                y: baseCorner2.y + Math.sin(barLengthAngle) * barHeight
+            };
+            
+            const gamesInThisBar = filteredGames.filter(g => 
+                g.release_year === bar.year && 
+                categorizePrice(g.priceRaw) === bar.priceLabel
+            );
+            
+            const highlightColors = [];
+            for (const [gameName, colorIndex] of selectedGames) {
+                if (gamesInThisBar.some(g => g.game_name === gameName)) {
+                    highlightColors.push(HIGHLIGHT_COLORS[colorIndex % HIGHLIGHT_COLORS.length]);
+                }
+            }
+            
+            let fillStyle;
+            if (highlightColors.length > 1) {
+                const gradientId = `gradient-${idx}`;
+                const gradient = svg.append("defs")
+                    .append("linearGradient")
+                    .attr("id", gradientId)
+                    .attr("x1", "0%")
+                    .attr("y1", "0%")
+                    .attr("x2", "100%")
+                    .attr("y2", "100%");
+                
+                highlightColors.forEach((color, colorIdx) => {
+                    gradient.append("stop")
+                        .attr("offset", `${(colorIdx / highlightColors.length) * 100}%`)
+                        .attr("stop-color", color);
+                    gradient.append("stop")
+                        .attr("offset", `${((colorIdx + 1) / highlightColors.length) * 100}%`)
+                        .attr("stop-color", color);
+                });
+                fillStyle = `url(#${gradientId})`;
+            } else if (highlightColors.length === 1) {
+                fillStyle = highlightColors[0];
+            } else {
+                fillStyle = getYearColor(bar.yearIdx, 30);
+            }
+            
+            svg.append("polygon")
+                .attr("points", `${baseCorner1.x},${baseCorner1.y} ${baseCorner2.x},${baseCorner2.y} ${topCorner2.x},${topCorner2.y} ${topCorner1.x},${topCorner1.y}`)
+                .attr("fill", fillStyle)
+                .attr("stroke", highlightColors.length > 0 ? "#FFFFFF" : "#EFDFC0aa")
+                .attr("stroke-width", highlightColors.length > 0 ? 1.5 : 0.5)
+                .style("cursor", "pointer")
+                .on("mouseover", function(event) {
+                    d3.select(this).attr("stroke", "white").attr("stroke-width", 2);
+                    const priceRangeText = typeof t === 'function' ? t('spiral_price_range') : 'Price range';
+                    const gamesCountText = typeof t === 'function' ? t('spiral_games_count') : 'Games';
+                    const totalInYearText = typeof t === 'function' ? t('spiral_total_in_year') : 'Total in year';
+                    const highlightedText = typeof t === 'function' ? t('spiral_highlighted') : 'Highlighted';
+                    
+                    let tooltipText = `${priceRangeText}: ${bar.priceLabel}<br>${gamesCountText}: ${bar.count}<br>${totalInYearText} ${bar.year}: ${bar.totalInYear}`;
+                    if (highlightColors.length > 0) {
+                        const highlightedGameNames = gamesInThisBar.filter(g => selectedGames.has(g.game_name)).map(g => g.game_name);
+                        if (highlightedGameNames.length > 0) {
+                            tooltipText += `<br>${highlightedText}: ${highlightedGameNames.join(', ')}`;
+                        }
+                    }
+                    tooltip.style("opacity", 1)
+                        .html(tooltipText)
+                        .style("left", (event.pageX + 12) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function() {
+                    d3.select(this).attr("stroke", highlightColors.length > 0 ? "#FFFFFF" : "#EFDFC0aa").attr("stroke-width", highlightColors.length > 0 ? 1.5 : 0.5);
+                    tooltip.style("opacity", 0);
+                });
+        });
+        
+        for (let i = 0; i < yearBoundaries.length - 1; i++) {
+            const currentYearBoundary = yearBoundaries[i];
+            const nextYearBoundary = yearBoundaries[i + 1];
+            const lastBarIdx = currentYearBoundary.endIdx;
+            const firstBarNextIdx = nextYearBoundary.startIdx;
+            const gapStartDist = (lastBarIdx + 1) * segmentLength;
+            const gapEndDist = firstBarNextIdx * segmentLength;
+            const midGapDist = (gapStartDist + gapEndDist) / 2;
+            const separatorPoint = spiralPathNode.getPointAtLength(midGapDist);
+            const prevPoint = spiralPathNode.getPointAtLength(Math.max(0, midGapDist - 5));
+            const nextPoint = spiralPathNode.getPointAtLength(Math.min(spiralLength, midGapDist + 5));
+            const tangentAngle = Math.atan2(nextPoint.y - prevPoint.y, nextPoint.x - prevPoint.x);
+            const normalAngle = tangentAngle + Math.PI / 2;
+            const separatorLength = 30;
+            const dx = Math.cos(normalAngle) * separatorLength / 2;
+            const dy = Math.sin(normalAngle) * separatorLength / 2;
+            const x1 = separatorPoint.x - dx;
+            const y1 = separatorPoint.y - dy;
+            const x2 = separatorPoint.x + dx;
+            const y2 = separatorPoint.y + dy;
+            svg.append("line")
+                .attr("x1", x1)
+                .attr("y1", y1)
+                .attr("x2", x2)
+                .attr("y2", y2)
+                .attr("class", "year-separator")
+                .attr("stroke", "#D98D00")
+                .attr("stroke-width", 2.5)
+                .attr("stroke-linecap", "round");
+        }
+        
+        yearBoundaries.forEach((boundary, index) => {
+            const midIdx = Math.floor((boundary.startIdx + boundary.endIdx) / 2);
+            const midDist = (midIdx * segmentLength) + (segmentLength / 2);
+            const labelPoint = spiralPathNode.getPointAtLength(midDist);
+            const prevPoint = spiralPathNode.getPointAtLength(Math.max(0, midDist - 10));
+            const nextPoint = spiralPathNode.getPointAtLength(Math.min(spiralLength, midDist + 10));
+            let angle = Math.atan2(nextPoint.y - prevPoint.y, nextPoint.x - prevPoint.x) * 180 / Math.PI;
+            if (angle > 90) angle -= 180;
+            if (angle < -90) angle += 180;
+            const radialAngle = Math.atan2(labelPoint.y, labelPoint.x);
+            const tangentRad = angle * Math.PI / 180;
+            const outwardNormal = tangentRad + Math.PI / 2;
+            let outwardCheck = Math.cos(outwardNormal - radialAngle);
+            let isPointingOutward = outwardCheck >= 0;
+            const offset = isPointingOutward ? -22 : 22;
+            const offsetX = Math.cos(outwardNormal) * offset;
+            const offsetY = Math.sin(outwardNormal) * offset;
+            const numBarsInYear = (boundary.endIdx - boundary.startIdx + 1);
+            const shouldShowLabel = boundary.year >= 2005 && index !== 0 && !(index < 5 && numBarsInYear < 2);
+            if (shouldShowLabel) {
+                svg.append("text")
+                    .attr("x", labelPoint.x + offsetX)
+                    .attr("y", labelPoint.y + offsetY)
+                    .attr("class", "year-label year-label-large")
+                    .attr("transform", `rotate(${angle}, ${labelPoint.x + offsetX}, ${labelPoint.y + offsetY})`)
+                    .text(`${boundary.year} (${boundary.totalGames})`);
+            }
+        });
+        
+        const totalDisplayedGames = filteredGames.length;
+        svg.append("circle")
+            .attr("r", minRadius - 8)
+            .attr("fill", "#1B1B1B")
+            .attr("stroke", "#D98D00")
+            .attr("stroke-width", 2.5);
+        
+        const gamesCenterText = typeof t === 'function' ? t('spiral_games_center') : 'GAMES';
+        svg.append("text")
+            .attr("x", 0)
+            .attr("y", -5)
+            .attr("class", "center-text")
+            .style("font-size", "16px")
+            .style("font-weight", "bold")
+            .text(totalDisplayedGames);
+        svg.append("text")
+            .attr("x", 0)
+            .attr("y", 12)
+            .attr("class", "center-subtext")
+            .style("font-size", "8px")
+            .text(gamesCenterText);
+        
+        const legendDiv = d3.select("#priceLegend");
+        legendDiv.html("");
+        const gradientItem = legendDiv.append("div").attr("class", "legend-item");
+        gradientItem.append("div").attr("class", "legend-color").style("background", "linear-gradient(90deg, white, #D98D00)").style("width", "40px");
+        
+        const olderYearsText = typeof t === 'function' ? t('spiral_older_years') : '← Older years → Recent years';
+        gradientItem.append("span").text(olderYearsText).style("font-size", "0.7rem");
+    }
+
+    function loadCSVData(csvText) {
+        const lines = csvText.trim().split('\n');
+        if (lines.length < 2) {
+            const errorMsg = typeof t === 'function' ? '❌ CSV file has no data rows.' : '❌ CSV file has no data rows.';
+            document.getElementById('statusMsg').innerHTML = errorMsg;
+            return false;
+        }
+        
+        const headers = parseCSVLine(lines[0]);
+        originalGames = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (lines[i].trim() === '') continue;
+            try {
+                const row = parseCSVLine(lines[i]);
+                if (row.length < headers.length) {
+                    while (row.length < headers.length) row.push('');
+                }
+                const game = parseCSVRow(row, headers);
+                if (!isNaN(game.release_year) && game.release_year > 1990 && game.release_year < 2030) {
+                    originalGames.push(game);
+                }
+            } catch(e) {
+                console.warn(`Error parsing row ${i}:`, e);
+            }
+        }
+        
+        if (originalGames.length === 0) {
+            const errorMsg = typeof t === 'function' ? '❌ No valid games found. Check CSV format.' : '❌ No valid games found. Check CSV format.';
+            document.getElementById('statusMsg').innerHTML = errorMsg;
+            return false;
+        }
+        
+        updateFilterSets();
+        applyFilters();
+        const loadedMsg = typeof t === 'function' ? `✅ Loaded ${originalGames.length} games! Spiral ready.` : `✅ Loaded ${originalGames.length} games! Spiral ready.`;
+        document.getElementById('statusMsg').innerHTML = loadedMsg;
+        return true;
+    }
+
+    function autoLoadCSV() {
+        const csvPath = '5_spiral.csv';
+        fetch(csvPath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(csvText => {
+                console.log('CSV loaded automatically from 5_spiral.csv');
+                loadCSVData(csvText);
+            })
+            .catch(error => {
+                console.error('Error loading CSV:', error);
+                const errorMsg = typeof t === 'function' ? `⚠️ Could not auto-load 5_spiral.csv: ${error.message}` : `⚠️ Could not auto-load 5_spiral.csv: ${error.message}`;
+                document.getElementById('statusMsg').innerHTML = errorMsg;
+            });
+    }
+
+    // Event listeners
+    const searchInput = document.getElementById('gameSearchInput');
+    searchInput.addEventListener('input', updateSuggestions);
+    searchInput.addEventListener('blur', () => {
+        setTimeout(() => {
+            document.getElementById('suggestionsList').classList.remove('active');
+        }, 200);
+    });
+
+    document.getElementById('csvUpload').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (evt) => loadCSVData(evt.target.result);
+            reader.onerror = () => {
+                const errorMsg = typeof t === 'function' ? '❌ Error reading file.' : '❌ Error reading file.';
+                document.getElementById('statusMsg').innerHTML = errorMsg;
+            };
+            reader.readAsText(file);
+        }
+    });
+    
+    document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+        activeGenres.clear();
+        activeGenres.add('ANY');
+        activePlayerTypes.clear();
+        playerSet.forEach(p => activePlayerTypes.add(p));
+        activePlatforms.clear();
+        platformSet.forEach(p => activePlatforms.add(p));
+        selectedGames.clear();
+        updateSelectedGamesDisplay();
+        renderGenreGrid();
+        renderTogglePanel('playerTypeList', playerSet, activePlayerTypes, 'large-label');
+        renderTogglePanel('platformList', platformSet, activePlatforms, 'large-label');
+        applyFilters();
+    });
+    
+    window.removeGame = removeGame;
+    
+    // Auto-load CSV when page loads
+    autoLoadCSV();
+</script>
+</body>
+</html>
