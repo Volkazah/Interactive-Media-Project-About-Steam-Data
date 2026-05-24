@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Steam Games - Gamer Reviews Flow Visualization</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Language support -->
+    <script src="language.js"></script>
     <style>
         * {
             margin: 0;
@@ -21,6 +23,38 @@
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        /* Language Selector Styles */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: rgba(239, 223, 192, 0.1);
+            border: 1px solid rgba(239, 223, 192, 0.3);
+            color: #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        .lang-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+            border-color: #EFDFC0;
         }
 
         .dashboard {
@@ -133,6 +167,11 @@
             color: #EFDFC0;
         }
 
+        .filter-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+        }
+
         .reset-btn, .clear-btn {
             padding: 8px 24px;
             font-size: 20px;
@@ -142,6 +181,10 @@
             cursor: pointer;
             font-family: 'Source Sans Pro', monospace;
             color: #EFDFC0;
+        }
+
+        .reset-btn:hover, .clear-btn:hover, .filter-btn:hover {
+            background: rgba(239,223,192,0.2);
         }
 
         .info-panel {
@@ -193,6 +236,17 @@
             color: #6bcf7f;
         }
 
+        .remove-game-btn {
+            margin-top: 5px;
+            padding: 2px 8px;
+            font-size: 10px;
+            background: #D98D00;
+            border: none;
+            border-radius: 12px;
+            color: #1B1B1B;
+            cursor: pointer;
+        }
+
         .vis-container {
             padding: 0.4rem 0.5rem;
             background: #1B1B1B;
@@ -232,7 +286,6 @@
 
         .upload-section {
             text-align: center;
-            cursor: pointer;
             transition: all 0.3s;
             padding: 5px;
             border-radius: 8px;
@@ -383,45 +436,47 @@
 </head>
 <body>
 <div class="dashboard">
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
+        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+    </div>
+
     <div class="header">
-        <div class="main-title">Gamers do change their opinion about videogames and often not in a better way</div>
-        <div class="sub-title" style="font-size: 14px; margin-top: 5px;">distribution change in gamer's reviews across 3139 top reviewed games in April 2026</div>
+        <div class="main-title" data-i18n="arc_title">Gamers do change their opinion about videogames and often not in a better way</div>
+        <div class="sub-title" style="font-size: 14px; margin-top: 5px;" data-i18n="arc_description">distribution change in gamer's reviews across 3139 top reviewed games in April 2026</div>
     </div>
 
     <div class="controls" id="topControls" style="display: none;">
         <div class="search-container">
-            <input type="text" id="gameSearch" placeholder="Search game..." autocomplete="off">
+            <input type="text" id="gameSearch" data-i18n="search_placeholder" placeholder="Search game..." autocomplete="off">
             <div id="autocompleteList" class="autocomplete-items"></div>
         </div>
         
         <div class="filter-section">
-            <button id="filterBoth" class="filter-btn active">Both</button>
-            <button id="filterAscending" class="filter-btn">Ascending ↑</button>
-            <button id="filterDescending" class="filter-btn">Descending ↓</button>
+            <button id="filterBoth" class="filter-btn active" data-i18n="filter_both">Both</button>
+            <button id="filterAscending" class="filter-btn" data-i18n="filter_ascending">Ascending ↑</button>
+            <button id="filterDescending" class="filter-btn" data-i18n="filter_descending">Descending ↓</button>
         </div>
         
-        <button id="resetBtn" class="reset-btn">Reset Positions</button>
-        <button id="clearAllBtn" class="clear-btn">Clear All</button>
+        <button id="resetBtn" class="reset-btn" data-i18n="reset_positions">Reset Positions</button>
+        <button id="clearAllBtn" class="clear-btn" data-i18n="clear_all">Clear All</button>
     </div>
 
     <div class="info-panel" id="infoPanel">
-        <div class="info-title">Highlighted Games</div>
+        <div class="info-title" data-i18n="compare_games">Highlighted Games</div>
         <div class="info-games-list" id="infoGamesList"></div>
     </div>
 
     <div class="vis-container" id="visContainer">
         <div id="vis"></div>
 
-        <div class="upload-panel" id="uploadPanel">
-            <div class="upload-section" id="uploadSection">
-                <input type="file" id="csvFile" accept=".csv">
-                <label for="csvFile" class="upload-label">Upload CSV File</label>
-                <div class="file-info">Click or drag & drop CSV file</div>
-            </div>
+        <!-- Hidden upload panel - status only -->
+        <div class="upload-panel" id="uploadPanel" style="display: none;">
             <div id="dataStats" class="stats-summary"></div>
         </div>
 
-        <div class="drag-instruction">Drag spheres • Hover for details</div>
+        <div class="drag-instruction" data-i18n="drag_instruction">Drag spheres • Hover for details</div>
         <div class="scale-info" id="scaleInfo"></div>
     </div>
 
@@ -487,23 +542,31 @@
     let minArcThickness = 1;
     let maxArcThickness = 14;
     
-    const uploadSection = document.getElementById('uploadSection');
-    const fileInput = document.getElementById('csvFile');
+    // Helper translation function with fallback
+    function t(key, fallback) {
+        if (typeof window !== 'undefined' && window.t) {
+            const translated = window.t(key);
+            if (translated && translated !== key) return translated;
+        }
+        return fallback || key;
+    }
     
     function autoLoadCSV() {
-        const csvPath = 'data/1_arc.csv';
+        // FIXED: CSV is in the same folder, not in 'data/' subfolder
+        const csvPath = '1_arc.csv';
         fetch(csvPath)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return response.text();
             })
             .then(csvText => {
-                console.log('CSV loaded automatically');
+                console.log('CSV loaded automatically from 1_arc.csv');
                 loadDataFromCSV(csvText, '1_arc.csv');
             })
             .catch(error => {
                 console.error('Error loading CSV:', error);
-                document.getElementById('dataStats').innerHTML = `<span class="error">Error loading data: ${error.message}</span>`;
+                const errorMsg = t('error_loading', 'Error loading CSV');
+                document.getElementById('dataStats').innerHTML = `<span class="error">${errorMsg}: ${error.message}</span>`;
             });
     }
 
@@ -511,31 +574,12 @@
         if (!file) return;
         const reader = new FileReader();
         reader.onload = function(event) { loadDataFromCSV(event.target.result, file.name); };
-        reader.onerror = function() { document.getElementById('dataStats').innerHTML = '<span class="error">Error reading file</span>'; };
+        reader.onerror = function() { 
+            const errorMsg = t('error_loading', 'Error reading file');
+            document.getElementById('dataStats').innerHTML = `<span class="error">${errorMsg}</span>`;
+        };
         reader.readAsText(file);
     }
-    
-    uploadSection.addEventListener('click', (e) => {
-        if (e.target === uploadSection || e.target.classList.contains('upload-label') || e.target.classList.contains('file-info')) {
-            fileInput.click();
-        }
-    });
-    
-    uploadSection.addEventListener('dragover', (e) => { e.preventDefault(); uploadSection.classList.add('drag-over'); });
-    uploadSection.addEventListener('dragleave', () => { uploadSection.classList.remove('drag-over'); });
-    uploadSection.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadSection.classList.remove('drag-over');
-        const file = e.dataTransfer.files[0];
-        if (file && file.name.endsWith('.csv')) handleFileUpload(file);
-    });
-    
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-            handleFileUpload(e.target.files[0]);
-            fileInput.value = '';
-        }
-    });
     
     function normalizeCategory(category) {
         if (!category) return "unknown";
@@ -645,7 +689,8 @@
         if (persistentGames.find(p => p.game.name === game.name)) return;
         
         if (persistentGames.length >= 5) {
-            document.getElementById('infoPanel').innerHTML = '<div class="info-title">Maximum 5 games can be compared at once. Remove a game first.</div>';
+            const maxMsg = t('max_games', 'Maximum 5 games can be compared at once. Remove a game first.');
+            document.getElementById('infoPanel').innerHTML = `<div class="info-title">${maxMsg}</div>`;
             setTimeout(() => {
                 updateInfoPanel();
             }, 3000);
@@ -679,7 +724,7 @@
                 <div class="info-game-details">${item.game.totalCategory} → ${item.game.recentCategory}</div>
                 <div class="info-game-reviews">${item.game.recentNumber.toLocaleString()} recent reviews</div>
                 <div class="info-game-details" style="font-size: 10px;">Total reviews: ${item.game.totalNumber.toLocaleString()}</div>
-                <button class="remove-game-btn" data-name="${item.game.name}" style="margin-top: 5px; padding: 2px 8px; font-size: 10px; background: #D98D00; border: none; border-radius: 12px; color: #1B1B1B; cursor: pointer;">Remove</button>
+                <button class="remove-game-btn" data-name="${item.game.name}">Remove</button>
             </div>
         `).join('');
         
@@ -731,75 +776,6 @@
             }
             
             updateInfoPanel();
-        }
-    }
-    
-    function removeHighlightForGame(persistentGame) {
-        const { game, colorIndex } = persistentGame;
-        
-        nodeGroup.selectAll(".sphere").each(function() {
-            const category = d3.select(this).attr("data-category");
-            if (category === game.totalCategory || category === game.recentCategory) {
-                d3.select(this).attr("stroke", (d) => SPHERE_COLORS[d.id] || SPHERE_COLORS).attr("stroke-width", 2);
-                d3.select(this).classed(`pulse-sphere-${colorIndex}`, false);
-                for(let i = 0; i < 5; i++) {
-                    d3.select(this).classed(`pulse-sphere-${i}`, false);
-                }
-            }
-        });
-        
-        if (window.activeGradients) {
-            window.activeGradients.forEach(gradId => {
-                svg.select(`#${gradId}`).remove();
-            });
-            window.activeGradients = [];
-        }
-        
-        if (animationGroup) {
-            animationGroup.selectAll(`.anim-arc-${colorIndex}`).remove();
-        }
-    }
-    
-    function startPulseQueue(sphereId, colorIndex, color) {
-        if (!pulseQueues[sphereId]) {
-            pulseQueues[sphereId] = [];
-            pulseQueues[sphereId].isPlaying = false;
-        }
-        
-        pulseQueues[sphereId].push({ colorIndex, color });
-        
-        if (!pulseQueues[sphereId].isPlaying) {
-            processPulseQueue(sphereId);
-        }
-    }
-    
-    function processPulseQueue(sphereId) {
-        if (!pulseQueues[sphereId] || pulseQueues[sphereId].length === 0) {
-            if (pulseQueues[sphereId]) pulseQueues[sphereId].isPlaying = false;
-            return;
-        }
-        
-        pulseQueues[sphereId].isPlaying = true;
-        const currentPulse = pulseQueues[sphereId].shift();
-        
-        const sphere = nodeGroup.selectAll(".sphere").filter(function() {
-            return d3.select(this).attr("data-category") === sphereId;
-        });
-        
-        if (sphere.size() > 0) {
-            sphere.style("filter", `drop-shadow(0 0 15px ${currentPulse.color})`);
-            sphere.attr("stroke-width", 6);
-            
-            setTimeout(() => {
-                sphere.style("filter", null);
-                sphere.attr("stroke-width", 4);
-                
-                setTimeout(() => {
-                    processPulseQueue(sphereId);
-                }, 500);
-            }, 800);
-        } else {
-            processPulseQueue(sphereId);
         }
     }
     
@@ -987,7 +963,8 @@
             
             if (gamesData.length === 0) throw new Error("No valid game data found");
             
-            document.getElementById('dataStats').innerHTML = `${gamesData.length.toLocaleString()} games loaded`;
+            const gamesLoadedMsg = t('games_loaded', 'games loaded');
+            document.getElementById('dataStats').innerHTML = `${gamesData.length.toLocaleString()} ${gamesLoadedMsg}`;
             document.getElementById('topControls').style.display = 'flex';
             document.getElementById('visContainer').classList.add('active');
             
@@ -1009,7 +986,8 @@
             
         } catch (error) {
             console.error("Error loading CSV:", error);
-            document.getElementById('dataStats').innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            const errorMsg = t('error_loading', 'Error');
+            document.getElementById('dataStats').innerHTML = `<span class="error">${errorMsg}: ${error.message}</span>`;
         }
     }
     
@@ -1244,24 +1222,12 @@
             .attr("x", d => d.x)
             .attr("y", d => d.y)
             .style("font-size", d => {
-                if (d.id === "very negative") {
-                    return "7px";
-                }
-                if (d.id === "mostly negative") {
-                    return "9px";
-                }
-                if (d.id === "mixed") {
-                    return "30px";
-                }
-                if (d.id === "overwhelmingly negative") {
-                    return "6px";
-                }
-                if (d.id === "overwhelmingly positive") {
-                    return "28px";
-                }
-                if (d.id === "very positive") {
-                    return "32px";
-                }
+                if (d.id === "very negative") return "7px";
+                if (d.id === "mostly negative") return "9px";
+                if (d.id === "mixed") return "30px";
+                if (d.id === "overwhelmingly negative") return "6px";
+                if (d.id === "overwhelmingly positive") return "28px";
+                if (d.id === "very positive") return "32px";
                 return "19px";
             })
             .style("fill", "#000000")
@@ -1439,6 +1405,7 @@
         redrawArcs();
     }
     
+    // Start auto-load
     autoLoadCSV();
 </script>
 </body>
