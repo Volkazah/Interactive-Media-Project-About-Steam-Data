@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Publishers and Developers Distribution</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- Language support -->
-    <script src="language.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -21,38 +19,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-        
-        /* Language Selector Styles */
-        .language-selector {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .lang-btn {
-            background: rgba(239, 223, 192, 0.1);
-            border: 1px solid rgba(239, 223, 192, 0.3);
-            color: #EFDFC0;
-            padding: 8px 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-family: 'Source Sans Pro', monospace;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .lang-btn:hover {
-            background: rgba(239, 223, 192, 0.2);
-        }
-
-        .lang-btn.active {
-            background: #EFDFC0;
-            color: #1B1B1B;
-            border-color: #EFDFC0;
         }
 
         .dashboard {
@@ -98,47 +64,57 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            justify-content: space-between;
-            gap: 15px;
+            gap: 20px;
         }
 
-        .upload-area {
-            background: #2a2a2a;
-            border-radius: 60px;
+        .left-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group {
+            background: #1B1B1B;
+            border-radius: 40px;
             padding: 4px 16px;
-            display: inline-flex;
+            display: flex;
             align-items: center;
             gap: 12px;
-            border: 1px solid #D98D00;
-            transition: 0.2s;
         }
 
-        .file-name {
-            font-size: 0.8rem;
-            color: #EFDFC0;
+        .control-group label {
             font-weight: 500;
-        }
-
-        .stats-badge {
-            background: #2a2a2a;
-            border-radius: 40px;
-            padding: 6px 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 20px;
             color: #EFDFC0;
             font-family: 'Source Sans Pro', monospace;
         }
 
-        .stats-badge span {
-            font-weight: 800;
-            color: #D98D00;
+        .control-select {
+            background: #1B1B1B;
+            border: 1px solid #D98D00;
+            border-radius: 32px;
+            padding: 6px 14px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #EFDFC0;
+            font-family: 'Source Sans Pro', monospace;
+        }
+
+        .control-select:hover {
+            border-color: #EFDFC0;
+            background: #2a2a2a;
         }
 
         .search-section {
+            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 8px;
             min-width: 300px;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         .search-container {
@@ -252,42 +228,8 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        .control-group {
-            background: #2a2a2a;
-            border-radius: 40px;
-            padding: 4px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .control-group label {
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: #EFDFC0;
-            font-family: 'Source Sans Pro', monospace;
-        }
-
-        .control-select {
-            background: #1B1B1B;
-            border: 1px solid #D98D00;
-            border-radius: 32px;
-            padding: 6px 14px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s;
-            color: #EFDFC0;
-            font-family: 'Source Sans Pro', monospace;
-        }
-
-        .control-select:hover {
-            border-color: #EFDFC0;
-            background: #2a2a2a;
-        }
-
         .layer-control {
-            background: #2a2a2a;
+            background: #1B1B1B;
             border-radius: 48px;
             display: flex;
             align-items: center;
@@ -298,7 +240,7 @@
         .layer-btn, .back-from-dendro {
             background: #D98D00;
             border: none;
-            color: #1B1B1B;
+            color: #2a2a2a;
             padding: 6px 16px;
             border-radius: 40px;
             font-size: 0.85rem;
@@ -319,19 +261,50 @@
         }
 
         .layer-indicator {
-            font-weight: 700;
-            font-size: 0.9rem;
-            background: #1B1B1B;
+            font-weight: 500;
+            font-size: 20px;
+            background: #D98D00;
+            color: #1B1B1B;
             padding: 4px 12px;
             border-radius: 32px;
-            color: #EFDFC0;
             font-family: 'Source Sans Pro', monospace;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .layer-indicator:hover {
+            background: #D98D00;
+            color: #1B1B1B;
+            transform: scale(1.02);
         }
 
         .vis-container {
             padding: 1.2rem 1.5rem 1.8rem;
             background: #1B1B1B;
             transition: all 0.3s ease;
+        }
+
+        .treemap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 0 10px;
+        }
+
+        .stats-header {
+            background: #2a2a2a;
+            border-radius: 40px;
+            padding: 6px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #EFDFC0;
+            font-family: 'Source Sans Pro', monospace;
+        }
+
+        .stats-header span {
+            font-weight: 800;
+            color: #D98D00;
         }
 
         .tooltip {
@@ -350,6 +323,10 @@
             line-height: 1.4;
             max-width: 280px;
             font-family: 'Source Sans Pro', monospace;
+            bottom: auto;
+            top: auto;
+            left: auto;
+            right: auto;
         }
 
         .tooltip strong {
@@ -443,6 +420,52 @@
             color: #EFDFC0;
             border-top: 1px solid #D98D00;
             font-family: 'Source Sans Pro', monospace;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-credit {
+            flex: 1;
+            text-align: center;
+        }
+
+        .upload-area {
+            background: #2a2a2a;
+            border-radius: 60px;
+            padding: 4px 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #D98D00;
+            transition: 0.2s;
+        }
+
+        .upload-area label {
+            background: #D98D00;
+            color: #1B1B1B;
+            padding: 6px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-area label:hover {
+            background: #c47d00;
+        }
+
+        #csv-file-input {
+            display: none;
+        }
+
+        .file-name {
+            font-size: 0.7rem;
+            color: #EFDFC0;
+            font-weight: 500;
         }
 
         button {
@@ -506,6 +529,8 @@
             color: #EFDFC0;
             margin-top: 4px;
             font-family: 'Source Sans Pro', monospace;
+            text-align: center;
+            display:none;
         }
 
         text {
@@ -516,88 +541,127 @@
             fill: #000000 !important;
             font-weight: 400 !important;
         }
+
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: rgba(239, 223, 192, 0.1);
+            border: 1px solid rgba(239, 223, 192, 0.3);
+            color: #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        .lang-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+            border-color: #EFDFC0;
+        }
     </style>
 </head>
 <body>
-
-<!-- Language Selector -->
-<div class="language-selector">
-    <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
-    <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
-</div>
-
 <div class="dashboard">
     <div class="header">
-        <h1 data-i18n="treemap_title">Indie Publishers Hold Their Ground Against AAA</h1>
-        <p data-i18n="treemap_subtitle">Publishers and Developers Distribution on Steam</p>
+        <h1>Indie Publishers Hold Their Ground Against AAA</h1>
+        <p>Publishers and Developers Distribution on Steam</p>
     </div>
 
     <div class="controls">
-        <div class="upload-area">
-            <span id="file-name-display" class="file-name" data-i18n="loading">Loading data...</span>
+        <div class="left-controls">
+            <div class="control-group">
+                <label>Tiling:</label>
+                <select id="tiling-algorithm" class="control-select">
+                    <option value="treemapSquarify">treemapSquarify</option>
+                    <option value="treemapBinary" selected>treemapBinary</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Sorting:</label>
+                <select id="sort-order" class="control-select">
+                    <option value="desc" selected>Descending (largest first)</option>
+                    <option value="asc">Ascending (smallest first)</option>
+                </select>
+            </div>
         </div>
-        <div class="stats-badge">
-            🧾 <span id="pub-count">0</span> <span data-i18n="publishers">publishers</span> &nbsp;|&nbsp; 🎮 <span id="game-count">0</span> <span data-i18n="games">games</span>
-        </div>
+        
         <div class="search-section">
             <div class="search-container">
-                <input type="text" id="search-input" class="search-input" data-i18n="search_placeholder" placeholder="🔍 Search game, publisher, developer... (up to 5 items)" autocomplete="off">
+                <input type="text" id="search-input" class="search-input" placeholder="Search game, publisher, developer... (up to 5 items)" autocomplete="off">
                 <div id="autocomplete-list" class="autocomplete-list" style="display: none;"></div>
             </div>
             <div class="search-tags" id="search-tags"></div>
-            <div class="search-hint">💡 Add up to 5 items to compare publishers side by side</div>
+            <div class="search-hint">Add up to 5 items to compare publishers side by side</div>
         </div>
-        <div class="control-group">
-            <label data-i18n="tiling">🧩 Tiling:</label>
-            <select id="tiling-algorithm" class="control-select">
-                <option value="treemapSquarify">treemapSquarify</option>
-                <option value="treemapBinary" selected>treemapBinary</option>
-            </select>
-        </div>
-        <div class="control-group">
-            <label data-i18n="sorting">📊 Sorting:</label>
-            <select id="sort-order" class="control-select">
-                <option value="desc" selected data-i18n="descending">Descending (largest first)</option>
-                <option value="asc" data-i18n="ascending">Ascending (smallest first)</option>
-            </select>
-        </div>
+
         <div class="layer-control">
             <div class="layer-status">
-                <span class="layer-indicator" id="layer-label">📌 Layer 1 · Top 40</span>
-                <button id="back-to-layer1-btn" class="layer-btn" style="display: none;" data-i18n="back_to_layer">← Back to Layer 1</button>
+                <span class="layer-indicator" id="layer-label">Layer 1 Top 40 Publishers</span>
             </div>
-            <button id="back-to-treemap-btn" class="back-from-dendro" style="display: none;" data-i18n="back_to_treemap">← Back to Treemap</button>
+            <button id="back-to-treemap-btn" class="back-from-dendro" style="display: none;">Back to Treemap</button>
         </div>
     </div>
 
     <div class="vis-container">
         <div id="treemap-view" style="display: block;">
+            <div class="treemap-header">
+                <div class="stats-header">
+                    <span id="pub-count">0</span> publishers | <span id="game-count">0</span> games
+                </div>
+            </div>
             <div class="treemap-wrapper" id="treemap-container">
                 <div class="empty-state">
-                    📁 Loading data...<br>
-                    <span style="font-size:0.7rem;">Please wait while data loads</span>
+                    Upload CSV file with Steam data<br>
+                    <span style="font-size:0.7rem;">Required columns: estimated_owners, rating, game_name, developer, publisher</span>
                 </div>
             </div>
         </div>
+
+        <div class="language-selector">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="ru">RU</button>
+        </div>
+
         <div id="dendro-view" style="display: none;">
             <div class="dendro-header">
                 <div class="dendro-scale-control">
-                    <span data-i18n="zoom">🔍 Zoom:</span>
+                    <span>Zoom:</span>
                     <input type="range" id="dendro-scale-slider" class="scale-slider" min="0.5" max="1.8" step="0.01" value="1">
                     <span id="scale-value" style="font-size:14px; min-width: 40px;">1.0x</span>
                 </div>
                 <div class="color-legend">
-                    <span data-i18n="game_rating">Game Rating</span>
+                    <span>Game Rating</span>
                     <div class="color-gradient"></div>
-                    <span data-i18n="low_to_high">Low → High</span>
+                    <span>Low → High</span>
                 </div>
-                <button id="close-dendro-btn" class="layer-btn" data-i18n="close">✕ Close</button>
+                <button id="close-dendro-btn" class="layer-btn">Close</button>
             </div>
             <div class="dendro-wrapper" id="dendro-container"></div>
         </div>
     </div>
     <footer>
-        Название Steam и логотип Steam являются товарными знаками и/или зарегистрированными товарными знаками компании Valve Corporation. Все прочие товарные знаки принадлежат их соответствующим владельцам
+        <div class="upload-area">
+            <label for="csv-file-input">Upload CSV</label>
+            <input type="file" id="csv-file-input" accept=".csv">
+            <span id="file-name-display" class="file-name">No file</span>
+        </div>
+        <div class="footer-credit">
+            Steam name and Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.
+        </div>
     </footer>
 </div>
 
@@ -644,7 +708,7 @@
         return `rgb(${r}, ${g}, ${b})`;
     }
     
-    // Fixed color #D98D00 for developer nodes and Others block
+    // Fixed color for developer nodes and Others block
     function getFixedOrangeColor() {
         return "#D98D00";
     }
@@ -766,14 +830,13 @@
         const tagsContainer = document.getElementById("search-tags");
         tagsContainer.innerHTML = "";
         if (searchItems.length === 0) {
-            tagsContainer.innerHTML = '<span style="font-size:0.7rem; color:#EFDFC0;">No active searches</span>';
+            tagsContainer.innerHTML = '<span style="font-size:0.7rem; color:#EFDFC0;"></span>';
             return;
         }
         searchItems.forEach((item, idx) => {
             const tag = document.createElement("div");
             tag.className = "search-tag";
-            const typeIcon = item.type === 'publisher' ? '📦' : (item.type === 'developer' ? '👨‍💻' : '🎮');
-            tag.innerHTML = `${typeIcon} ${item.name} <button onclick="window.removeSearchItem(${idx})">✕</button>`;
+            tag.innerHTML = `${item.name} <button onclick="window.removeSearchItem(${idx})">✕</button>`;
             tagsContainer.appendChild(tag);
         });
         const clearBtn = document.createElement("button");
@@ -783,26 +846,52 @@
         tagsContainer.appendChild(clearBtn);
     }
     
+    function getOthersPublishersNames() {
+        return new Set(othersPublishers.map(p => p.name));
+    }
+
+    function getTop40PublishersNames() {
+        return new Set(top40Publishers.map(p => p.name));
+    }
+    
     function applyHighlights() {
         const highlightedPublishers = getHighlightedPublishers();
         const hasActiveSearch = searchItems.length > 0;
+        
+        if (!hasActiveSearch) {
+            d3.selectAll(".treemap-rect").classed("highlight-rect", false).classed("dim-rect", false);
+            return;
+        }
+        
+        const isLayer1 = currentLayer === 1;
+        const top40Names = getTop40PublishersNames();
+        const othersNames = getOthersPublishersNames();
+        
+        let hasHighlightedInOtherLayer = false;
+        for (const pubName of highlightedPublishers) {
+            if (isLayer1 && othersNames.has(pubName)) {
+                hasHighlightedInOtherLayer = true;
+                break;
+            } else if (!isLayer1 && top40Names.has(pubName)) {
+                hasHighlightedInOtherLayer = true;
+                break;
+            }
+        }
+        
         d3.selectAll(".treemap-rect").each(function(d) {
             const rect = d3.select(this);
             const isHighlighted = highlightedPublishers.has(d.data.name);
-            if (hasActiveSearch) {
-                if (isHighlighted) {
-                    rect.classed("highlight-rect", true);
-                    rect.classed("dim-rect", false);
-                } else if (!d.data.isOthersGroup) {
-                    rect.classed("highlight-rect", false);
-                    rect.classed("dim-rect", true);
-                } else {
-                    rect.classed("highlight-rect", false);
-                    rect.classed("dim-rect", false);
-                }
-            } else {
+            const isOthersBlock = d.data.isOthersGroup === true;
+            
+            if (isHighlighted) {
+                rect.classed("highlight-rect", true);
+                rect.classed("dim-rect", false);
+            } else if (isOthersBlock && hasHighlightedInOtherLayer) {
                 rect.classed("highlight-rect", false);
                 rect.classed("dim-rect", false);
+            } else {
+                rect.classed("highlight-rect", false);
+                rect.classed("dim-rect", true);
             }
         });
     }
@@ -817,8 +906,7 @@
         results.forEach(result => {
             const item = document.createElement("div");
             item.className = "autocomplete-item";
-            const typeIcon = result.type === 'publisher' ? '📦' : (result.type === 'developer' ? '👨‍💻' : '🎮');
-            item.innerHTML = `${typeIcon} ${result.name} <span style="color:#94a3b8; font-size:0.7rem;">(${result.type})</span>`;
+            item.innerHTML = `${result.name} <span style="color:#94a3b8; font-size:0.7rem;">(${result.type})</span>`;
             item.onclick = () => {
                 document.getElementById("search-input").value = "";
                 listDiv.style.display = "none";
@@ -831,22 +919,37 @@
     
     // Clean publisher names
     function cleanPublisherName(pubStr) {
+        if (!pubStr) return "";
         let cleaned = cleanString(pubStr);
         cleaned = cleaned.replace(/\s*\([^)]*\)/g, '').trim();
+        cleaned = cleaned.replace(/^["']|["']$/g, '');
+        cleaned = cleaned.replace(/\s+/g, ' ').trim();
         return cleaned;
     }
-    
+
     function splitPublishers(publisherStr) {
         if (!publisherStr || publisherStr.trim() === "") return [];
-        let rawPubs = publisherStr.split(',').map(p => cleanPublisherName(p)).filter(p => p.length > 0);
-        let uniquePubs = [...new Set(rawPubs)];
+        
+        let rawPubs = publisherStr.split(',').map(p => {
+            let cleaned = cleanPublisherName(p);
+            return cleaned;
+        }).filter(p => p.length > 0);
+        
+        let uniquePubs = [];
+        for (let pub of rawPubs) {
+            if (!uniquePubs.some(p => p.toLowerCase() === pub.toLowerCase())) {
+                uniquePubs.push(pub);
+            }
+        }
+        
         return uniquePubs;
     }
-    
-    // Parse CSV
+
+    // Parse CSV with proper multi-publisher distribution
     function parseCSVToObjects(csvString) {
         const lines = csvString.trim().split(/\r?\n/);
         if (lines.length < 2) return [];
+        
         const headersRaw = lines[0].split(',').map(h => cleanString(h.toLowerCase()));
         
         const idxMap = {
@@ -876,15 +979,31 @@
         
         if (idxMap.estimated_owners === -1 || idxMap.rating === -1 || idxMap.game_name === -1 || 
             idxMap.developer === -1 || idxMap.publisher === -1) {
-            console.warn("Missing required columns. Available headers:", headersRaw);
             return [];
         }
         
         const records = [];
+        
         for (let i = 1; i < lines.length; i++) {
-            const line = cleanString(lines[i]);
-            if (line === "") continue;
-            const parts = line.split(',').map(p => cleanString(p));
+            const line = lines[i];
+            if (line.trim() === "") continue;
+            
+            const parts = [];
+            let currentPart = "";
+            let inQuotes = false;
+            
+            for (let char of line) {
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    parts.push(currentPart.trim());
+                    currentPart = "";
+                } else {
+                    currentPart += char;
+                }
+            }
+            parts.push(currentPart.trim());
+            
             if (parts.length < 5) continue;
             
             const publisherRaw = parts[idxMap.publisher];
@@ -901,26 +1020,42 @@
             const app_id = idxMap.app_id !== -1 ? (parts[idxMap.app_id] || i) : i;
             
             const publishers = splitPublishers(publisherRaw);
+            
             if (publishers.length === 0) continue;
+            
             const ownersPerPublisher = estimated_owners / publishers.length;
             
             for (const singlePublisher of publishers) {
                 records.push({
-                    app_id, game_name, developer, publisher: singlePublisher, 
-                    estimated_owners: ownersPerPublisher, rating
+                    app_id: app_id,
+                    game_name: game_name,
+                    developer: developer,
+                    publisher: singlePublisher,
+                    estimated_owners: ownersPerPublisher,
+                    rating: rating
                 });
             }
         }
+        
         return records;
     }
     
     function getPublisherAggregates(gamesArray) {
         const pubMap = new Map();
+        
         for (const game of gamesArray) {
             const pub = game.publisher;
+            if (!pub) continue;
+            
             if (!pubMap.has(pub)) {
-                pubMap.set(pub, { totalOwners: 0, games: [], uniqueGames: new Set(), uniqueDevelopers: new Set() });
+                pubMap.set(pub, { 
+                    totalOwners: 0, 
+                    games: [], 
+                    uniqueGames: new Set(), 
+                    uniqueDevelopers: new Set() 
+                });
             }
+            
             const entry = pubMap.get(pub);
             entry.totalOwners += game.estimated_owners;
             entry.games.push(game);
@@ -933,8 +1068,8 @@
             const richness = data.uniqueGames.size + data.uniqueDevelopers.size;
             if (richness > maxRichness) maxRichness = richness;
             return {
-                name, 
-                totalOwners: data.totalOwners, 
+                name: name,
+                totalOwners: data.totalOwners,
                 gamesCount: data.uniqueGames.size,
                 developersCount: data.uniqueDevelopers.size,
                 richness: richness,
@@ -1084,11 +1219,11 @@
                     let contentText = `<strong>${d.data.name}</strong><br>`;
                     
                     if (d.depth === 1) {
-                        contentText += `🎮 Games: ${d.data.gamesCount}<br>👥 Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}`;
+                        contentText += `Games: ${d.data.gamesCount}<br>Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}`;
                     } else if (d.depth === 2) {
-                        contentText += `🎮 Game<br>👥 Owners: ${(d.data.value || 0).toLocaleString()}`;
+                        contentText += `Game<br>Owners: ${(d.data.value || 0).toLocaleString()}`;
                         if (d.data.rating && d.data.rating > 0) {
-                            contentText += `<br>⭐ Rating: <strong>${d.data.rating}%</strong>`;
+                            contentText += `<br>Rating: <strong>${d.data.rating}%</strong>`;
                             if (d.data.rating >= 90) {
                                 contentText += ` (Excellent)`;
                             } else if (d.data.rating >= 80) {
@@ -1101,7 +1236,7 @@
                                 contentText += ` (Poor)`;
                             }
                         } else {
-                            contentText += `<br>⭐ Rating: No data`;
+                            contentText += `<br>Rating: No data`;
                         }
                     }
                     
@@ -1193,11 +1328,11 @@
                     let contentText = `<strong>${d.data.name}</strong><br>`;
                     
                     if (d.depth === 1) {
-                        contentText += `🎮 Games: ${d.data.gamesCount}<br>👥 Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}`;
+                        contentText += `Games: ${d.data.gamesCount}<br>Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}`;
                     } else if (d.depth === 2) {
-                        contentText += `🎮 Game<br>👥 Owners: ${(d.data.value || 0).toLocaleString()}`;
+                        contentText += `Game<br>Owners: ${(d.data.value || 0).toLocaleString()}`;
                         if (d.data.rating && d.data.rating > 0) {
-                            contentText += `<br>⭐ Rating: <strong>${d.data.rating}%</strong>`;
+                            contentText += `<br>Rating: <strong>${d.data.rating}%</strong>`;
                             if (d.data.rating >= 90) {
                                 contentText += ` (Excellent)`;
                             } else if (d.data.rating >= 80) {
@@ -1210,7 +1345,7 @@
                                 contentText += ` (Poor)`;
                             }
                         } else {
-                            contentText += `<br>⭐ Rating: No data`;
+                            contentText += `<br>Rating: No data`;
                         }
                     }
                     
@@ -1269,7 +1404,7 @@
             const othersTotalOwners = othersPublishers.reduce((sum, p) => sum + p.totalOwners, 0);
             const othersGamesCount = othersPublishers.reduce((sum, p) => sum + p.gamesCount, 0);
             children.push({
-                name: "📁 Others (remaining publishers)",
+                name: "Others 3879 publishers",
                 totalOwners: othersTotalOwners,
                 gamesCount: othersGamesCount,
                 isOthersGroup: true
@@ -1325,9 +1460,10 @@
                 cleanupTooltip();
                 if (d.data.isOthersGroup && !isLayer2 && othersPublishers.length > 0) {
                     currentLayer = 2;
-                    drawTreemap(othersPublishers, `📂 Layer 2 · Remaining Publishers (${othersPublishers.length})`, true);
-                    document.getElementById("back-to-layer1-btn").style.display = "flex";
-                    document.getElementById("layer-label").innerHTML = `📂 Layer 2 · ${othersPublishers.length} publishers`;
+                    const newTitle = `Layer 2 Remaining Publishers (${othersPublishers.length})`;
+                    drawTreemap(othersPublishers, newTitle, true);
+                    const layerLabel = document.getElementById("layer-label");
+                    layerLabel.innerHTML = newTitle;
                     if (searchItems.length) setTimeout(() => applyHighlights(), 50);
                 } else if (!d.data.isOthersGroup) {
                     selectedPublisher = d.data.name;
@@ -1339,16 +1475,23 @@
                 }
             })
             .on("mouseover", function(event, d) {
-                const tooltip = d3.select("body").append("div").attr("class", "tooltip");
+                const tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
                 if (d.data.isOthersGroup && !isLayer2) {
-                    tooltip.html(`<strong>📁 ${d.data.name}</strong><br>🎮 Games: ${d.data.gamesCount || 0}<br>👥 Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}<br>✨ Click to explore Layer 2 (${othersPublishers.length} publishers)`);
+                    tooltip.html(`<strong>${d.data.name}</strong><br>Games: ${d.data.gamesCount || 0}<br>Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}<br>Click to explore Layer 2 (${othersPublishers.length} publishers)`);
                 } else {
                     let normalized = maxPublisherRichness > 0 ? (d.data.richness || 1) / maxPublisherRichness : 0;
                     normalized = Math.min(1, Math.max(0.15, normalized));
                     const colorIntensity = Math.floor(normalized * 100);
-                    tooltip.html(`<strong>${d.data.name}</strong><br>🎮 Games: ${d.data.gamesCount || 0}<br>👨‍💻 Developers: ${d.data.developersCount || 0}<br>👥 Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}<br>🟠 Orange intensity: ${colorIntensity}%<br>✨ Click to explore game hierarchy`);
+                    tooltip.html(`<strong>${d.data.name}</strong><br>Games: ${d.data.gamesCount || 0}<br>Developers: ${d.data.developersCount || 0}<br>Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}<br>Orange intensity: ${colorIntensity}%<br>Click to explore game hierarchy`);
                 }
-                tooltip.style("opacity", 1).style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 40) + "px");
+                
+                // Position tooltip below the cursor
+                const tooltipNode = tooltip.node();
+                tooltip.style("opacity", 1)
+                    .style("left", (event.pageX - tooltipNode.offsetWidth / 2) + "px")
+                    .style("top", (event.pageY + 20) + "px")
+                    .style("bottom", "auto")
+                    .style("right", "auto");
                 activeTooltip = tooltip;
             })
             .on("mouseout", () => cleanupTooltip());
@@ -1378,8 +1521,8 @@
                     .attr("font-weight", "400")
                     .attr("fill", "#000000")
                     .classed("treemap-text", true)
-                    .text(`👥 ${shortOwners}`);
-                if (rectH > 50 && rectW > 70) {
+                    .text(`${shortOwners}`);
+                if (rectH > 50 && rectW > 70 && !d.data.isOthersGroup) {
                     group.append("text")
                         .attr("x", 5)
                         .attr("y", 47)
@@ -1387,7 +1530,7 @@
                         .attr("font-weight", "400")
                         .attr("fill", "#000000")
                         .classed("treemap-text", true)
-                        .text(`🎮 ${d.data.gamesCount} games | 👨‍💻 ${d.data.developersCount || 0} devs`);
+                        .text(`${d.data.gamesCount} games | ${d.data.developersCount || 0} devs`);
                 }
             } else if (rectW > 35 && rectH > 25) {
                 group.append("text")
@@ -1398,7 +1541,7 @@
                     .attr("fill", "#000000")
                     .classed("treemap-text", true)
                     .text(displayName.length > 12 ? displayName.slice(0,10)+".." : displayName);
-                if (rectW > 45) {
+                if (rectW > 45 && !d.data.isOthersGroup) {
                     group.append("text")
                         .attr("x", 3)
                         .attr("y", 27)
@@ -1416,7 +1559,7 @@
                     .attr("font-size", 8)
                     .attr("font-weight", "400")
                     .attr("fill", "#000000")
-                    .text("🔍 click to expand");
+                    .text("click to expand");
             }
         });
         
@@ -1433,11 +1576,9 @@
         top40Publishers = allPublishers.slice(0, 40);
         othersPublishers = allPublishers.slice(40);
         if (currentLayer === 1) {
-            drawTreemap(top40Publishers, `📌 Layer 1 · Top 40 Publishers`, false);
-            document.getElementById("back-to-layer1-btn").style.display = "none";
+            drawTreemap(top40Publishers, `Layer 1 Top 40 Publishers`, false);
         } else if (currentLayer === 2 && othersPublishers.length > 0) {
-            drawTreemap(othersPublishers, `📂 Layer 2 · Remaining Publishers (${othersPublishers.length})`, true);
-            document.getElementById("back-to-layer1-btn").style.display = "flex";
+            drawTreemap(othersPublishers, `Layer 2 Remaining Publishers (${othersPublishers.length})`, true);
         }
     }
     
@@ -1455,6 +1596,46 @@
         currentLayer = 1;
         renderTreemap();
         document.getElementById("file-name-display").innerText = fileName;
+    }
+    
+    function autoLoadCSV() {
+        const csvPath = '4_treemap.csv';
+        fetch(csvPath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(csvText => {
+                const parsed = parseCSVToObjects(csvText);
+                if (parsed.length === 0) {
+                    document.getElementById("file-name-display").innerText = "Auto-load failed";
+                    return;
+                }
+                rawGameData = parsed;
+                buildSearchIndex();
+                searchItems = [];
+                updateSearchTags();
+                currentLayer = 1;
+                renderTreemap();
+                document.getElementById("file-name-display").innerText = "data/4_treemap.csv (auto-loaded)";
+            })
+            .catch(error => {
+                console.error('Error loading CSV:', error);
+                document.getElementById("file-name-display").innerHTML = `<span style="color: #ff9f4a;">Could not auto-load data/4_treemap.csv</span>`;
+            });
+    }
+
+    function setupFileUpload() {
+        const fileInput = document.getElementById("csv-file-input");
+        fileInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => loadAndRenderFromCSV(ev.target.result, file.name);
+            reader.readAsText(file, "UTF-8");
+        });
     }
     
     function setupSearch() {
@@ -1485,7 +1666,7 @@
     function setupNavigation() {
         const backToTreemapBtn = document.getElementById("back-to-treemap-btn");
         const closeDendroBtn = document.getElementById("close-dendro-btn");
-        const backToLayer1Btn = document.getElementById("back-to-layer1-btn");
+        const layerLabel = document.getElementById("layer-label");
         const scaleSlider = document.getElementById("dendro-scale-slider");
         const scaleValue = document.getElementById("scale-value");
         
@@ -1497,9 +1678,23 @@
             cleanupTooltip();
             renderTreemap();
         }
+        
         backToTreemapBtn.addEventListener("click", backToTreemap);
         closeDendroBtn.addEventListener("click", backToTreemap);
-        backToLayer1Btn.addEventListener("click", () => { currentLayer = 1; renderTreemap(); backToLayer1Btn.style.display = "none"; });
+        
+        // Click on layer label to switch between layers
+        layerLabel.addEventListener("click", () => {
+            if (currentView === "treemap") {
+                if (currentLayer === 1 && othersPublishers.length > 0) {
+                    currentLayer = 2;
+                    renderTreemap();
+                } else if (currentLayer === 2) {
+                    currentLayer = 1;
+                    renderTreemap();
+                }
+            }
+        });
+        
         scaleSlider.addEventListener("input", (e) => {
             currentScale = parseFloat(e.target.value);
             scaleValue.textContent = currentScale.toFixed(2) + "x";
@@ -1507,60 +1702,23 @@
                 drawCircularDendrogram(selectedPublisher, currentScale);
             }
         });
-        document.getElementById("tiling-algorithm").addEventListener("change", (e) => { currentAlgorithm = e.target.value; if (currentView === "treemap") renderTreemap(); });
-        document.getElementById("sort-order").addEventListener("change", (e) => { currentSortOrder = e.target.value; if (currentView === "treemap") renderTreemap(); });
-    }
-    
-    // Auto-load CSV function
-    function autoLoadCSV() {
-        const csvPath = '4_treemap.csv';
-        fetch(csvPath)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(csvText => {
-                console.log('CSV loaded automatically from 4_treemap.csv');
-                const parsed = parseCSVToObjects(csvText);
-                if (parsed.length === 0) {
-                    console.warn("No valid data parsed from CSV");
-                    document.getElementById("file-name-display").innerText = "Auto-load failed";
-                    return;
-                }
-                rawGameData = parsed;
-                buildSearchIndex();
-                searchItems = [];
-                updateSearchTags();
-                currentLayer = 1;
-                renderTreemap();
-                if (typeof t === 'function') {
-                    document.getElementById("file-name-display").innerHTML = `✅ ${rawGameData.length} ${t('games_loaded')}`;
-                } else {
-                    document.getElementById("file-name-display").innerText = `✅ ${rawGameData.length} games loaded`;
-                }
-                document.getElementById("pub-count").innerText = top40Publishers.length;
-                document.getElementById("game-count").innerText = rawGameData.length;
-            })
-            .catch(error => {
-                console.error('Error loading CSV:', error);
-                document.getElementById("file-name-display").innerHTML = `<span style="color: #ff9f4a;">⚠️ Error loading 4_treemap.csv: ${error.message}</span>`;
-                const treemapContainer = document.getElementById("treemap-container");
-                if (treemapContainer) {
-                    treemapContainer.innerHTML = `<div class="empty-state">
-                        ⚠️ Could not auto-load 4_treemap.csv<br>
-                        <span style="font-size:0.7rem;">Error: ${error.message}</span><br><br>
-                        📁 Please check that the file exists in the same folder
-                    </div>`;
-                }
-            });
+        
+        document.getElementById("tiling-algorithm").addEventListener("change", (e) => { 
+            currentAlgorithm = e.target.value; 
+            if (currentView === "treemap") renderTreemap(); 
+        });
+        
+        document.getElementById("sort-order").addEventListener("change", (e) => { 
+            currentSortOrder = e.target.value; 
+            if (currentView === "treemap") renderTreemap(); 
+        });
     }
     
     window.removeSearchItem = removeSearchItem;
     window.clearAllSearchItems = clearAllSearchItems;
     
     document.addEventListener("DOMContentLoaded", () => {
+        setupFileUpload();
         setupNavigation();
         setupSearch();
         autoLoadCSV();
