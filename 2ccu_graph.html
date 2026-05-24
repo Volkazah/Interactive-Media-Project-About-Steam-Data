@@ -6,8 +6,6 @@
     <title>D3.js Interactive: Video Game Player Retention Analysis</title>
     <!-- D3.js library -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- Language support -->
-    <script src="language.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap');
         
@@ -28,38 +26,6 @@
             align-items: center;
         }
         
-        /* Language Selector Styles */
-        .language-selector {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .lang-btn {
-            background: rgba(239, 223, 192, 0.1);
-            border: 1px solid rgba(239, 223, 192, 0.3);
-            color: #EFDFC0;
-            padding: 8px 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-family: 'Source Sans Pro', monospace;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .lang-btn:hover {
-            background: rgba(239, 223, 192, 0.2);
-        }
-
-        .lang-btn.active {
-            background: #EFDFC0;
-            color: #1B1B1B;
-            border-color: #EFDFC0;
-        }
-
         .dashboard {
             max-width: 1600px;
             width: 100%;
@@ -219,8 +185,8 @@
             display: flex;
             flex-wrap: wrap;
             gap: 30px;
-            align-items: center;
-            justify-content: space-between;
+            align-items: center; /* Changed from flex-start to center */
+            justify-content: space-between; /* Added to distribute items */
             border: 1px solid rgba(217, 141, 0, 0.3);
         }
 
@@ -228,7 +194,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            flex: 1;
+            flex: 1; /* Added to allow flexible width */
         }
 
         .filter-group span {
@@ -288,12 +254,12 @@
 
         .display-mode-group {
             display: flex;
-            font-size: 20px;
+            font-size: 20px; /* Change this value to desired size (default was 16px) */
             font-weight: 600;
             flex-direction: column;
             gap: 10px;
-            align-items: center;
-            flex: 1;
+            align-items: center; /* Added to center content */
+            flex: 1; /* Added */
         }
 
         .mode-buttons {
@@ -327,12 +293,12 @@
 
         .aggregate-toggle-group {
             display: flex;
-            font-size: 20px;
+            font-size: 20px; /* Change this value to desired size (default was 16px) */
             font-weight: 600;
             flex-direction: column;
             gap: 10px;
-            align-items: flex-end;
-            flex: 1;
+            align-items: flex-end; /* Changed from flex-start to flex-end */
+            flex: 1; /* Added */
         }
 
         .aggregate-btn {
@@ -482,7 +448,7 @@
             background: #1B1B1B;
             padding: 16px 24px;
             text-align: center;
-            font-size: 11px;
+            font-size: 12px;
             color: #EFDFC0;
             border-top: 1px solid #D98D00;
             font-family: 'Source Sans Pro', monospace;
@@ -498,12 +464,13 @@
             font-size: 12px;
             font-weight: 600;
             transition: all 0.2s;
-            display: inline-block;
+            display: none;
         }
 
         .footer-file-label:hover {
             background: #c47d00;
             transform: scale(1.02);
+            display: none;
         }
 
         .footer-status {
@@ -520,32 +487,26 @@
 </head>
 <body>
 <div class="dashboard">
-    <!-- Language Selector -->
-    <div class="language-selector">
-        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
-        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
-    </div>
-
     <div class="header">
-        <div class="main-title" data-i18n="ccu_title">Only a few games are successful at player retention</div>
-        <div class="sub-title" data-i18n="ccu_subtitle">Change in % of player number during one year after CCU peak</div>
+        <div class="main-title">Only a few games are successful at player retention</div>
+        <div class="sub-title">Change in % of player number during one year after CCU peak</div>
     </div>
 
     <div class="controls">
         <div class="controls-row">
             <div class="search-section">
-                <div class="search-label" data-i18n="search_game">Search Games (max 5 highlights)</div>
+                <div class="search-label">Search Games (max 5 highlights)</div>
                 <div class="search-input-container">
-                    <input type="text" id="game-search-input" class="search-input" data-i18n="search_placeholder" placeholder="Type game name...">
+                    <input type="text" id="game-search-input" class="search-input" placeholder="Type game name...">
                     <div id="game-suggestions" class="suggestions"></div>
                 </div>
                 <div id="highlighted-games" class="selected-items"></div>
             </div>
 
             <div class="search-section">
-                <div class="search-label" data-i18n="filter_genre">Filter by Genre (max 3 genres)</div>
+                <div class="search-label">Filter by Genre (max 3 genres)</div>
                 <div class="search-input-container">
-                    <input type="text" id="genre-search-input" class="search-input" data-i18n="genre_placeholder" placeholder="Type genre...">
+                    <input type="text" id="genre-search-input" class="search-input" placeholder="Type genre...">
                     <div id="genre-suggestions" class="suggestions"></div>
                 </div>
                 <div id="selected-genres" class="selected-items"></div>
@@ -554,30 +515,30 @@
 
         <div class="filter-bar">
             <div class="filter-group">
-                <span data-i18n="player_type">Filter by Player Type:</span>
+                <span>Filter by Player Type:</span>
                 <div class="filter-buttons" id="type-filter-buttons"></div>
             </div>
             
             <div class="display-mode-group">
-                <span data-i18n="display_mode">Display Mode:</span>
+                <span>Display Mode:</span>
                 <div class="mode-buttons">
-                    <button class="mode-btn" data-mode="lines" data-i18n="lines_only">Lines Only</button>
-                    <button class="mode-btn active" data-mode="both" data-i18n="lines_points">Lines & Points</button>
-                    <button class="mode-btn" data-mode="points" data-i18n="points_only">Points Only</button>
+                    <button class="mode-btn" data-mode="lines">Lines Only</button>
+                    <button class="mode-btn active" data-mode="both">Lines & Points</button>
+                    <button class="mode-btn" data-mode="points">Points Only</button>
                 </div>
             </div>
 
             <div class="aggregate-toggle-group">
-                <span data-i18n="aggregate_mode">Aggregate Mode:</span>
-                <button id="aggregate-toggle" class="aggregate-btn" data-i18n="show_aggregate">Show Aggregate Lines</button>
+                <span>Aggregate Mode:</span>
+                <button id="aggregate-toggle" class="aggregate-btn">Show Aggregate Lines</button>
             </div>
         </div>
 
         <div class="zoom-section">
-            <button class="zoom-btn" data-zoom="full" data-i18n="full_range">Full Range (0-100%)</button>
-            <button class="zoom-btn" data-zoom="high" data-i18n="high_retention">High Retention (67-100%)</button>
-            <button class="zoom-btn" data-zoom="medium" data-i18n="medium_retention">Medium Retention (34-66%)</button>
-            <button class="zoom-btn" data-zoom="low" data-i18n="low_retention">Low Retention (0-33%)</button>
+            <button class="zoom-btn" data-zoom="full">Full Range (0-100%)</button>
+            <button class="zoom-btn" data-zoom="high">High Retention (67-100%)</button>
+            <button class="zoom-btn" data-zoom="medium">Medium Retention (34-66%)</button>
+            <button class="zoom-btn" data-zoom="low">Low Retention (0-33%)</button>
         </div>
     </div>
 
@@ -591,7 +552,7 @@
     <footer>
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
             <div>Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.</div>
-            <label class="footer-file-label" style="display: none;">
+            <label class="footer-file-label">
                 Upload CSV
                 <input type="file" id="file-input" accept=".csv" style="display: none;">
             </label>
@@ -601,15 +562,6 @@
 </div>
 
 <script>
-    // Helper translation function
-    function t(key, fallback) {
-        if (typeof window !== 'undefined' && window.t) {
-            const translated = window.t(key);
-            if (translated && translated !== key) return translated;
-        }
-        return fallback || key;
-    }
-
     let rawData = [];
     let filteredGames = [];
     let allPlayerTypes = new Set();
@@ -1024,7 +976,6 @@
             .style("fill", "#EFDFC0")
             .style("font-size", "14px")
             .style("font-family", "'Source Sans Pro', monospace")
-            .attr("data-i18n", "months")
             .text("Months →");
         
         chartGroup.append("text")
@@ -1035,30 +986,40 @@
             .style("fill", "#EFDFC0")
             .style("font-size", "14px")
             .style("font-family", "'Source Sans Pro', monospace")
-            .attr("data-i18n", "player_retention")
             .text(aggregateMode ? "Percentage of Games in Zone (0-100%)" : "Player Retention (% of peak)");
     }
     
     function updateChart() {
+        console.log('updateChart called');
+        console.log('svg exists?', !!svg);
+        console.log('filteredGames length:', filteredGames.length);
+        
         if (!svg || filteredGames.length === 0) {
+            console.log('No svg or no games, showing empty state');
             d3.select("#line-chart svg").remove();
             const container = document.getElementById("line-chart");
-            const noGamesMsg = t('no_games', 'No games to display');
-            const uploadPrompt = rawData.length === 0 ? (t('upload_prompt', 'Upload a CSV file to get started')) : (t('change_filters', 'Try changing the filter criteria'));
             container.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:600px; color:#EFDFC0; font-family:'Source Sans Pro', monospace; flex-direction:column;">
                 <div style="font-size:48px; margin-bottom:16px;">📊</div>
-                <div>${noGamesMsg}</div>
-                <div style="font-size:14px; margin-top:8px;">${uploadPrompt}</div>
+                <div>No games to display</div>
+                <div style="font-size:14px; margin-top:8px;">${filteredGames.length === 0 ? 'Filtered games empty' : 'No SVG'}</div>
             </div>`;
             return;
         }
         
+        console.log('Proceeding to draw chart with', filteredGames.length, 'games');
+        
         const existingSvg = d3.select("#line-chart svg").node();
-        if (!existingSvg) initChart();
+        console.log('Existing SVG node?', !!existingSvg);
+        
+        if (!existingSvg) {
+            console.log('No existing SVG, calling initChart');
+            initChart();
+        }
         
         updateScalesAndAxes();
         
         if (aggregateMode) {
+            // Aggregate mode drawing (unchanged)
             const aggregateData = calculateAggregateData();
             if (aggregateData) {
                 const zones = [
@@ -1110,13 +1071,16 @@
                 });
             }
         } else {
+            // Split games into non-highlighted and highlighted for proper layering
             const nonHighlightedGames = filteredGames.filter(game => !highlightedGames.has(game.gameName));
             const highlightedGamesList = filteredGames.filter(game => highlightedGames.has(game.gameName));
             
+            // First draw non-highlighted games (back layer)
             nonHighlightedGames.forEach(game => {
                 drawGameLines(game, false);
             });
             
+            // Then draw highlighted games (front layer) - always on top
             highlightedGamesList.forEach(game => {
                 drawGameLines(game, true);
             });
@@ -1130,17 +1094,17 @@
         legendDiv.html("");
         
         if (aggregateMode) {
-            legendDiv.append("span").attr("class", "legend-title").text(t('aggregate_mode_title', "Aggregate Mode (Scaled to zones):"));
+            legendDiv.append("span").attr("class", "legend-title").text("Aggregate Mode (Scaled to zones):");
             legendDiv.append("div").attr("class", "legend-item")
-                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[0]};"></div><span>${t('high_retention_legend', 'High Retention (67-100%)')} - % of games</span>`);
+                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[0]};"></div><span>High Retention (67-100%) - % of games</span>`);
             legendDiv.append("div").attr("class", "legend-item")
-                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[1]};"></div><span>${t('medium_retention_legend', 'Medium Retention (34-66%)')} - % of games</span>`);
+                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[1]};"></div><span>Medium Retention (34-66%) - % of games</span>`);
             legendDiv.append("div").attr("class", "legend-item")
-                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[2]};"></div><span>${t('low_retention_legend', 'Low Retention (0-33%)')} - % of games</span>`);
+                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[2]};"></div><span>Low Retention (0-33%) - % of games</span>`);
             legendDiv.append("div").attr("class", "legend-item")
-                .html(`<span style="font-size:11px; opacity:0.8;">⚠️ ${t('incomplete_data_warning', 'Games with incomplete data excluded from aggregate')}</span>`);
+                .html(`<span style="font-size:11px; opacity:0.8;">⚠️ Games with incomplete data excluded from aggregate</span>`);
         } else {
-            legendDiv.append("span").attr("class", "legend-title").text(t('player_types', "Player Types:"));
+            legendDiv.append("span").attr("class", "legend-title").text("Player Types:");
             
             const uniquePlayerTypes = [...new Set(filteredGames.map(g => g.player_type))].sort();
             uniquePlayerTypes.forEach(playerType => {
@@ -1151,177 +1115,59 @@
             
             if (highlightedGames.size > 0) {
                 legendDiv.append("div").attr("class", "legend-item")
-                    .html(`<div class="highlight-legend" style="background: #D98D00;"></div><span>${t('highlighted_game', 'Highlighted Game')}</span>`);
+                    .html(`<div class="highlight-legend" style="background: #D98D00;"></div><span>Highlighted Game</span>`);
             }
             
             if (displayMode === "points" || displayMode === "both") {
                 legendDiv.append("div").attr("class", "legend-item")
-                    .html(`<div class="circle-legend"></div><span>${t('monthly_data_point', 'Monthly Data Point')}</span>`);
+                    .html(`<div class="circle-legend"></div><span>Monthly Data Point</span>`);
             }
             
             const hasDashedLines = filteredGames.some(game => game.hasMissingData);
             if (hasDashedLines) {
                 legendDiv.append("div").attr("class", "legend-item")
-                    .html(`<div style="width:24px; height:2px; background: repeating-linear-gradient(90deg, #EFDFC0, #EFDFC0 6px, transparent 6px, transparent 12px);"></div><span>${t('incomplete_data', 'Incomplete Data (dashed line)')}</span>`);
+                    .html(`<div style="width:24px; height:2px; background: repeating-linear-gradient(90deg, #EFDFC0, #EFDFC0 6px, transparent 6px, transparent 12px);"></div><span>Incomplete Data (dashed line)</span>`);
             }
         }
         
         if (selectedGenres.size > 0) {
             legendDiv.append("div").attr("class", "legend-item")
-                .html(`<span style="font-size:12px;">${t('genres_label', 'Genres')}: ${Array.from(selectedGenres).join(", ")}</span>`);
+                .html(`<span style="font-size:12px;">Genres: ${Array.from(selectedGenres).join(", ")}</span>`);
         }
         
         legendDiv.append("div").attr("class", "legend-item")
-            .html(`<span style="font-size:15px;">${filteredGames.length} ${t('games_displayed', 'games displayed')}</span>`);
-    }
-    
-    function drawGameLines(game, isHighlighted) {
-        const lineData = game.values;
-        const isHighlightingModeActive = highlightingModeActive;
-        
-        let strokeWidth, strokeOpacity, lineColor;
-        
-        if (isHighlightingModeActive) {
-            if (isHighlighted) {
-                strokeWidth = 4.5;
-                strokeOpacity = 1;
-                lineColor = getColorForPlayerType(game.player_type, true);
-            } else {
-                strokeWidth = 1.5;
-                strokeOpacity = 0.25;
-                lineColor = getColorForPlayerType(game.player_type, false);
-            }
-        } else {
-            strokeWidth = isHighlighted ? 4.5 : 2;
-            strokeOpacity = isHighlighted ? 1 : 0.6;
-            lineColor = getColorForPlayerType(game.player_type, isHighlighted);
-        }
-        
-        if (displayMode === "lines" || displayMode === "both") {
-            const path = clipGroup.append("path")
-                .datum(lineData)
-                .attr("class", "line-path")
-                .attr("d", d => lineGenerator(d))
-                .attr("fill", "none")
-                .attr("stroke", lineColor)
-                .attr("stroke-width", strokeWidth)
-                .attr("stroke-opacity", strokeOpacity)
-                .attr("stroke-linecap", "round")
-                .attr("stroke-dasharray", game.hasMissingData ? "6,4" : "none");
-            
-            const hoverLine = chartGroup.append("path")
-                .datum(lineData)
-                .attr("class", "line-hover")
-                .attr("d", d => lineGenerator(d))
-                .attr("fill", "none")
-                .attr("stroke", "transparent")
-                .attr("stroke-width", 12)
-                .attr("stroke-opacity", 0)
-                .style("cursor", "pointer")
-                .on("mouseenter", function() {
-                    if (isHighlightingModeActive) {
-                        d3.select(this.previousSibling).attr("stroke-width", 5).attr("stroke-opacity", 0.8);
-                    } else {
-                        clipGroup.selectAll(".line-path").attr("stroke-width", 1.5).attr("stroke-opacity", 0.3);
-                        d3.select(this.previousSibling).attr("stroke-width", 4).attr("stroke-opacity", 1);
-                    }
-                })
-                .on("mousemove", function(event) {
-                    const mouseX = d3.pointer(event, chartGroup.node())[0];
-                    const xDate = xScale.invert(mouseX);
-                    let monthIndex = Math.round(xDate);
-                    monthIndex = Math.min(12, Math.max(0, monthIndex));
-                    const retentionVal = lineData[monthIndex];
-                    const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
-                    
-                    tooltipDiv.style("opacity", 1)
-                        .html(`<strong>${game.gameName}</strong><br>${t('genres', 'Genres')}: ${genresDisplay}<br>${t('type', 'Type')}: ${game.player_type}<br>${monthLabels[monthIndex]}<br>${t('retention', 'Retention')}: ${retentionVal !== null ? retentionVal.toFixed(1) + '%' : 'N/A'}`)
-                        .style("left", (event.pageX + 12) + "px")
-                        .style("top", (event.pageY - 30) + "px");
-                })
-                .on("mouseleave", function() {
-                    if (isHighlightingModeActive) {
-                        d3.select(this.previousSibling).attr("stroke-width", 4.5).attr("stroke-opacity", 1);
-                    } else {
-                        clipGroup.selectAll(".line-path").attr("stroke-width", d => {
-                            const idx = Array.from(clipGroup.selectAll(".line-path").nodes()).indexOf(this.previousSibling);
-                            const gameName = filteredGames[idx]?.gameName;
-                            return highlightedGames.has(gameName) ? 4.5 : 2;
-                        }).attr("stroke-opacity", d => {
-                            const idx = Array.from(clipGroup.selectAll(".line-path").nodes()).indexOf(this.previousSibling);
-                            const gameName = filteredGames[idx]?.gameName;
-                            return highlightedGames.has(gameName) ? 1 : 0.6;
-                        });
-                    }
-                    tooltipDiv.style("opacity", 0);
-                });
-        }
-        
-        if (displayMode === "points" || displayMode === "both") {
-            lineData.forEach((val, idx) => {
-                if (val !== null && val >= currentZoomRange[0] && val <= currentZoomRange[1]) {
-                    let circleSize;
-                    if (isHighlightingModeActive) {
-                        circleSize = isHighlighted ? 7 : 3;
-                    } else {
-                        circleSize = isHighlighted ? 6 : 4;
-                    }
-                    
-                    const circle = clipGroup.append("circle")
-                        .attr("cx", xScale(idx))
-                        .attr("cy", yScale(val))
-                        .attr("r", circleSize)
-                        .attr("fill", CIRCLE_COLOR)
-                        .attr("stroke", "#1B1B1B")
-                        .attr("stroke-width", 2)
-                        .attr("opacity", isHighlightingModeActive ? (isHighlighted ? 0.9 : 0.4) : 0.9)
-                        .attr("class", "data-circle")
-                        .style("cursor", "pointer")
-                        .on("mouseenter", function() {
-                            d3.select(this).attr("r", isHighlighted ? 9 : 6);
-                        })
-                        .on("mousemove", function(event) {
-                            const retentionVal = val;
-                            const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
-                            
-                            tooltipDiv.style("opacity", 1)
-                                .html(`<strong>${game.gameName}</strong><br>${t('genres', 'Genres')}: ${genresDisplay}<br>${t('type', 'Type')}: ${game.player_type}<br>${monthLabels[idx]}<br>${t('retention', 'Retention')}: ${retentionVal.toFixed(1)}%`)
-                                .style("left", (event.pageX + 12) + "px")
-                                .style("top", (event.pageY - 30) + "px");
-                        })
-                        .on("mouseleave", function() {
-                            if (isHighlightingModeActive) {
-                                d3.select(this).attr("r", isHighlighted ? 7 : 3);
-                            } else {
-                                d3.select(this).attr("r", isHighlighted ? 6 : 4);
-                            }
-                            tooltipDiv.style("opacity", 0);
-                        });
-                }
-            });
-        }
+            .html(`<span style="font-size:15px;">${filteredGames.length} games displayed</span>`);
     }
     
     function applyFilters() {
+        console.log('applyFilters - rawData length:', rawData.length);
+        
         if (!rawData.length) {
+            console.log('No rawData, skipping');
             filteredGames = [];
             updateChart();
             return;
         }
         
         let games = [...rawData];
+        console.log('Initial games count:', games.length);
         
         if (activeTypes.length > 0) {
             games = games.filter(game => activeTypes.includes(game.player_type));
+            console.log('After player type filter:', games.length);
         }
         
         if (selectedGenres.size > 0) {
             games = games.filter(game => 
                 game.genres.some(genre => selectedGenres.has(genre))
             );
+            console.log('After genre filter:', games.length);
         }
         
         filteredGames = games;
+        console.log('Final filteredGames length:', filteredGames.length);
+        console.log('First filtered game sample:', filteredGames[0]);
+        
         updateChart();
     }
     
@@ -1419,6 +1265,7 @@
         const container = document.getElementById("highlighted-games");
         container.innerHTML = "";
         
+        // Set highlighting mode based on whether there are highlighted games
         highlightingModeActive = highlightedGames.size > 0;
         
         highlightedGames.forEach(gameName => {
@@ -1437,11 +1284,149 @@
             });
         });
         
+        // Re-render chart to update layering and styling
         if (filteredGames.length > 0) {
             updateChart();
         }
     }
-    
+    function drawGameLines(game, isHighlighted) {
+        const lineData = game.values;
+        
+        // Determine if highlighting mode is active
+        const isHighlightingModeActive = highlightingModeActive;
+        
+        // Set stroke properties based on highlighting mode
+        let strokeWidth, strokeOpacity, lineColor;
+        
+        if (isHighlightingModeActive) {
+            if (isHighlighted) {
+                // Highlighted game in highlighting mode - full saturation, thick, fully opaque
+                strokeWidth = 4.5;
+                strokeOpacity = 1;
+                lineColor = getColorForPlayerType(game.player_type, true);
+            } else {
+                // Non-highlighted games in highlighting mode - thin, dimmed
+                strokeWidth = 1.5;
+                strokeOpacity = 0.25;
+                lineColor = getColorForPlayerType(game.player_type, false);
+            }
+        } else {
+            // Normal mode
+            strokeWidth = isHighlighted ? 4.5 : 2;
+            strokeOpacity = isHighlighted ? 1 : 0.6;
+            lineColor = getColorForPlayerType(game.player_type, isHighlighted);
+        }
+        
+        if (displayMode === "lines" || displayMode === "both") {
+            const path = clipGroup.append("path")
+                .datum(lineData)
+                .attr("class", "line-path")
+                .attr("d", d => lineGenerator(d))
+                .attr("fill", "none")
+                .attr("stroke", lineColor)
+                .attr("stroke-width", strokeWidth)
+                .attr("stroke-opacity", strokeOpacity)
+                .attr("stroke-linecap", "round")
+                .attr("stroke-dasharray", game.hasMissingData ? "6,4" : "none");
+            
+            // Add hover for lines
+            const hoverLine = chartGroup.append("path")
+                .datum(lineData)
+                .attr("class", "line-hover")
+                .attr("d", d => lineGenerator(d))
+                .attr("fill", "none")
+                .attr("stroke", "transparent")
+                .attr("stroke-width", 12)
+                .attr("stroke-opacity", 0)
+                .style("cursor", "pointer")
+                .on("mouseenter", function() {
+                    if (isHighlightingModeActive) {
+                        // In highlighting mode, only highlight the hovered line temporarily
+                        // Don't reset other highlighted games
+                        d3.select(this.previousSibling).attr("stroke-width", 5).attr("stroke-opacity", 0.8);
+                    } else {
+                        // Normal mode behavior
+                        clipGroup.selectAll(".line-path").attr("stroke-width", 1.5).attr("stroke-opacity", 0.3);
+                        d3.select(this.previousSibling).attr("stroke-width", 4).attr("stroke-opacity", 1);
+                    }
+                })
+                .on("mousemove", function(event) {
+                    const mouseX = d3.pointer(event, chartGroup.node())[0];
+                    const xDate = xScale.invert(mouseX);
+                    let monthIndex = Math.round(xDate);
+                    monthIndex = Math.min(12, Math.max(0, monthIndex));
+                    const retentionVal = lineData[monthIndex];
+                    const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
+                    
+                    tooltipDiv.style("opacity", 1)
+                        .html(`<strong>${game.gameName}</strong><br>Genres: ${genresDisplay}<br>Type: ${game.player_type}<br>${monthLabels[monthIndex]}<br>Retention: ${retentionVal !== null ? retentionVal.toFixed(1) + '%' : 'N/A'}`)
+                        .style("left", (event.pageX + 12) + "px")
+                        .style("top", (event.pageY - 30) + "px");
+                })
+                .on("mouseleave", function() {
+                    if (isHighlightingModeActive) {
+                        // In highlighting mode, restore the hovered line to its original highlighting state
+                        d3.select(this.previousSibling).attr("stroke-width", 4.5).attr("stroke-opacity", 1);
+                    } else {
+                        // Normal mode - restore all lines to original state
+                        clipGroup.selectAll(".line-path").attr("stroke-width", d => {
+                            const idx = Array.from(clipGroup.selectAll(".line-path").nodes()).indexOf(this.previousSibling);
+                            const gameName = filteredGames[idx]?.gameName;
+                            return highlightedGames.has(gameName) ? 4.5 : 2;
+                        }).attr("stroke-opacity", d => {
+                            const idx = Array.from(clipGroup.selectAll(".line-path").nodes()).indexOf(this.previousSibling);
+                            const gameName = filteredGames[idx]?.gameName;
+                            return highlightedGames.has(gameName) ? 1 : 0.6;
+                        });
+                    }
+                    tooltipDiv.style("opacity", 0);
+                });
+        }
+        
+        if (displayMode === "points" || displayMode === "both") {
+            lineData.forEach((val, idx) => {
+                if (val !== null && val >= currentZoomRange[0] && val <= currentZoomRange[1]) {
+                    let circleSize;
+                    if (isHighlightingModeActive) {
+                        circleSize = isHighlighted ? 7 : 3;
+                    } else {
+                        circleSize = isHighlighted ? 6 : 4;
+                    }
+                    
+                    const circle = clipGroup.append("circle")
+                        .attr("cx", xScale(idx))
+                        .attr("cy", yScale(val))
+                        .attr("r", circleSize)
+                        .attr("fill", CIRCLE_COLOR)
+                        .attr("stroke", "#1B1B1B")
+                        .attr("stroke-width", 2)
+                        .attr("opacity", isHighlightingModeActive ? (isHighlighted ? 0.9 : 0.4) : 0.9)
+                        .attr("class", "data-circle")
+                        .style("cursor", "pointer")
+                        .on("mouseenter", function() {
+                            d3.select(this).attr("r", isHighlighted ? 9 : 6);
+                        })
+                        .on("mousemove", function(event) {
+                            const retentionVal = val;
+                            const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
+                            
+                            tooltipDiv.style("opacity", 1)
+                                .html(`<strong>${game.gameName}</strong><br>Genres: ${genresDisplay}<br>Type: ${game.player_type}<br>${monthLabels[idx]}<br>Retention: ${retentionVal.toFixed(1)}%`)
+                                .style("left", (event.pageX + 12) + "px")
+                                .style("top", (event.pageY - 30) + "px");
+                        })
+                        .on("mouseleave", function() {
+                            if (isHighlightingModeActive) {
+                                d3.select(this).attr("r", isHighlighted ? 7 : 3);
+                            } else {
+                                d3.select(this).attr("r", isHighlighted ? 6 : 4);
+                            }
+                            tooltipDiv.style("opacity", 0);
+                        });
+                }
+            });
+        }
+    }
     function updateSelectedGenresList() {
         const container = document.getElementById("selected-genres");
         container.innerHTML = "";
@@ -1499,12 +1484,10 @@
             aggregateMode = !aggregateMode;
             if (aggregateMode) {
                 this.classList.add("active");
-                this.setAttribute("data-i18n", "hide_aggregate");
-                this.textContent = t('hide_aggregate', "Hide Aggregate Lines");
+                this.textContent = "Hide Aggregate Lines";
             } else {
                 this.classList.remove("active");
-                this.setAttribute("data-i18n", "show_aggregate");
-                this.textContent = t('show_aggregate', "Show Aggregate Lines");
+                this.textContent = "Show Aggregate Lines";
             }
             applyFilters();
         });
@@ -1536,63 +1519,48 @@
             });
             filterButtonsContainer.appendChild(btn);
         });
+        
+        const resetBtn = document.getElementById("reset-filter");
+        if (resetBtn) {
+            resetBtn.onclick = () => {
+                activeTypes = [];
+                renderFilterUI();
+                applyFilters();
+            };
+        }
     }
     
-    window.addEventListener("resize", () => {
-        setTimeout(() => {
-            if (rawData.length > 0) {
-                initChart();
-                applyFilters();
-            } else {
-                initChart();
-                // Don't call updateChart() here if no data
-            }
-        }, 100);
-    });
     function autoLoadCSV() {
-    // Full URL to the CSV file
         const csvPath = 'https://volkazah.github.io/Interactive-Media-Project-About-Steam-Data/2_ccu.csv';
         
-        console.log('Auto-loading CSV from:', csvPath);
+        console.log('Loading CSV from:', csvPath);
         
         fetch(csvPath)
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 return response.text();
             })
             .then(csvText => {
-                console.log('CSV loaded successfully, length:', csvText.length);
+                console.log('CSV loaded, parsing...');
                 
-                try {
-                    const games = parseCSVAndBuild(csvText);
-                    rawData = games;
-                    // ... rest of your data processing code
-                    applyFilters();
-                } catch(err) {
-                    console.error('Error parsing CSV:', err);
+                const games = parseCSVAndBuild(csvText);
+                
+                if (!games || games.length === 0) {
+                    console.error('No games parsed! Check CSV format');
+                    return;
                 }
-            })
-            .catch(error => {
-                console.error('Error loading CSV:', error);
-            });
-    }
-    
-    document.getElementById("file-input").addEventListener("change", function(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const statusDiv = document.getElementById("file-status");
-        statusDiv.textContent = "⏳ Loading...";
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const csvContent = e.target.result;
-                const games = parseCSVAndBuild(csvContent);
+                
+                console.log(`✅ Parsed ${games.length} games`);
+                
+                // Set global data
                 rawData = games;
+                console.log('rawData length after parse:', rawData.length);
+                applyFilters(); // This should trigger the chart
+                // Update player types
                 allPlayerTypes.clear();
                 rawData.forEach(g => allPlayerTypes.add(g.player_type));
+                
+                // Reset filters
                 activeTypes = [];
                 selectedGenres.clear();
                 highlightedGames.clear();
@@ -1601,6 +1569,7 @@
                 displayMode = "both";
                 aggregateMode = false;
                 
+                // Update UI button states
                 document.querySelector(".mode-btn[data-mode='both']").classList.add("active");
                 document.querySelector(".mode-btn[data-mode='lines']").classList.remove("active");
                 document.querySelector(".mode-btn[data-mode='points']").classList.remove("active");
@@ -1611,47 +1580,41 @@
                 document.querySelector(".zoom-btn[data-zoom='low']").classList.remove("active");
                 
                 const toggleBtn = document.getElementById("aggregate-toggle");
-                toggleBtn.classList.remove("active");
-                toggleBtn.textContent = "Show Aggregate Lines";
+                if (toggleBtn) {
+                    toggleBtn.classList.remove("active");
+                    toggleBtn.textContent = "Show Aggregate Lines";
+                }
                 
+                // Initialize UI components
                 renderFilterUI();
                 setupGameSearch();
                 setupGenreSearch();
                 setupDisplayMode();
                 setupZoom();
                 setupAggregateToggle();
+                
+                // ✅ CRITICAL: This triggers the chart rendering
                 applyFilters();
                 updateHighlightedGamesList();
                 updateSelectedGenresList();
-                statusDiv.innerHTML = `✅ Loaded ${rawData.length} games, ${allPlayerTypes.size} types, ${allGenres.size} genres`;
-            } catch(err) {
-                statusDiv.innerHTML = `❌ Error: ${err.message}`;
-                console.error(err);
-                rawData = [];
-                filteredGames = [];
-                updateChart();
-            }
-        };
-        reader.readAsText(file);
-    });
-    
+                
+                console.log(`✅ Chart should now be visible with ${rawData.length} games`);
+            })
+            .catch(error => {
+                console.error('Auto-load failed:', error);
+                // Show error in chart area
+                const container = document.getElementById("line-chart");
+                if (container) {
+                    container.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:600px; color:#ff6b6b;">
+                        Error loading CSV: ${error.message}
+                    </div>`;
+                }
+            });
+    }
+    console.log('line-chart container exists?', document.getElementById('line-chart'));
+    console.log('radarGrid container exists?', document.getElementById('radarGrid'));
     initChart();
-    updateChart();
-    
-    // Auto-load when page loads
     autoLoadCSV();
-    
-    window.addEventListener("resize", () => {
-        setTimeout(() => {
-            if (rawData.length > 0) {
-                initChart();
-                applyFilters();
-            } else {
-                initChart();
-                updateChart();
-            }
-        }, 100);
-    });
 </script>
 </body>
 </html>
