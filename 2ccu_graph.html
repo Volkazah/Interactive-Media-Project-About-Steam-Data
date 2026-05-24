@@ -1538,12 +1538,19 @@
         });
     }
     
-   function autoLoadCSV() {
-    // FIXED: CSV is in the same folder
+    window.addEventListener("resize", () => {
+        setTimeout(() => {
+            if (rawData.length > 0) {
+                initChart();
+                applyFilters();
+            } else {
+                initChart();
+                // Don't call updateChart() here if no data
+            }
+        }, 100);
+    });
+    function autoLoadCSV() {
         const csvPath = '2_ccu.csv';
-        
-        console.log('Auto-loading CSV from:', csvPath);
-        
         fetch(csvPath)
             .then(response => {
                 if (!response.ok) {
@@ -1552,7 +1559,9 @@
                 return response.text();
             })
             .then(csvText => {
-                console.log('CSV loaded successfully, length:', csvText.length);
+                console.log('CSV loaded automatically from data/2_ccu.csv');
+                const statusDiv = document.getElementById("file-status");
+                statusDiv.textContent = "⏳ Loading auto CSV...";
                 
                 try {
                     const games = parseCSVAndBuild(csvText);
@@ -1586,20 +1595,13 @@
                     setupDisplayMode();
                     setupZoom();
                     setupAggregateToggle();
-                    
-                    // CRITICAL FIX: Call applyFilters AFTER data is loaded
                     applyFilters();
                     updateHighlightedGamesList();
                     updateSelectedGenresList();
-                    
-                    const gamesLoadedMsg = `${rawData.length} games loaded`;
-                    console.log(`✅ Auto-loaded ${gamesLoadedMsg}`);
-                    
-                    // Also update the chart directly if needed
-                    updateChart();
-                    
+                    statusDiv.innerHTML = `✅ Auto-loaded ${rawData.length} games, ${allPlayerTypes.size} types, ${allGenres.size} genres`;
                 } catch(err) {
-                    console.error('Error parsing CSV:', err);
+                    statusDiv.innerHTML = `❌ Error: ${err.message}`;
+                    console.error(err);
                     rawData = [];
                     filteredGames = [];
                     updateChart();
@@ -1607,12 +1609,70 @@
             })
             .catch(error => {
                 console.error('Error loading CSV:', error);
-                console.error('Make sure 2_ccu.csv is in the same folder as this HTML file');
+                const statusDiv = document.getElementById("file-status");
+                statusDiv.innerHTML = `<span style="color: #ff9f4a;">⚠️ Could not auto-load data/2_ccu.csv - ${error.message}</span><br>
+                                      <span style="font-size: 11px;">📁 Please use the "Upload CSV" button below to select the file manually</span>`;
             });
     }
     
-    // Don't call updateChart() before data loads - just initialize the chart container
+    document.getElementById("file-input").addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const statusDiv = document.getElementById("file-status");
+        statusDiv.textContent = "⏳ Loading...";
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const csvContent = e.target.result;
+                const games = parseCSVAndBuild(csvContent);
+                rawData = games;
+                allPlayerTypes.clear();
+                rawData.forEach(g => allPlayerTypes.add(g.player_type));
+                activeTypes = [];
+                selectedGenres.clear();
+                highlightedGames.clear();
+                playerTypeColorMap.clear();
+                currentZoomRange = [0, 100];
+                displayMode = "both";
+                aggregateMode = false;
+                
+                document.querySelector(".mode-btn[data-mode='both']").classList.add("active");
+                document.querySelector(".mode-btn[data-mode='lines']").classList.remove("active");
+                document.querySelector(".mode-btn[data-mode='points']").classList.remove("active");
+                
+                document.querySelector(".zoom-btn[data-zoom='full']").classList.add("active");
+                document.querySelector(".zoom-btn[data-zoom='high']").classList.remove("active");
+                document.querySelector(".zoom-btn[data-zoom='medium']").classList.remove("active");
+                document.querySelector(".zoom-btn[data-zoom='low']").classList.remove("active");
+                
+                const toggleBtn = document.getElementById("aggregate-toggle");
+                toggleBtn.classList.remove("active");
+                toggleBtn.textContent = "Show Aggregate Lines";
+                
+                renderFilterUI();
+                setupGameSearch();
+                setupGenreSearch();
+                setupDisplayMode();
+                setupZoom();
+                setupAggregateToggle();
+                applyFilters();
+                updateHighlightedGamesList();
+                updateSelectedGenresList();
+                statusDiv.innerHTML = `✅ Loaded ${rawData.length} games, ${allPlayerTypes.size} types, ${allGenres.size} genres`;
+            } catch(err) {
+                statusDiv.innerHTML = `❌ Error: ${err.message}`;
+                console.error(err);
+                rawData = [];
+                filteredGames = [];
+                updateChart();
+            }
+        };
+        reader.readAsText(file);
+    });
+    
     initChart();
+    updateChart();
     
     // Auto-load when page loads
     autoLoadCSV();
@@ -1624,11 +1684,10 @@
                 applyFilters();
             } else {
                 initChart();
-                // Don't call updateChart() here if no data
+                updateChart();
             }
         }, 100);
     });
-    
 </script>
 </body>
 </html>
