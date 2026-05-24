@@ -552,21 +552,26 @@
     }
     
     function autoLoadCSV() {
-        // FIXED: CSV is in the same folder, not in 'data/' subfolder
         const csvPath = '1_arc.csv';
         fetch(csvPath)
             .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 return response.text();
             })
             .then(csvText => {
-                console.log('CSV loaded automatically from 1_arc.csv');
-                loadDataFromCSV(csvText, '1_arc.csv');
+                console.log('CSV loaded automatically');
+                const parsed = parseCSVtoGames(csvText);
+                if (parsed.length === 0) { 
+                    console.log('CSV parsed but no valid games found');
+                    return; 
+                }
+                gamesDataset = parsed;
+                resetAllRings();
             })
             .catch(error => {
                 console.error('Error loading CSV:', error);
-                const errorMsg = t('error_loading', 'Error loading CSV');
-                document.getElementById('dataStats').innerHTML = `<span class="error">${errorMsg}: ${error.message}</span>`;
             });
     }
 
