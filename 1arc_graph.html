@@ -553,27 +553,50 @@
     
     function autoLoadCSV() {
         const csvPath = '1_arc.csv';
+        
+        console.log('🔄 Auto-loading CSV from:', csvPath);
+        
+        // Show loading message
+        const dataStats = document.getElementById('dataStats');
+        if (dataStats) {
+            dataStats.innerHTML = '⏳ Loading 1_arc.csv...';
+        }
+        
         fetch(csvPath)
             .then(response => {
+                console.log('📡 Fetch response status:', response.status);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP ${response.status}: File not found`);
                 }
                 return response.text();
             })
             .then(csvText => {
-                console.log('CSV loaded automatically');
-                const parsed = parseCSVtoGames(csvText);
-                if (parsed.length === 0) { 
-                    console.log('CSV parsed but no valid games found');
-                    return; 
-                }
-                gamesDataset = parsed;
-                resetAllRings();
+                console.log('✅ CSV loaded, size:', csvText.length, 'bytes');
+                console.log('📄 First line:', csvText.split('\n')[0].substring(0, 100));
+                
+                // This will trigger the entire visualization creation
+                loadDataFromCSV(csvText, '1_arc.csv');
             })
             .catch(error => {
-                console.error('Error loading CSV:', error);
+                console.error('❌ Error loading CSV:', error);
+                if (dataStats) {
+                    dataStats.innerHTML = `<span class="error">❌ Cannot find 1_arc.csv in the same folder. Error: ${error.message}</span>`;
+                }
+                // Show error in visualization area
+                const visDiv = document.getElementById('vis');
+                if (visDiv) {
+                    visDiv.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:400px; color:#ff6b6b; font-family:monospace; flex-direction:column; text-align:center; padding:20px;">
+                        <div style="font-size:48px; margin-bottom:16px;">📁</div>
+                        <div><strong>CSV File Not Found</strong></div>
+                        <div style="font-size:13px; margin-top:10px; color:#aaa;">Expected file: <code style="background:#333; padding:2px 6px; border-radius:4px;">1_arc.csv</code></div>
+                        <div style="font-size:12px; margin-top:8px;">Make sure the file is in the same folder as this HTML file.</div>
+                    </div>`;
+                }
             });
     }
+    
+    // Start auto-load when page loads
+    autoLoadCSV();
 
     function handleFileUpload(file) {
         if (!file) return;
@@ -1410,8 +1433,6 @@
         redrawArcs();
     }
     
-    // Start auto-load
-    autoLoadCSV();
 </script>
 </body>
 </html>
