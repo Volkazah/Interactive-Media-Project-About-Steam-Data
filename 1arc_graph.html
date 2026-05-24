@@ -1422,7 +1422,7 @@
         setTimeout(() => { if (document.getElementById('searchResult').innerHTML.includes('reset')) document.getElementById('searchResult').innerHTML = ''; }, 2000);
     }
     function autoLoadCSV() {
-        const csvPath = 'data/1_arc.csv';  // Path to your CSV file
+        const csvPath = '1_arc.csv';  // Path to your CSV file
         fetch(csvPath)
             .then(response => {
                 if (!response.ok) {
