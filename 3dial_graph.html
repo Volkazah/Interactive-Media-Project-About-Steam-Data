@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Best of the Best | Game Discovery Engine</title>
-    <!-- Language support -->
-    <script src="language.js"></script>
+    <title>Best of the Best</title>
     <style>
         * {
             margin: 0;
@@ -22,39 +20,42 @@
             justify-content: center;
             align-items: center;
             font-family: 'Source Sans Pro', 'Inter', system-ui, sans-serif;
-            padding: 10px;
-        }
-        
-        /* Language Selector Styles */
-        .language-selector {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
+            padding: 20px;
         }
 
-        .lang-btn {
-            background: rgba(239, 223, 192, 0.1);
-            border: 1px solid rgba(239, 223, 192, 0.3);
-            color: #EFDFC0;
-            padding: 8px 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-family: 'Source Sans Pro', monospace;
-            font-size: 14px;
+        .dashboard {
+            max-width: 1600px;
+            width: 100%;
+            background: #1B1B1B;
+            border-radius: 28px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
             transition: all 0.2s;
         }
 
-        .lang-btn:hover {
-            background: rgba(239, 223, 192, 0.2);
+        .header {
+            background: #1B1B1B;
+            color: #EFDFC0;
+            padding: 1.2rem 2rem;
+            border-bottom: 3px solid #D98D00;
+            text-align: center;
         }
 
-        .lang-btn.active {
-            background: #EFDFC0;
-            color: #1B1B1B;
-            border-color: #EFDFC0;
+        .main-title {
+            font-family: 'Consolas', 'Source Sans Pro', monospace;
+            font-size: 60px;
+            color: #EFDFC0;
+            font-weight: 400;
+            letter-spacing: -0.3px;
+            margin: 0;
+        }
+
+        .sub-title {
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 20px;
+            color: #EFDFC0;
+            opacity: 0.75;
+            margin-top: 8px;
         }
 
         .main-layout {
@@ -64,35 +65,36 @@
             justify-content: center;
             align-items: flex-start;
             width: 100%;
-            max-width: 1600px;
-            margin: 0 auto;
+            padding: 1.5rem;
         }
 
         .main-wrapper {
             position: relative;
             width: min(80vw, 80vh, 800px);
-            margin: 20px auto 70px;
+            margin: 0 auto;
             flex-shrink: 0;
         }
 
+        /* Vertical Year Selector */
         .vertical-selector {
-            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            background: #2a2a2a;
             border-radius: 40px;
             padding: 20px 12px;
             width: 130px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-            border: 1px solid rgba(239,223,192,0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            border: 1px solid #EFDFC0;
             align-self: center;
             position: relative;
         }
 
         .vertical-selector h4 {
             color: #EFDFC0;
-            text-align: center;
-            font-size: 18px;
+            font-size: 28px;
             font-family: 'Source Sans Pro', monospace;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-align: center;
+            letter-spacing: 1.5px;
+            font-weight: 400;
         }
 
         .year-wheel {
@@ -120,30 +122,29 @@
         .year-item {
             text-align: center;
             padding: 12px 0;
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 500;
             font-family: 'Source Sans Pro', monospace;
             color: #EFDFC0;
             transition: all 0.15s ease;
-            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            background: #3a3a3a;
             margin: 4px 8px;
             border-radius: 30px;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(239,223,192,0.2);
             cursor: pointer;
         }
 
         .year-item:hover {
-            background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+            background: #EFDFC0;
+            color: #1B1B1B;
             transform: scale(1.02);
         }
 
         .year-item.active {
-            background: linear-gradient(145deg, #EFDFC0, #d4c4a0);
+            background: #EFDFC0;
             color: #1B1B1B;
             transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(239,223,192,0.5);
-            border-color: rgba(239,223,192,0.8);
+            box-shadow: 0 0 20px EFDFC0(217,141,0,0.5);
+            border-color: #EFDFC0;
         }
 
         .year-nav {
@@ -171,12 +172,11 @@
         }
 
         .toggle-panel {
-            background: rgba(26, 26, 26, 0.95);
-            backdrop-filter: blur(12px);
+            background: #2a2a2a;
             border-radius: 24px;
             padding: 20px;
-            width: 240px;
-            border: 1px solid rgba(239,223,192,0.3);
+            width: 280px;
+            border: 1px solid #EFDFC0;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             align-self: center;
             max-height: 90vh;
@@ -185,11 +185,12 @@
 
         .toggle-panel h3 {
             color: #EFDFC0;
-            font-size: 18px;
+            font-size: 26px;
             font-family: 'Source Sans Pro', monospace;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             text-align: center;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
+            font-weight: 300;
         }
 
         .toggle-item {
@@ -197,17 +198,17 @@
             align-items: center;
             justify-content: space-between;
             padding: 12px 0;
-            border-bottom: 1px solid rgba(239,223,192,0.2);
+            border-bottom: 1px solid #EFDFC0;
             cursor: pointer;
         }
 
         .toggle-item:hover {
-            background: rgba(239,223,192,0.1);
+            background: rgba(255, 246, 229, 0.1);
         }
 
         .toggle-label {
             color: #EFDFC0;
-            font-size: 16px;
+            font-size: 20px;
             font-family: 'Source Sans Pro', monospace;
             font-weight: 500;
         }
@@ -220,7 +221,7 @@
             position: relative;
             transition: 0.2s;
             cursor: pointer;
-            border: 1px solid rgba(239,223,192,0.3);
+            border: 1px solid #EFDFC0;
         }
 
         .toggle-switch.active {
@@ -244,15 +245,55 @@
             background: #1B1B1B;
         }
 
+        /* Text orientation controls */
+        .orient-controls {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #EFDFC0;
+        }
+
+        .orient-title {
+            color: #EFDFC0;
+            font-size: 20px;
+            font-family: 'Source Sans Pro', monospace;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .orient-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .orient-btn {
+            background: #3a3a3a;
+            color: #EFDFC0;
+            border: 1px solid #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Source Sans Pro', monospace;
+        }
+
+        .orient-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+        }
+
+        .orient-btn:hover {
+            background: #EFDFC0;
+            color: #1B1B1B;
+        }
+
         .header-text {
             text-align: center;
             margin-bottom: 30px;
             position: relative;
             width: 100%;
-            max-width: 1400px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 0 40px;
+            padding: 0 20px;
             min-height: 180px;
             height: auto;
             display: flex;
@@ -260,25 +301,11 @@
             justify-content: center;
         }
 
-        .main-title {
-            font-family: 'Consolas', monospace;
-            font-size: 72px;
-            color: #EFDFC0;
-            letter-spacing: 6px;
-            font-weight: bold;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
-            text-align: center;
-            width: 100%;
-            white-space: nowrap;
-            overflow: visible;
-        }
-
         .dynamic-title {
             font-family: 'Source Sans Pro', sans-serif;
-            font-size: 36px;
+            font-size: 32px;
             color: #EFDFC0;
             line-height: 1.4;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
             text-align: center;
             width: 100%;
             max-width: 1200px;
@@ -290,7 +317,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 140px;
+            min-height: 100px;
             height: auto;
         }
 
@@ -317,6 +344,7 @@
             cursor: grabbing;
         }
 
+        /* Larger Center Card */
         .center-card {
             position: absolute;
             top: 50%;
@@ -333,8 +361,8 @@
             align-items: center;
             text-align: center;
             z-index: 20;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.05);
-            border: 2px solid rgba(239,223,192,0.5);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 2px solid #D98D00;
             pointer-events: none;
         }
 
@@ -342,16 +370,16 @@
             font-size: clamp(16px, 4vw, 28px);
             font-weight: 800;
             font-family: 'Source Sans Pro', sans-serif;
-            background: linear-gradient(135deg, #EFDFC0, #d4c4a0);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
+            color: #EFDFC0;
+            text-shadow: 
+                0 0 10px rgba(217, 141, 0, 0.3),
+                0 0 20px rgba(217, 141, 0, 0.2),
+                0 0 30px rgba(217, 141, 0, 0.1);
             letter-spacing: 1px;
             text-align: center;
             word-break: break-word;
             padding: 0 15px;
         }
-
         .legend {
             position: absolute;
             bottom: -45px;
@@ -360,7 +388,7 @@
             text-align: center;
             font-size: 12px;
             font-family: 'Source Sans Pro', monospace;
-            color: #8F8585;
+            color: #888;
             pointer-events: none;
         }
 
@@ -375,55 +403,48 @@
 
         .import-btn {
             background: #2a2a2a;
-            border: 1px solid #EFDFC0;
-            padding: 8px 16px;
+            border: 1px solid #D98D00;
+            padding: 8px 20px;
             border-radius: 40px;
             color: #EFDFC0;
             font-size: 12px;
             font-family: 'Source Sans Pro', monospace;
             cursor: pointer;
-            backdrop-filter: blur(4px);
             font-weight: 600;
             transition: 0.2s;
         }
         .import-btn:hover {
-            background: #EFDFC0;
+            background: #D98D00;
             color: #1B1B1B;
         }
-        
-        .status-badge {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.7);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-family: 'Source Sans Pro', monospace;
-            color: #EFDFC0;
-            pointer-events: none;
-        }
+        #csvInput { display: none; }
         
         .reset-filters {
-            position: fixed;
-            bottom: 20px;
-            right: 150px;
-            background: #3a3a3a;
+            background: #2a2a2a;
             border: 1px solid #EFDFC0;
-            padding: 8px 16px;
+            padding: 8px 20px;
             border-radius: 40px;
             color: #EFDFC0;
-            font-size: 12px;
+            font-size: 18px;
             font-family: 'Source Sans Pro', monospace;
             cursor: pointer;
-            backdrop-filter: blur(4px);
-            font-weight: 600;
+            font-weight: 400;
             transition: 0.2s;
-            z-index: 100;
         }
         .reset-filters:hover {
             background: #EFDFC0;
             color: #1B1B1B;
+        }
+
+        footer {
+            background: #1B1B1B;
+            padding: 12px 24px;
+            text-align: center;
+            font-size: 10px;
+            color: #EFDFC0;
+            border-top: 1px solid #D98D00;
+            font-family: 'Source Sans Pro', monospace;
+            margin-top: 20px;
         }
 
         @media (max-width: 1000px) {
@@ -435,7 +456,7 @@
             
             .dynamic-title {
                 font-size: 24px;
-                min-height: 120px;
+                min-height: 100px;
                 padding: 0 15px;
                 line-height: 1.3;
             }
@@ -446,6 +467,7 @@
             .main-layout {
                 flex-direction: column;
                 align-items: center;
+                padding: 1rem;
             }
             .vertical-selector {
                 order: 1;
@@ -468,51 +490,67 @@
     </style>
 </head>
 <body>
+<div class="dashboard">
+    <div class="header">
+        <div class="main-title">BEST OF THE BEST</div>
+        <div class="sub-title">Look for the most successful videogames of all time. Choose specific years, metrics and genres. Customise dials to your preferences</div>
+    </div>
 
-<!-- Language Selector -->
-<div class="language-selector">
-    <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
-    <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
-</div>
+    <div class="main-layout">
+        <div class="main-wrapper">
+            <div class="header-text">
+                <div class="dynamic-title" id="dynamicTitle">Loading game data...</div>
+            </div>
 
-<div class="main-layout">
-    <div class="main-wrapper">
-        <div class="header-text">
-            <div class="main-title" data-i18n="dial_title">BEST OF THE BEST</div>
-            <div class="dynamic-title" id="dynamicTitle">Loading game data...</div>
-        </div>
-
-        <div class="wheel-container" id="wheelContainer">
-            <canvas id="ringCanvas" width="800" height="800"></canvas>
-            <div class="center-card">
-                <div class="game-name" id="centerGameName">—</div>
+            <div class="wheel-container" id="wheelContainer">
+                <canvas id="ringCanvas" width="800" height="800"></canvas>
+                <div class="center-card">
+                    <div class="game-name" id="centerGameName">—</div>
+                </div>
             </div>
         </div>
-        <div class="legend">🖱️ Drag any visible ring to rotate · Top segment = active filter</div>
+
+        <!-- Vertical Year Selector -->
+        <div class="vertical-selector">
+            <h4>Year</h4>
+            <div class="year-wheel" id="yearWheel">
+                <div class="year-items" id="yearItems"></div>
+            </div>
+            <div class="year-nav">
+                <button id="yearUpBtn">▲</button>
+                <button id="yearDownBtn">▼</button>
+            </div>
+        </div>
+
+        <div class="toggle-panel">
+            <h3>Customize Dials</h3>
+            <div id="toggleContainer"></div>
+            
+            <!-- Text Orientation Control -->
+            <div class="orient-controls">
+                <h3>Text Orientation<h3>
+                <div class="orient-buttons">
+                    <button id="orientRadial" class="orient-btn active">Radial</button>
+                    <button id="orientHorizontal" class="orient-btn">Horizontal</button>
+                </div>
+            </div>
+            
+            <!-- Reset Filters Button -->
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #EFDFC0;">
+                <button class="reset-filters" id="resetBtn" style="width: 100%;">⟳ Reset Filters</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Vertical Year Selector -->
-    <div class="vertical-selector">
-        <h4 data-i18n="year">📅 YEAR</h4>
-        <div class="year-wheel" id="yearWheel">
-            <div class="year-items" id="yearItems"></div>
-        </div>
-        <div class="year-nav">
-            <button id="yearUpBtn">▲</button>
-            <button id="yearDownBtn">▼</button>
-        </div>
-    </div>
-
-    <div class="toggle-panel">
-        <h3 data-i18n="customize_dials">🎮 CUSTOMIZE DIALS</h3>
-        <div id="toggleContainer"></div>
-    </div>
+    <footer>
+        Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.
+    </footer>
 </div>
 
 <div class="import-area">
-    <button class="reset-filters" id="resetBtn" data-i18n="reset_filters">⟳ Reset Filters</button>
+    <label class="import-btn" for="csvInput">📂 IMPORT CSV</label>
+    <input type="file" id="csvInput" accept=".csv">
 </div>
-<div class="status-badge" id="dataStatus" data-i18n="loading">Loading data...</div>
 
 <script>
     // ============================================================
@@ -524,6 +562,9 @@
     let gamesDataset = [];
     let currentBestGame = null;
     let currentYearFilter = 'Any';
+    
+    // NEW: Text orientation state
+    let textOrientation = "radial"; // Options: "radial", "horizontal"
 
     // New color palette for dials
     const COLOR_PALETTE = ['#FFE7B6', '#F0D9A8', '#EED196', '#E7BB66', '#D98D00'];
@@ -570,7 +611,7 @@
         return true;
     }
 
-    // Metric options with translation keys
+    // Metric options
     const metricOptions = [
         'most recommended', 'high rated', 'most reviews', 'most achievements',
         'median playtime', 'peak CCU', 'most followers'
@@ -579,6 +620,15 @@
         'recommendations_count', 'rating', 'reviews', 'achievements_count',
         'median_playtime_hours', 'peak_players', 'follows'
     ];
+    const metricTextMap = {
+        'most recommended': 'is the most recommended',
+        'high rated': 'is the highest rated',
+        'most reviews': 'is the most reviewed',
+        'most achievements': 'has the most achievements',
+        'median playtime': 'has the highest median playtime',
+        'peak CCU': 'has the highest CCU peak',
+        'most followers': 'is the most followed'
+    };
 
     // Genre options
     const genreOptions = ['any', 'simulation', 'strategy', 'action', 'RPG', 'racing', 'indie', 'adventure', 'casual', 'sports'];
@@ -590,16 +640,16 @@
 
     // All rings configuration - UPDATED RADII for larger circle (max radius 0.95)
     const ALL_RINGS = [
-        { name: 'metric', label: 'METRIC', options: metricOptions, values: metricValues, currentIdx: 1, rotationAngle: 0,
+        { name: 'metric', label: 'Metric', options: metricOptions, values: metricValues, currentIdx: 1, rotationAngle: 0,
           colors: { bg: COLOR_PALETTE[0], active: '#FA8112', text: '#000000', inactiveText: '#000000' } },
-        { name: 'genre', label: 'GENRE', options: genreOptions, values: genreValues, currentIdx: 0, rotationAngle: 0,
+        { name: 'genre', label: 'Genre', options: genreOptions, values: genreValues, currentIdx: 0, rotationAngle: 0,
           colors: { bg: COLOR_PALETTE[1], active: '#FA8112', text: '#000000', inactiveText: '#000000' } },
-        { name: 'player', label: 'PLAYER TYPE', options: ['any', 'single-player', 'multi-player', 'single&multi-player'],
+        { name: 'player', label: 'Player Type', options: ['any', 'single-player', 'multi-player', 'single&multi-player'],
           values: ['All', 'Single-player', 'Multi-player', 'Single&Multi-player'], currentIdx: 0, rotationAngle: 0,
           colors: { bg: COLOR_PALETTE[2], active: '#FA8112', text: '#000000', inactiveText: '#000000' } },
-        { name: 'os', label: 'SUPPORTED OS', options: osOptions, values: osValues, currentIdx: 0, rotationAngle: 0,
+        { name: 'os', label: 'Supported OS', options: osOptions, values: osValues, currentIdx: 0, rotationAngle: 0,
           colors: { bg: COLOR_PALETTE[3], active: '#FA8112', text: '#000000', inactiveText: '#000000' } },
-        { name: 'price', label: 'PRICE', options: priceOptions, values: priceValues, currentIdx: 0, rotationAngle: 0,
+        { name: 'price', label: 'Price', options: priceOptions, values: priceValues, currentIdx: 0, rotationAngle: 0,
           colors: { bg: COLOR_PALETTE[4], active: '#FA8112', text: '#000000', inactiveText: '#000000' } }
     ];
 
@@ -612,7 +662,7 @@
         if (count === 0) return [];
         
         const ringGap = 0.015;
-        const maxRadius = 1;
+        const maxRadius = 1;  // Almost touches canvas edge
         const minRadius = 0.22;
         const availableSpan = maxRadius - minRadius;
         const totalGaps = (count - 1) * ringGap;
@@ -695,11 +745,13 @@
             
             let price = null;
             const priceRaw = game.price$ || game.price;
-            if (priceRaw && priceRaw !== '—' && priceRaw !== '-' && priceRaw !== 'N/A') {
-                price = parseNumberWithCommas(priceRaw);
-                if (String(priceRaw).toLowerCase() === 'free') price = 0;
+            if (priceRaw && priceRaw !== '—' && priceRaw !== '-' && priceRaw !== 'N/A' && priceRaw !== 'n/a' && priceRaw !== '') {
+                if (String(priceRaw).toLowerCase().trim() === 'free') {
+                    price = 0;
+                } else {
+                    price = parseNumberWithCommas(priceRaw);
+                }
             }
-            
             games.push({
                 name: game.game_name || game.name || `Game_${i}`,
                 release_year: parseNumberWithCommas(game.release_year) || 2000,
@@ -717,6 +769,30 @@
             });
         }
         return games;
+    }
+    
+    function autoLoadCSV() {
+        const csvPath = '3_dial.csv';
+        fetch(csvPath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(csvText => {
+                console.log('CSV loaded automatically');
+                const parsed = parseCSVtoGames(csvText);
+                if (parsed.length === 0) { 
+                    console.log('CSV parsed but no valid games found');
+                    return; 
+                }
+                gamesDataset = parsed;
+                resetAllRings();
+            })
+            .catch(error => {
+                console.error('Error loading CSV:', error);
+            });
     }
 
     // ========== Filter functions ==========
@@ -826,11 +902,7 @@
         const priceRing = RINGS.find(r => r.name === 'price');
         
         const metricOption = metricRing?.options[metricRing.currentIdx] || 'high rated';
-        let metricText = 'is the best';
-        if (typeof t === 'function') {
-            const metricKey = metricOption.replace(/ /g, '_');
-            metricText = t(metricKey) || metricText;
-        }
+        const metricText = metricTextMap[metricOption] || 'is the best';
         
         const genreOption = genreRing?.options[genreRing.currentIdx] || 'any';
         const isSpecificGenre = genreOption !== 'any';
@@ -852,6 +924,7 @@
         const yearOption = currentYearFilter;
         const isSpecificYear = yearOption !== 'Any';
         
+        // Build the text parts array for better handling
         const textParts = [];
         textParts.push(`«${currentBestGame.name}» ${metricText}`);
         
@@ -883,9 +956,11 @@
             textParts.push('of all time');
         }
         
+        // Join with spaces
         return textParts.join(' ');
     }
     
+    // Function to scale text to fit container
     function fitTextToContainer(text, containerWidth, containerHeight, fontSize, fontFamily) {
         const tempCanvas = document.createElement('canvas');
         const tempCtx = tempCanvas.getContext('2d');
@@ -932,7 +1007,7 @@
         document.getElementById('dynamicTitle').innerHTML = dynamicText;
     }
 
-    // ========== DRAW RINGS with FIXED full rotation ==========
+    // ========== DRAW RINGS with configurable text orientation ==========
     function drawRings() {
         if (!ctx) return;
         ctx.clearRect(0, 0, width, height);
@@ -993,18 +1068,22 @@
                 
                 ctx.save();
                 ctx.translate(x, y);
-                ctx.rotate(midAngle + Math.PI/2);
+                
+                // Apply rotation based on text orientation setting
+                if (textOrientation === "radial") {
+                    // Text follows the circle's curve (default)
+                    ctx.rotate(midAngle + Math.PI/2);
+                } else if (textOrientation === "horizontal") {
+                    // Text stays horizontal (no rotation)
+                    // No additional rotation needed
+                }
+                
                 ctx.fillStyle = isActive ? '#1B1B1B' : ring.colors.inactiveText;
                 ctx.font = `500 ${Math.max(14, centerX * 0.035)}px 'Source Sans Pro', sans-serif`;
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 let label = ring.options[i];
                 if (label === 'single&multi-player') label = 'Single & Multi';
-                if (typeof t === 'function' && ring.name === 'metric') {
-                    const translationKey = label.replace(/ /g, '_');
-                    const translated = t(translationKey);
-                    if (translated && translated !== translationKey) label = translated;
-                }
                 ctx.fillText(label, 0, 0);
                 ctx.restore();
             }
@@ -1023,7 +1102,7 @@
         ctx.moveTo(centerX - 8, topY);
         ctx.lineTo(centerX, topY - 8);
         ctx.lineTo(centerX + 8, topY);
-        ctx.fillStyle = '#EFDFC0';
+        ctx.fillStyle = '#FA8112';
         ctx.fill();
     }
 
@@ -1197,16 +1276,26 @@
     }
 
     function resetAllRings() {
+        // Reset all ring rotations and indices
         ALL_RINGS.forEach(ring => { ring.rotationAngle = 0; ring.currentIdx = ring.name === 'metric' ? 1 : 0; });
+        
+        // Reset year filter
         currentYearFilter = 'Any';
         yearIndex = 0;
         currentDragYearIndex = 0;
         updateYearSelectorVisual();
+        
+        // RE-ENABLE ALL TURNED OFF DIALS
+        visibleRings = { metric: true, genre: true, player: true, os: true, price: true };
+        
+        // Update the toggle UI to reflect all dials are now visible
+        updateToggleUI();
+        
+        // Recalculate radii with all dials enabled
         RINGS = calculateDynamicRadii();
         drawRings();
         updateBestGame();
     }
-
     function toggleRing(ringName) {
         visibleRings[ringName] = !visibleRings[ringName];
         RINGS = calculateDynamicRadii();
@@ -1222,66 +1311,93 @@
             const item = document.createElement('div');
             item.className = 'toggle-item';
             item.onclick = () => toggleRing(ring.name);
-            let label = ring.label;
-            if (typeof t === 'function') {
-                const labelKey = ring.name === 'metric' ? 'metric' : 
-                                ring.name === 'genre' ? 'genre' :
-                                ring.name === 'player' ? 'player_type_label' :
-                                ring.name === 'os' ? 'supported_os' : 'price';
-                label = t(labelKey) || label;
-            }
-            item.innerHTML = `<span class="toggle-label">${label}</span><div class="toggle-switch ${visibleRings[ring.name] ? 'active' : ''}"></div>`;
+            item.innerHTML = `<span class="toggle-label">${ring.label}</span><div class="toggle-switch ${visibleRings[ring.name] ? 'active' : ''}"></div>`;
             container.appendChild(item);
         });
+    }
+
+    // NEW: Setup text orientation controls
+    function setupTextOrientation() {
+        const radialBtn = document.getElementById('orientRadial');
+        const horizontalBtn = document.getElementById('orientHorizontal');
+        
+        function updateOrientationButtons() {
+            if (textOrientation === 'radial') {
+                radialBtn.classList.add('active');
+                horizontalBtn.classList.remove('active');
+            } else if (textOrientation === 'horizontal') {
+                radialBtn.classList.remove('active');
+                horizontalBtn.classList.add('active');
+            }
+        }
+        
+        radialBtn.addEventListener('click', () => {
+            textOrientation = 'radial';
+            updateOrientationButtons();
+            drawRings();
+        });
+        
+        horizontalBtn.addEventListener('click', () => {
+            textOrientation = 'horizontal';
+            updateOrientationButtons();
+            drawRings();
+        });
+        
+        updateOrientationButtons();
     }
 
     function resizeCanvas() {
         const container = document.getElementById('wheelContainer');
         const size = container.clientWidth;
-        canvas.width = size;
-        canvas.height = size;
-        width = size;
-        height = size;
-        centerX = size/2;
-        centerY = size/2;
+        
+        // Set CSS display size
+        canvas.style.width = `${size}px`;
+        canvas.style.height = `${size}px`;
+        
+        // Set actual canvas resolution (higher for better quality)
+        const pixelRatio = 2;
+        canvas.width = size * pixelRatio;
+        canvas.height = size * pixelRatio;
+        
+        // IMPORTANT: Update width/height variables to the actual canvas size
+        width = canvas.width;
+        height = canvas.height;
+        centerX = width / 2;
+        centerY = height / 2;
+        
+        // Scale all drawing operations - this is critical!
+        ctx.save();
+        ctx.scale(pixelRatio, pixelRatio);
+        
         RINGS = calculateDynamicRadii();
         drawRings();
+        
+        ctx.restore();
     }
 
-    // Auto-load CSV
-    function autoLoadCSV() {
-        const csvPath = '3_dial.csv';
-        fetch(csvPath)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(csvText => {
-                console.log('CSV loaded automatically from 3_dial.csv');
-                const parsed = parseCSVtoGames(csvText);
-                if (parsed.length === 0) { 
-                    document.getElementById('dataStatus').innerHTML = '⚠️ CSV parsed but no valid games found';
-                    return; 
-                }
-                gamesDataset = parsed;
-                resetAllRings();
-                if (typeof t === 'function') {
-                    document.getElementById('dataStatus').innerHTML = `✅ ${parsed.length.toLocaleString()} ${t('games_loaded')}`;
-                } else {
-                    document.getElementById('dataStatus').innerHTML = `✅ ${parsed.length.toLocaleString()} games loaded`;
-                }
-            })
-            .catch(error => {
-                console.error('Error loading CSV:', error);
-                document.getElementById('dataStatus').innerHTML = `⚠️ Error loading 3_dial.csv: ${error.message}`;
-            });
-    }
+    // CSV loading
+    document.getElementById('csvInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const parsed = parseCSVtoGames(ev.target.result);
+            if (parsed.length === 0) { 
+                console.log('CSV parsed but no valid games found');
+                return; 
+            }
+            gamesDataset = parsed;
+            resetAllRings();
+        };
+        reader.readAsText(file, 'UTF-8');
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', resetAllRings);
 
     // Initialize
     updateToggleUI();
     initYearSelector();
+    setupTextOrientation(); // NEW: Initialize text orientation controls
     window.addEventListener('resize', () => { resizeCanvas(); drawRings(); });
     resizeCanvas();
     drawRings();
@@ -1294,9 +1410,6 @@
     window.addEventListener('touchend', onDragEnd);
     canvas.style.cursor = 'grab';
     
-    document.getElementById('resetBtn').addEventListener('click', resetAllRings);
-    
-    // Auto-load CSV when page loads
     autoLoadCSV();
 </script>
 </body>
