@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Best of the Best</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Language support -->
+    <script src="language.js"></script>
     <style>
         * {
             margin: 0;
@@ -21,6 +24,38 @@
             align-items: center;
             font-family: 'Source Sans Pro', 'Inter', system-ui, sans-serif;
             padding: 20px;
+        }
+
+        /* Language Selector Styles */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: rgba(239, 223, 192, 0.1);
+            border: 1px solid rgba(239, 223, 192, 0.3);
+            color: #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        .lang-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+            border-color: #EFDFC0;
         }
 
         .dashboard {
@@ -143,7 +178,7 @@
             background: #EFDFC0;
             color: #1B1B1B;
             transform: scale(1.05);
-            box-shadow: 0 0 20px EFDFC0(217,141,0,0.5);
+            box-shadow: 0 0 20px rgba(217,141,0,0.5);
             border-color: #EFDFC0;
         }
 
@@ -494,9 +529,16 @@
 </head>
 <body>
 <div class="dashboard">
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <button id="mainPageBtn" class="lang-btn" data-i18n="main_page">🏠 Main Page</button>
+        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
+        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+    </div>
+
     <div class="header">
-        <div class="main-title">BEST OF THE BEST</div>
-        <div class="sub-title">Look for the most successful videogames of all time. Choose specific years, metrics and genres. Customise dials to your preferences</div>
+        <div class="main-title" data-i18n="dial_title">BEST OF THE BEST</div>
+        <div class="sub-title" data-i18n="dial_subtitle">Look for the most successful videogames of all time. Choose specific years, metrics and genres. Customise dials to your preferences</div>
     </div>
 
     <div class="main-layout">
@@ -515,7 +557,7 @@
 
         <!-- Vertical Year Selector -->
         <div class="vertical-selector">
-            <h4>Year</h4>
+            <h4 data-i18n="year">Year</h4>
             <div class="year-wheel" id="yearWheel">
                 <div class="year-items" id="yearItems"></div>
             </div>
@@ -526,21 +568,21 @@
         </div>
 
         <div class="toggle-panel">
-            <h3>Customize Dials</h3>
+            <h3 data-i18n="customize_dials">Customize Dials</h3>
             <div id="toggleContainer"></div>
             
             <!-- Text Orientation Control -->
             <div class="orient-controls">
-                <h3>Text Orientation<h3>
+                <h3 class="orient-title" data-i18n="text_orientation">Text Orientation</h3>
                 <div class="orient-buttons">
-                    <button id="orientRadial" class="orient-btn active">Radial</button>
-                    <button id="orientHorizontal" class="orient-btn">Horizontal</button>
+                    <button id="orientRadial" class="orient-btn active" data-i18n="radial">Radial</button>
+                    <button id="orientHorizontal" class="orient-btn" data-i18n="horizontal">Horizontal</button>
                 </div>
             </div>
             
             <!-- Reset Filters Button -->
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #EFDFC0;">
-                <button class="reset-filters" id="resetBtn" style="width: 100%;">⟳ Reset Filters</button>
+                <button class="reset-filters" id="resetBtn" data-i18n="reset_filters" style="width: 100%;">⟳ Reset Filters</button>
             </div>
         </div>
     </div>
@@ -556,6 +598,15 @@
 </div>
 
 <script>
+    // Helper function to get translated text - using window.translate
+    function _(key, fallback) {
+        if (typeof window !== 'undefined' && window.translate) {
+            const translated = window.translate(key);
+            if (translated && translated !== key) return translated;
+        }
+        return fallback || key;
+    }
+
     // ============================================================
     // FIXED: Full rotation working, larger visuals, improved text
     // ============================================================
@@ -586,16 +637,16 @@
     const priceValues = ['All', 'Free', '0-5', '5-10', '10-15', '15-20', '20-30', '30-40', '40-60', '60-plus'];
 
     function getPriceText(range, isFreeToPlay = false) {
-        if (isFreeToPlay) return 'free';
-        if (range === 'Free') return 'free';
-        if (range === '0-5') return 'in a price range under $5';
-        if (range === '5-10') return 'in a price range from $5 to $10';
-        if (range === '10-15') return 'in a price range from $10 to $15';
-        if (range === '15-20') return 'in a price range from $15 to $20';
-        if (range === '20-30') return 'in a price range from $20 to $30';
-        if (range === '30-40') return 'in a price range from $30 to $40';
-        if (range === '40-60') return 'in a price range from $40 to $60';
-        if (range === '60-plus') return 'in a price range of $60 and more';
+        if (isFreeToPlay) return _('free', 'free');
+        if (range === 'Free') return _('free', 'free');
+        if (range === '0-5') return _('price_range_under_5', 'in a price range under $5');
+        if (range === '5-10') return _('price_range_5_10', 'in a price range from $5 to $10');
+        if (range === '10-15') return _('price_range_10_15', 'in a price range from $10 to $15');
+        if (range === '15-20') return _('price_range_15_20', 'in a price range from $15 to $20');
+        if (range === '20-30') return _('price_range_20_30', 'in a price range from $20 to $30');
+        if (range === '30-40') return _('price_range_30_40', 'in a price range from $30 to $40');
+        if (range === '40-60') return _('price_range_40_60', 'in a price range from $40 to $60');
+        if (range === '60-plus') return _('price_range_60_plus', 'in a price range of $60 and more');
         return '';
     }
 
@@ -614,7 +665,7 @@
         return true;
     }
 
-    // Metric options
+    // Metric options with translation keys
     const metricOptions = [
         'most recommended', 'high rated', 'most reviews', 'most achievements',
         'median playtime', 'peak CCU', 'most followers'
@@ -623,15 +674,20 @@
         'recommendations_count', 'rating', 'reviews', 'achievements_count',
         'median_playtime_hours', 'peak_players', 'follows'
     ];
-    const metricTextMap = {
-        'most recommended': 'is the most recommended',
-        'high rated': 'is the highest rated',
-        'most reviews': 'is the most reviewed',
-        'most achievements': 'has the most achievements',
-        'median playtime': 'has the highest median playtime',
-        'peak CCU': 'has the highest CCU peak',
-        'most followers': 'is the most followed'
-    };
+    
+    // Translation map for metric text
+    function getMetricText(metricOption) {
+        const metricMap = {
+            'most recommended': _('metric_most_recommended', 'is the most recommended'),
+            'high rated': _('metric_high_rated', 'is the highest rated'),
+            'most reviews': _('metric_most_reviews', 'is the most reviewed'),
+            'most achievements': _('metric_most_achievements', 'has the most achievements'),
+            'median playtime': _('metric_median_playtime', 'has the highest median playtime'),
+            'peak CCU': _('metric_peak_ccu', 'has the highest CCU peak'),
+            'most followers': _('metric_most_followers', 'is the most followed')
+        };
+        return metricMap[metricOption] || _('is_best', 'is the best');
+    }
 
     // Genre options
     const genreOptions = ['any', 'simulation', 'strategy', 'action', 'RPG', 'racing', 'indie', 'adventure', 'casual', 'sports'];
@@ -640,6 +696,79 @@
     // OS options
     const osOptions = ['any', 'windows', 'mac', 'linux'];
     const osValues = ['All', 'Windows', 'Mac', 'Linux'];
+
+    // Helper to get translated label for rings
+    function getRingLabel(ringName, defaultValue) {
+        const labelMap = {
+            'Metric': _('dial_metric', 'Metric'),
+            'Genre': _('dial_genre', 'Genre'),
+            'Player Type': _('dial_player_type', 'Player Type'),
+            'Supported OS': _('dial_supported_os', 'Supported OS'),
+            'Price': _('dial_price', 'Price')
+        };
+        return labelMap[defaultValue] || defaultValue;
+    }
+
+    // Helper to get translated option
+    function getTranslatedOption(ringName, option) {
+        if (ringName === 'metric') {
+            const metricMap = {
+                'most recommended': _('metric_most_recommended_option', 'most recommended'),
+                'high rated': _('metric_high_rated_option', 'high rated'),
+                'most reviews': _('metric_most_reviews_option', 'most reviews'),
+                'most achievements': _('metric_most_achievements_option', 'most achievements'),
+                'median playtime': _('metric_median_playtime_option', 'median playtime'),
+                'peak CCU': _('metric_peak_ccu_option', 'peak CCU'),
+                'most followers': _('metric_most_followers_option', 'most followers')
+            };
+            return metricMap[option] || option;
+        } else if (ringName === 'genre') {
+            const genreMap = {
+                'any': _('genre_any', 'any'),
+                'simulation': _('genre_simulation', 'simulation'),
+                'strategy': _('genre_strategy', 'strategy'),
+                'action': _('genre_action', 'action'),
+                'RPG': _('genre_rpg', 'RPG'),
+                'racing': _('genre_racing', 'racing'),
+                'indie': _('genre_indie', 'indie'),
+                'adventure': _('genre_adventure', 'adventure'),
+                'casual': _('genre_casual', 'casual'),
+                'sports': _('genre_sports', 'sports')
+            };
+            return genreMap[option] || option;
+        } else if (ringName === 'player') {
+            const playerMap = {
+                'any': _('player_any', 'any'),
+                'single-player': _('player_single', 'single-player'),
+                'multi-player': _('player_multi', 'multi-player'),
+                'single&multi-player': _('player_both', 'single&multi-player')
+            };
+            return playerMap[option] || option;
+        } else if (ringName === 'os') {
+            const osMap = {
+                'any': _('os_any', 'any'),
+                'windows': _('os_windows', 'windows'),
+                'mac': _('os_mac', 'mac'),
+                'linux': _('os_linux', 'linux')
+            };
+            return osMap[option] || option;
+        } else if (ringName === 'price') {
+            const priceMap = {
+                'any': _('price_any', 'any'),
+                'free to play': _('price_free', 'free to play'),
+                '<$5': _('price_under_5', '<$5'),
+                '<$10': _('price_under_10', '<$10'),
+                '<$15': _('price_under_15', '<$15'),
+                '<$20': _('price_under_20', '<$20'),
+                '<$30': _('price_under_30', '<$30'),
+                '<$40': _('price_under_40', '<$40'),
+                '<$60': _('price_under_60', '<$60'),
+                '>$60': _('price_over_60', '>$60')
+            };
+            return priceMap[option] || option;
+        }
+        return option;
+    }
 
     // All rings configuration - UPDATED RADII for larger circle (max radius 0.95)
     const ALL_RINGS = [
@@ -887,15 +1016,15 @@
     }
 
     function formatPlayerType(playerOption) {
-        if (playerOption === 'single-player') return 'Singleplayer';
-        if (playerOption === 'multi-player') return 'Multiplayer';
-        if (playerOption === 'single&multi-player') return 'Single&Multiplayer';
+        if (playerOption === 'single-player') return _('player_single_display', 'Singleplayer');
+        if (playerOption === 'multi-player') return _('player_multi_display', 'Multiplayer');
+        if (playerOption === 'single&multi-player') return _('player_both_display', 'Single&Multiplayer');
         return '';
     }
 
     function generateDynamicText() {
         if (!currentBestGame || !gamesDataset.length) {
-            return 'No data loaded — please import CSV';
+            return _('no_data_message', 'No data loaded — please import CSV');
         }
         
         const metricRing = RINGS.find(r => r.name === 'metric');
@@ -905,11 +1034,11 @@
         const priceRing = RINGS.find(r => r.name === 'price');
         
         const metricOption = metricRing?.options[metricRing.currentIdx] || 'high rated';
-        const metricText = metricTextMap[metricOption] || 'is the best';
+        const metricText = getMetricText(metricOption);
         
         const genreOption = genreRing?.options[genreRing.currentIdx] || 'any';
         const isSpecificGenre = genreOption !== 'any';
-        const genreName = capitalizeFirst(genreOption);
+        const genreName = capitalizeFirst(getTranslatedOption('genre', genreOption));
         
         const playerOption = playerRing?.options[playerRing.currentIdx] || 'any';
         const isSpecificPlayer = playerOption !== 'any';
@@ -927,7 +1056,6 @@
         const yearOption = currentYearFilter;
         const isSpecificYear = yearOption !== 'Any';
         
-        // Build the text parts array for better handling
         const textParts = [];
         textParts.push(`«${currentBestGame.name}» ${metricText}`);
         
@@ -942,11 +1070,11 @@
         if (isSpecificGenre) {
             textParts.push(genreName);
         } else {
-            textParts.push('game');
+            textParts.push(_('game_word', 'game'));
         }
         
         if (isSpecificOS) {
-            textParts.push(`on ${osOption}`);
+            textParts.push(_('on_word', 'on') + ` ${getTranslatedOption('os', osOption)}`);
         }
         
         if (isSpecificPrice && !isFreeToPlay && priceText) {
@@ -954,12 +1082,11 @@
         }
         
         if (isSpecificYear) {
-            textParts.push(`in ${yearOption}`);
+            textParts.push(_('in_word', 'in') + ` ${yearOption}`);
         } else {
-            textParts.push('of all time');
+            textParts.push(_('of_all_time', 'of all time'));
         }
         
-        // Join with spaces
         return textParts.join(' ');
     }
     
@@ -986,7 +1113,7 @@
     function updateUI() {
         if (!currentBestGame || !gamesDataset.length) {
             document.getElementById('centerGameName').innerHTML = '—';
-            document.getElementById('dynamicTitle').innerHTML = 'No games match the current filters — try adjusting the dials';
+            document.getElementById('dynamicTitle').innerHTML = _('no_filters_match', 'No games match the current filters — try adjusting the dials');
             document.getElementById('dynamicTitle').style.color = '#8F8585';
             return;
         }
@@ -1085,8 +1212,8 @@
                 ctx.font = `500 ${Math.max(14, centerX * 0.035)}px 'Source Sans Pro', sans-serif`;
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
-                let label = ring.options[i];
-                if (label === 'single&multi-player') label = 'Single & Multi';
+                let label = getTranslatedOption(ring.name, ring.options[i]);
+                if (label === 'single&multi-player') label = _('single_multi', 'Single & Multi');
                 ctx.fillText(label, 0, 0);
                 ctx.restore();
             }
@@ -1132,7 +1259,7 @@
         visibleYears.forEach(year => {
             const div = document.createElement('div');
             div.className = 'year-item';
-            const displayYear = year === 'Any' ? 'ANY' : year;
+            const displayYear = year === 'Any' ? _('any_year', 'ANY') : year;
             if (year === currentYearFilter) div.classList.add('active');
             div.textContent = displayYear;
             div.onclick = (e) => {
@@ -1299,6 +1426,7 @@
         drawRings();
         updateBestGame();
     }
+    
     function toggleRing(ringName) {
         visibleRings[ringName] = !visibleRings[ringName];
         RINGS = calculateDynamicRadii();
@@ -1314,7 +1442,7 @@
             const item = document.createElement('div');
             item.className = 'toggle-item';
             item.onclick = () => toggleRing(ring.name);
-            item.innerHTML = `<span class="toggle-label">${ring.label}</span><div class="toggle-switch ${visibleRings[ring.name] ? 'active' : ''}"></div>`;
+            item.innerHTML = `<span class="toggle-label">${getRingLabel(ring.name, ring.label)}</span><div class="toggle-switch ${visibleRings[ring.name] ? 'active' : ''}"></div>`;
             container.appendChild(item);
         });
     }
@@ -1397,10 +1525,50 @@
 
     document.getElementById('resetBtn').addEventListener('click', resetAllRings);
 
+    // Initialize language and main page button
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup language switcher
+        if (typeof window.setupLanguageSwitcher === 'function') {
+            window.setupLanguageSwitcher();
+        } else {
+            const langButtons = document.querySelectorAll('.lang-btn[data-lang]');
+            langButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    if (typeof window.setLanguage === 'function') {
+                        window.setLanguage(lang);
+                    } else {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('lang', lang);
+                        window.location.href = url.toString();
+                    }
+                });
+            });
+        }
+        
+        // Add click handler for the Main Page button
+        const mainPageBtn = document.getElementById('mainPageBtn');
+        if (mainPageBtn) {
+            mainPageBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'https://volkazah.github.io/Interactive-Media-Project-About-Steam-Data/';
+            });
+        }
+    });
+    
+    // Listen for language changes to update dynamic content
+    window.addEventListener('languageChanged', function() {
+        updateToggleUI();
+        if (gamesDataset.length) {
+            updateBestGame();
+            drawRings();
+        }
+    });
+
     // Initialize
     updateToggleUI();
     initYearSelector();
-    setupTextOrientation(); // NEW: Initialize text orientation controls
+    setupTextOrientation();
     window.addEventListener('resize', () => { resizeCanvas(); drawRings(); });
     resizeCanvas();
     drawRings();
