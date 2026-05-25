@@ -357,37 +357,6 @@ const translations = {
 // Language management
 let currentLanguage = 'en';
 
-function t(key) {
-    return translations[currentLanguage][key] || key;
-}
-
-function applyTranslations() {
-    // Translate all elements with data-i18n attribute
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        const translation = t(key);
-        
-        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-            if (element.hasAttribute('placeholder')) {
-                element.placeholder = translation;
-            } else {
-                element.value = translation;
-            }
-        } else {
-            element.textContent = translation;
-        }
-    });
-    
-    // Update the page title
-    const titleElement = document.querySelector('title');
-    if (titleElement) {
-        const currentTitle = titleElement.textContent;
-        // Don't translate title if it's not in translations
-    }
-    
-    console.log('Translations applied for language:', currentLanguage);
-}
-
 function setLanguage(lang) {
     if (translations[lang]) {
         currentLanguage = lang;
@@ -403,22 +372,35 @@ function setLanguage(lang) {
             }
         });
         
-        // Dispatch custom event for any page-specific updates
+        // Dispatch event for page updates
         window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
     }
 }
 
+function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const translation = translations[currentLanguage][key];
+        if (translation) {
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                if (element.hasAttribute('placeholder')) {
+                    element.placeholder = translation;
+                }
+            } else {
+                element.textContent = translation;
+            }
+        }
+    });
+}
+
 function initLanguage() {
-    // Check URL parameter first
     const urlParams = new URLSearchParams(window.location.search);
     let lang = urlParams.get('lang');
     
-    // Then check localStorage
     if (!lang) {
         lang = localStorage.getItem('preferred_language');
     }
     
-    // Default to English
     if (!lang || !translations[lang]) {
         lang = 'en';
     }
@@ -426,7 +408,7 @@ function initLanguage() {
     currentLanguage = lang;
     applyTranslations();
     
-    // Update URL without reloading
+    // Update URL without reload
     const url = new URL(window.location.href);
     if (url.searchParams.get('lang') !== lang) {
         url.searchParams.set('lang', lang);
@@ -442,28 +424,33 @@ function initLanguage() {
         }
     });
     
-    console.log('Language initialized to:', lang);
+    // Dispatch event
+    window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
 }
 
-// Setup language switcher buttons
 function setupLanguageSwitcher() {
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             const lang = this.getAttribute('data-lang');
             if (lang && translations[lang]) {
-                // Update URL parameter
                 const url = new URL(window.location.href);
                 url.searchParams.set('lang', lang);
                 window.history.pushState({}, '', url);
-                // Apply translation without reload
                 setLanguage(lang);
             }
         });
     });
 }
 
-// Initialize when DOM is ready
+// Expose globally
+window.translations = translations;
+window.currentLanguage = currentLanguage;
+window.setLanguage = setLanguage;
+window.initLanguage = initLanguage;
+window.setupLanguageSwitcher = setupLanguageSwitcher;
+
+// Auto-initialize
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         initLanguage();
