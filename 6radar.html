@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Game Performance Radar Tool</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- Language support -->
-    <script src="language.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -21,38 +19,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        /* Language Selector Styles */
-        .language-selector {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .lang-btn {
-            background: rgba(239, 223, 192, 0.1);
-            border: 1px solid rgba(239, 223, 192, 0.3);
-            color: #EFDFC0;
-            padding: 8px 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-family: 'Source Sans Pro', monospace;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .lang-btn:hover {
-            background: rgba(239, 223, 192, 0.2);
-        }
-
-        .lang-btn.active {
-            background: #EFDFC0;
-            color: #1B1B1B;
-            border-color: #EFDFC0;
         }
 
         .dashboard {
@@ -111,6 +77,7 @@
             gap: 12px;
             border: 1px solid #D98D00;
             transition: 0.2s;
+            display:none;
         }
 
         .upload-area label {
@@ -122,10 +89,12 @@
             font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.2s;
+            display:none;
         }
 
         .upload-area label:hover {
             background: #c47d00;
+            display:none;
         }
 
         #csv-file-input {
@@ -158,15 +127,16 @@
 
         .metrics-title {
             font-weight: 600;
-            font-size: 20px;
+            font-size: 18px;
             color: #EFDFC0;
             font-family: 'Source Sans Pro', monospace;
         }
 
         .metrics-count {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 500;
             color: #D98D00;
+            background: #1B1B1B;
             padding: 2px 8px;
             border-radius: 20px;
         }
@@ -229,7 +199,7 @@
 
         .dial-label {
             color: #EFDFC0;
-            font-size: 18px;
+            font-size: 17px;
             font-family: 'Source Sans Pro', monospace;
             font-weight: 400;
             transition: color 0.2s;
@@ -319,7 +289,7 @@
             border-radius: 40px;
             color: #EFDFC0;
             font-family: 'Source Sans Pro', sans-serif;
-            font-size: 20px;
+            font-size: 16px;
         }
 
         .game-search:focus {
@@ -370,8 +340,10 @@
             cursor: pointer;
             transition: 0.2s;
             font-weight: bold;
-            font-size: 32px;
+            font-size: 1.3rem;
             color: #D02752;
+            border: none;
+            border-radius: 50%;
             font-family: monospace;
         }
 
@@ -450,6 +422,7 @@
 
         button, .upload-label {
             font-family: 'Source Sans Pro', monospace;
+            display:none;
         }
 
         @media (max-width: 900px) {
@@ -465,6 +438,7 @@
             }
         }
 
+        /* Ensure flex wrapper for last two cards maintains consistency */
         .radar-grid > div[style*="display: flex"] {
             display: flex !important;
             justify-content: center !important;
@@ -491,31 +465,25 @@
 </head>
 <body>
 <div class="dashboard">
-    <!-- Language Selector -->
-    <div class="language-selector">
-        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
-        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
-    </div>
-
     <div class="header">
-        <h1 data-i18n="radar_title">Game Performance Radar Tool</h1>
-        <p data-i18n="radar_subtitle">Interactive comparison of videogames based on several metrics</p>
+        <h1>Game Performance Radar Tool</h1>
+        <p>Compare up to 5 games · Interactive radar charts with semi-transparent overlays</p>
     </div>
 
     <div class="controls">
         <div class="upload-area">
-            <label for="csv-file-input" data-i18n="radar_upload_csv">📂 Upload CSV</label>
+            <label for="csv-file-input">📂 Upload CSV</label>
             <input type="file" id="csv-file-input" accept=".csv">
-            <span id="file-name-display" class="file-name" data-i18n="radar_no_file">No file</span>
+            <span id="file-name-display" class="file-name">No file</span>
         </div>
         
         <div class="stats-badge">
-            🎮 <span id="game-count">0</span> <span data-i18n="radar_games_loaded">games loaded</span>
+            🎮 <span id="game-count">0</span> games loaded
         </div>
 
         <div class="metrics-group">
-            <div class="metrics-title" data-i18n="radar_active_metrics">Active metrics</div>
-            <div class="metrics-count" id="metricsCount">7/7 <span data-i18n="radar_selected">selected</span></div>
+            <div class="metrics-title">Active metrics</div>
+            <div class="metrics-count" id="metricsCount">(7/7 selected)</div>
             <div id="scaleTogglesContainer" class="metrics-dials"></div>
         </div>
     </div>
@@ -537,28 +505,16 @@
     const MAX_RADARS = 5;
     const MIN_RADARS = 2;
     
-    // Map metrics to user-friendly display names with translation support
-    function getMetricDisplay(metric) {
-        const metricKey = metric.replace(/_/g, '_');
-        if (metric === "recommendations_count") return [t('radar_metric_recommendations'), t('radar_count')];
-        if (metric === "reviews") return [t('radar_metric_reviews')];
-        if (metric === "rating%") return [t('radar_metric_rating')];
-        if (metric === "median_playtime_minutes") return [t('radar_metric_playtime')];
-        if (metric === "peak_players") return [t('radar_metric_peak')];
-        if (metric === "achievements_count") return [t('radar_metric_achievements'), t('radar_count')];
-        if (metric === "follows") return [t('radar_metric_follows')];
-        return [metric.replace("_", " ")];
-    }
-    
-    // Helper function for translations with fallback
-    function t(key, fallback = null) {
-        if (typeof window !== 'undefined' && window.t) {
-            const translated = window.t(key);
-            if (translated && translated !== key) return translated;
-        }
-        if (fallback) return fallback;
-        return key;
-    }
+    // Map metrics to user-friendly display names
+    const METRIC_DISPLAY = {
+        "recommendations_count": ["recommendations", "count"],
+        "reviews": ["reviews"],
+        "rating%": ["rating", "%"],
+        "median_playtime_minutes": ["playtime", "(min)"],
+        "peak_players": ["peak", "players"],
+        "achievements_count": ["achievements", "count"],
+        "follows": ["follows"]
+    };
     
     // ----- GLOBAL STATE -----
     let fullDataset = [];
@@ -572,13 +528,7 @@
     }
     
     function updateGameCount() {
-        const gamesLoadedText = t('radar_games_loaded', 'games loaded');
         document.getElementById("game-count").innerText = fullDataset.length;
-        // Update the span text after the number
-        const gameCountSpan = document.querySelector("#game-count").nextSibling;
-        if (gameCountSpan && gameCountSpan.nodeType === Node.TEXT_NODE) {
-            // This is handled by the data-i18n attribute on the parent
-        }
     }
     
     function updateFileName(fileName) {
@@ -607,9 +557,8 @@
         
         const filteredMetrics = activeMetrics.filter(m => mainGameObj && mainGameObj[m] !== undefined);
         if (!mainGameObj || filteredMetrics.length < 3) {
-            const needMetricsText = t('radar_need_metrics', '⚠️ Need at least 3 metrics selected<br/>Enable more metrics above.');
             container.append("div").style("text-align","center").style("padding","2rem").style("color","#EFDFC0")
-                .html(needMetricsText);
+                .html(`⚠️ Need at least 3 metrics selected<br/>Enable more metrics above.`);
             return;
         }
         
@@ -751,11 +700,8 @@
                         else if (info.metric === "price$") maxDisplay = "$" + maxDisplay.toFixed(2);
                         else maxDisplay = maxDisplay.toLocaleString();
                     }
-                    const valueText = t('radar_value', 'Value');
-                    const maxText = t('radar_max', 'Max (100%)');
-                    const proportionText = t('radar_proportion', 'Proportion');
                     globalTooltip.style("opacity", 1)
-                        .html(`<strong>${info.metric.replace("_"," ")}</strong><br/>${valueText}: ${displayValue}<br/>${maxText}: ${maxDisplay}<br/><span style="font-size:15px;">${proportionText}: ${(info.norm*100).toFixed(1)}%</span>`)
+                        .html(`<strong>${info.metric.replace("_"," ")}</strong><br/>Value: ${displayValue}<br/>Max (100%): ${maxDisplay}<br/><span style="font-size:15px;">Proportion: ${(info.norm*100).toFixed(1)}%</span>`)
                         .style("left", (event.pageX + 12) + "px")
                         .style("top", (event.pageY - 28) + "px");
                 })
@@ -779,7 +725,7 @@
                 labelRadius = radius + 32;
             }
             
-            const displayParts = getMetricDisplay(metric);
+            const displayParts = METRIC_DISPLAY[metric] || [metric.replace("_", " ")];
             
             let labelX = Math.cos(angle) * labelRadius;
             let labelY = Math.sin(angle) * labelRadius;
@@ -789,9 +735,11 @@
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "middle");
             
+            // Add semi-transparent background for better readability
             const lineHeight = 16;
             const totalHeight = displayParts.length * lineHeight;
             const startY = -totalHeight / 2 + lineHeight / 2;
+            
             
             displayParts.forEach((line, lineIdx) => {
                 labelGroup.append("text")
@@ -848,8 +796,7 @@
                     .attr("class", "add-button-large")
                     .on("click", () => {
                         if (activeRadarIndices.filter(v => v === true).length >= MAX_RADARS) {
-                            const maxWarnText = t('radar_max_radars_warning', `Maximum ${MAX_RADARS} radars allowed`).replace('{max}', MAX_RADARS);
-                            alert(maxWarnText);
+                            alert(`Maximum ${MAX_RADARS} radars allowed`);
                             return;
                         }
                         activeRadarIndices[slot] = true;
@@ -885,11 +832,10 @@
             const headerDiv = cardDiv.append("div").attr("class", "radar-header");
             
             const searchWrapper = headerDiv.append("div").attr("class", "game-search-wrapper");
-            const searchPlaceholder = t('radar_search_placeholder', 'Search game...');
             const searchInput = searchWrapper.append("input")
                 .attr("type", "text")
                 .attr("class", "game-search")
-                .attr("placeholder", searchPlaceholder)
+                .attr("placeholder", "Search game...")
                 .attr("autocomplete", "off")
                 .property("value", radarGames[slot].game_name);
             
@@ -899,8 +845,7 @@
             removeBtn.on("click", () => {
                 const activeCountAfter = activeRadarIndices.filter(v => v === true).length;
                 if (activeCountAfter <= MIN_RADARS) {
-                    const minWarnText = t('radar_min_radars_warning', `Cannot remove: minimum ${MIN_RADARS} radars required`).replace('{min}', MIN_RADARS);
-                    alert(minWarnText);
+                    alert(`Cannot remove: minimum ${MIN_RADARS} radars required`);
                     return;
                 }
                 activeRadarIndices[slot] = false;
@@ -994,75 +939,65 @@
         }
     }
     
-    function loadDataFromCSV(csvText, fileName) {
-        try {
-            const parsed = d3.csvParse(csvText);
-            if (!parsed.length) throw new Error("CSV is empty");
-            
-            const requiredCols = ["game_name", "release_year", "price$", "recommendations_count", "reviews", "rating%", "median_playtime_minutes", "peak_players", "achievements_count", "follows"];
-            const firstRow = parsed[0];
-            const missing = requiredCols.filter(col => !(col in firstRow));
-            if (missing.length) {
-                const missingText = t('radar_csv_missing_columns', 'CSV missing required columns: {columns}').replace('{columns}', missing.join(", "));
-                alert(missingText);
-                return;
-            }
-            
-            fullDataset = parsed.map(row => {
-                let obj = {};
-                for (let key of requiredCols) {
-                    if (key === "game_name" || key === "release_year") {
-                        obj[key] = row[key]?.toString().trim() || "";
-                    } else {
-                        let num = parseFloat(row[key]);
-                        obj[key] = isNaN(num) ? 0 : Math.max(0, num);
-                    }
-                }
-                return obj;
-            }).filter(d => d.game_name && d.game_name !== "");
-            
-            if (!fullDataset.length) {
-                const noGamesText = t('radar_no_valid_games', 'No valid game entries found.');
-                alert(noGamesText);
-                return;
-            }
-            
-            updateGameCount();
-            updateFileName(fileName);
-            
-            // Initialize radars with default games
-            activeRadarIndices = [true, true, true, true, true];
-            radarGames = [null, null, null, null, null];
-            for (let i = 0; i < MAX_RADARS; i++) {
-                const defaultName = DEFAULT_GAMES[i % DEFAULT_GAMES.length];
-                let found = findGameByName(defaultName);
-                radarGames[i] = found || fullDataset[0];
-            }
-            
-            activeMetrics = [...ALL_METRICS];
-            document.querySelectorAll("#scaleTogglesContainer input").forEach((cb, i) => {
-                if (cb && i < ALL_METRICS.length) cb.checked = true;
-            });
-            
-            refreshAllRadars();
-        } catch(err) {
-            console.error(err);
-            const errorText = t('radar_error_parsing', 'Error parsing CSV: {error}').replace('{error}', err.message);
-            alert(errorText);
-        }
-    }
-
-    
     function handleCSVUpload(file) {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = function(e) {
-            loadDataFromCSV(e.target.result, file.name);
+            const text = e.target.result;
+            try {
+                const parsed = d3.csvParse(text);
+                if (!parsed.length) throw new Error("CSV is empty");
+                
+                const requiredCols = ["game_name", "release_year", "price$", "recommendations_count", "reviews", "rating%", "median_playtime_minutes", "peak_players", "achievements_count", "follows"];
+                const firstRow = parsed[0];
+                const missing = requiredCols.filter(col => !(col in firstRow));
+                if (missing.length) {
+                    alert(`CSV missing required columns: ${missing.join(", ")}`);
+                    return;
+                }
+                
+                fullDataset = parsed.map(row => {
+                    let obj = {};
+                    for (let key of requiredCols) {
+                        if (key === "game_name" || key === "release_year") {
+                            obj[key] = row[key]?.toString().trim() || "";
+                        } else {
+                            let num = parseFloat(row[key]);
+                            obj[key] = isNaN(num) ? 0 : Math.max(0, num);
+                        }
+                    }
+                    return obj;
+                }).filter(d => d.game_name && d.game_name !== "");
+                
+                if (!fullDataset.length) {
+                    alert("No valid game entries found.");
+                    return;
+                }
+                
+                updateGameCount();
+                updateFileName(file.name);
+                
+                // Initialize radars with default games
+                activeRadarIndices = [true, true, true, true, true];
+                radarGames = [null, null, null, null, null];
+                for (let i = 0; i < MAX_RADARS; i++) {
+                    const defaultName = DEFAULT_GAMES[i % DEFAULT_GAMES.length];
+                    let found = findGameByName(defaultName);
+                    radarGames[i] = found || fullDataset[0];
+                }
+                
+                activeMetrics = [...ALL_METRICS];
+                document.querySelectorAll("#scaleTogglesContainer input").forEach((cb, i) => {
+                    if (cb && i < ALL_METRICS.length) cb.checked = true;
+                });
+                
+                refreshAllRadars();
+            } catch(err) {
+                console.error(err);
+                alert("Error parsing CSV: " + err.message);
+            }
         };
-        reader.onerror = () => {
-            const failedText = t('radar_failed_read', 'Failed to read file.');
-            alert(failedText);
-        };
+        reader.onerror = () => alert("Failed to read file.");
         reader.readAsText(file);
     }
     
@@ -1072,13 +1007,7 @@
         
         ALL_METRICS.forEach(metric => {
             const isActive = activeMetrics.includes(metric);
-            let displayName = metric.replace("_", " ").replace("rating%", t('radar_metric_rating', 'rating %'));
-            if (metric === "recommendations_count") displayName = t('radar_metric_recommendations', 'recommendations');
-            if (metric === "reviews") displayName = t('radar_metric_reviews', 'reviews');
-            if (metric === "median_playtime_minutes") displayName = t('radar_metric_playtime', 'playtime (min)');
-            if (metric === "peak_players") displayName = t('radar_metric_peak', 'peak players');
-            if (metric === "achievements_count") displayName = t('radar_metric_achievements', 'achievements');
-            if (metric === "follows") displayName = t('radar_metric_follows', 'follows');
+            const displayName = metric.replace("_", " ").replace("rating%", "rating %");
             
             const dial = container.append("div")
                 .attr("class", `metric-dial ${isActive ? 'active' : ''}`)
@@ -1094,14 +1023,12 @@
                 const currentlyActive = activeMetrics.includes(metric);
                 
                 if (!currentlyActive && activeMetrics.length >= 7) {
-                    const maxMetricText = t('radar_max_metrics_warning', 'Maximum 7 metrics allowed');
-                    alert(maxMetricText);
+                    alert("Maximum 7 metrics allowed");
                     return;
                 }
                 
                 if (currentlyActive && activeMetrics.length <= 3) {
-                    const minMetricText = t('radar_min_metrics_warning', 'Minimum 3 metrics required for radar charts');
-                    alert(minMetricText);
+                    alert("Minimum 3 metrics required for radar charts");
                     return;
                 }
                 
@@ -1114,16 +1041,14 @@
                 }
                 
                 const countSpan = document.getElementById("metricsCount");
-                const selectedText = t('radar_selected', 'selected');
-                if (countSpan) countSpan.innerHTML = `${activeMetrics.length}/7 ${selectedText}`;
+                if (countSpan) countSpan.innerHTML = `(${activeMetrics.length}/7 selected)`;
                 
                 if (fullDataset.length) refreshAllRadars();
             });
         });
         
         const countSpan = document.getElementById("metricsCount");
-        const selectedText = t('radar_selected', 'selected');
-        if (countSpan) countSpan.innerHTML = `${activeMetrics.length}/7 ${selectedText}`;
+        if (countSpan) countSpan.innerHTML = `(${activeMetrics.length}/7 selected)`;
     }
     
     function bindEvents() {
@@ -1153,60 +1078,94 @@
     }
     
     init();
-    function autoLoadCSV() {
-    // Try multiple possible paths for flexibility
-        const possiblePaths = [
-            '6_radar.csv',           // Same directory
-            './6_radar.csv',         // Explicit current directory
-            '/6_radar.csv',          // Root relative
-            'data/6_radar.csv'       // Common data folder
-        ];
+      function autoLoadCSV() {
+        // Full URL to the CSV file
+        const csvPath = 'https://volkazah.github.io/Interactive-Media-Project-About-Steam-Data/6_radar.csv';
         
-        function tryLoadCSV(index) {
-            if (index >= possiblePaths.length) {
-                console.error('Could not load CSV from any path');
-                const fileNameSpan = document.getElementById("file-name-display");
-                if (fileNameSpan) {
-                    fileNameSpan.innerHTML = `⚠️ Please upload CSV manually`;
-                    fileNameSpan.style.color = "#D98D00";
+        console.log('Auto-loading CSV from:', csvPath);
+        
+        fetch(csvPath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                return;
-            }
-            
-            const csvPath = possiblePaths[index];
-            console.log(`Attempting to load CSV from: ${csvPath}`);
-            
-            fetch(csvPath)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                return response.text();
+            })
+            .then(csvText => {
+                console.log('CSV loaded successfully, length:', csvText.length);
+                const parsed = d3.csvParse(csvText);
+                
+                if (!parsed.length) {
+                    console.error('CSV is empty');
+                    return;
+                }
+                
+                const requiredCols = ["game_name", "release_year", "price$", "recommendations_count", "reviews", "rating%", "median_playtime_minutes", "peak_players", "achievements_count", "follows"];
+                const firstRow = parsed[0];
+                const missing = requiredCols.filter(col => !(col in firstRow));
+                if (missing.length) {
+                    console.error('Missing columns:', missing);
+                    return;
+                }
+                
+                fullDataset = parsed.map(row => {
+                    let obj = {};
+                    for (let key of requiredCols) {
+                        if (key === "game_name" || key === "release_year") {
+                            obj[key] = row[key]?.toString().trim() || "";
+                        } else {
+                            let num = parseFloat(row[key]);
+                            obj[key] = isNaN(num) ? 0 : Math.max(0, num);
+                        }
                     }
-                    // Check if content looks like CSV
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && !contentType.includes('text/csv') && !contentType.includes('text/plain')) {
-                        console.warn(`Unexpected content type: ${contentType}`);
-                    }
-                    return response.text();
-                })
-                .then(csvText => {
-                    // Validate it's actually CSV content
-                    if (!csvText.trim().startsWith('game_name') && !csvText.includes('game_name')) {
-                        throw new Error('File does not appear to be a valid CSV (missing game_name column)');
-                    }
-                    console.log(`CSV loaded successfully from ${csvPath}, size: ${csvText.length} bytes`);
-                    loadDataFromCSV(csvText, '6_radar.csv');
-                })
-                .catch(error => {
-                    console.warn(`Failed to load from ${csvPath}:`, error.message);
-                    tryLoadCSV(index + 1);
-                });
-        }
-        
-        tryLoadCSV(0);
+                    return obj;
+                }).filter(d => d.game_name && d.game_name !== "");
+                
+                if (!fullDataset.length) {
+                    console.error('No valid games found');
+                    return;
+                }
+                
+                updateGameCount();
+                updateFileName("6_radar.csv (auto-loaded)");
+                
+                activeRadarIndices = [true, true, true, true, true];
+                radarGames = [null, null, null, null, null];
+                for (let i = 0; i < MAX_RADARS; i++) {
+                    const defaultName = DEFAULT_GAMES[i % DEFAULT_GAMES.length];
+                    let found = findGameByName(defaultName);
+                    radarGames[i] = found || fullDataset[0];
+                }
+                
+                activeMetrics = [...ALL_METRICS];
+                buildScaleToggles();
+                refreshAllRadars();
+                
+                console.log(`✅ Loaded ${fullDataset.length} games`);
+            })
+            .catch(error => {
+                console.error('Error loading CSV:', error);
+                const radarGrid = document.getElementById("radarGrid");
+                if (radarGrid) {
+                    radarGrid.innerHTML = `<div class="empty-state">
+                        <div style="font-size:48px; margin-bottom:16px;">📁</div>
+                        <div>Could not auto-load 6_radar.csv</div>
+                        <div style="font-size:14px; margin-top:8px;">Please use the Upload button below</div>
+                        <button onclick="document.getElementById('csv-file-input').click()" style="margin-top:16px; background:#D98D00; color:#1B1B1B; border:none; padding:8px 24px; border-radius:40px; cursor:pointer;">📂 Upload CSV</button>
+                    </div>`;
+                }
+            });
     }
     
-    // Auto-load CSV when page loads
+    // ✅ CRITICAL: Initialize the container FIRST
+    // Make sure refreshAllRadars can show empty state
+    refreshAllRadars();
+    
+    // ✅ THEN auto-load data
     autoLoadCSV();
+    
+    // Bind upload button events
+    bindEvents();
 </script>
 </body>
 </html>
