@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Steam Games - Gamer Reviews Flow Visualization</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- Language support - loaded but will be initialized after graph -->
+    <!-- Language support -->
     <script src="language.js"></script>
     <style>
         * {
@@ -446,12 +446,12 @@
         <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
         <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
     </div>
-    
+
     <div class="header">
         <div class="main-title" data-i18n="arc_title">Gamers do change their opinion about videogames and often not in a better way</div>
         <div class="sub-title" style="font-size: 14px; margin-top: 5px;" data-i18n="arc_description">distribution change in gamer's reviews across 3139 top reviewed games in April 2026</div>
     </div>
-    
+
     <div class="controls" id="topControls" style="display: none;">
         <div class="search-container">
             <input type="text" id="gameSearch" data-i18n="search_placeholder" placeholder="Search game..." autocomplete="off">
@@ -467,7 +467,7 @@
         <button id="resetBtn" class="reset-btn" data-i18n="reset_positions">Reset Positions</button>
         <button id="clearAllBtn" class="clear-btn" data-i18n="clear_all">Clear All</button>
     </div>
-    
+
     <div class="info-panel" id="infoPanel">
         <div class="info-title" data-i18n="compare_games">Highlighted Games</div>
         <div class="info-games-list" id="infoGamesList"></div>
@@ -479,13 +479,13 @@
         <div class="upload-panel" id="uploadPanel">
             <div class="upload-section" id="uploadSection">
                 <input type="file" id="csvFile" accept=".csv">
-                <label for="csvFile" class="upload-label">Upload CSV File</label>
-                <div class="file-info">Click or drag & drop CSV file</div>
+                <label for="csvFile" class="upload-label" data-i18n="upload_csv">Upload CSV File</label>
+                <div class="file-info" data-i18n="click_or_drag">Click or drag & drop CSV file</div>
             </div>
             <div id="dataStats" class="stats-summary"></div>
         </div>
 
-        <div class="drag-instruction">Drag spheres • Hover for details</div>
+        <div class="drag-instruction" data-i18n="drag_instruction">Drag spheres • Hover for details</div>
         <div class="scale-info" id="scaleInfo"></div>
     </div>
 
@@ -554,13 +554,52 @@
     const uploadSection = document.getElementById('uploadSection');
     const fileInput = document.getElementById('csvFile');
 
-    // Translation helper function (safe)
-    function _(key, fallback) {
+    // Translation helper functions
+    function t(key, fallback) {
         if (typeof window !== 'undefined' && window.t) {
             const translated = window.t(key);
             if (translated && translated !== key) return translated;
         }
         return fallback || key;
+    }
+    
+    function getTranslatedCategory(category) {
+        const categoryMap = {
+            "overwhelmingly positive": t("category_overwhelmingly_positive", "overwhelmingly positive"),
+            "very positive": t("category_very_positive", "very positive"),
+            "mostly positive": t("category_mostly_positive", "mostly positive"),
+            "mixed": t("category_mixed", "mixed"),
+            "mostly negative": t("category_mostly_negative", "mostly negative"),
+            "very negative": t("category_very_negative", "very negative"),
+            "overwhelmingly negative": t("category_overwhelmingly_negative", "overwhelmingly negative")
+        };
+        return categoryMap[category] || category;
+    }
+    
+    function getTranslatedDisplayName(category) {
+        const displayMap = {
+            "overwhelmingly positive": t("category_display_overwhelmingly_positive", "Overwhelmingly Positive"),
+            "very positive": t("category_display_very_positive", "Very Positive"),
+            "mostly positive": t("category_display_mostly_positive", "Mostly Positive"),
+            "mixed": t("category_display_mixed", "Mixed"),
+            "mostly negative": t("category_display_mostly_negative", "Mostly Negative"),
+            "very negative": t("category_display_very_negative", "Very Negative"),
+            "overwhelmingly negative": t("category_display_overwhelmingly_negative", "Overwhelmingly Negative")
+        };
+        return displayMap[category] || category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+    
+    function updateScaleInfo(totalAscending, totalDescending) {
+        const ascendingText = t("scale_ascending", "Ascending");
+        const descendingText = t("scale_descending", "Descending");
+        document.getElementById('scaleInfo').innerHTML = `<span>${ascendingText}: </span><span style="color: #07BC00; font-weight: bold;">${totalAscending.toLocaleString()}</span> | <span>${descendingText}: </span><span style="color: #D02752; font-weight: bold;">${totalDescending.toLocaleString()}</span>`;
+    }
+    
+    function updateFooterText() {
+        const footer = document.querySelector('footer');
+        if (footer) {
+            footer.textContent = t("footer_text", "Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.");
+        }
     }
 
     function handleFileUpload(file) {
@@ -701,7 +740,8 @@
         if (persistentGames.find(p => p.game.name === game.name)) return;
         
         if (persistentGames.length >= 5) {
-            document.getElementById('infoPanel').innerHTML = '<div class="info-title">Maximum 5 games can be compared at once. Remove a game first.</div>';
+            const maxMsg = t("max_games", "Maximum 5 games can be compared at once. Remove a game first.");
+            document.getElementById('infoPanel').innerHTML = `<div class="info-title">${maxMsg}</div>`;
             setTimeout(() => {
                 updateInfoPanel();
             }, 3000);
@@ -729,15 +769,28 @@
         }
         
         infoPanel.style.display = 'block';
-        infoGamesList.innerHTML = persistentGames.map(item => `
-            <div class="info-game-item" style="border-left-color: ${ANIMATION_COLORS[item.colorIndex]};">
-                <div class="info-game-name" style="color: ${ANIMATION_COLORS[item.colorIndex]};">${item.game.name}</div>
-                <div class="info-game-details">${item.game.totalCategory} → ${item.game.recentCategory}</div>
-                <div class="info-game-reviews">${item.game.recentNumber.toLocaleString()} recent reviews</div>
-                <div class="info-game-details" style="font-size: 10px;">Total reviews: ${item.game.totalNumber.toLocaleString()}</div>
-                <button class="remove-game-btn" data-name="${item.game.name}">Remove</button>
-            </div>
-        `).join('');
+        const compareGamesText = t("compare_games", "Highlighted Games");
+        const recentReviewsText = t("recent_reviews", "recent reviews");
+        const totalReviewsText = t("total_reviews", "Total reviews");
+        const removeText = t("remove_button", "Remove");
+        const toText = t("to", "→");
+        
+        document.querySelector('#infoPanel .info-title').textContent = compareGamesText;
+        
+        infoGamesList.innerHTML = persistentGames.map(item => {
+            const fromCat = getTranslatedCategory(item.game.totalCategory);
+            const toCat = getTranslatedCategory(item.game.recentCategory);
+            
+            return `
+                <div class="info-game-item" style="border-left-color: ${ANIMATION_COLORS[item.colorIndex]};">
+                    <div class="info-game-name" style="color: ${ANIMATION_COLORS[item.colorIndex]};">${item.game.name}</div>
+                    <div class="info-game-details">${fromCat} ${toText} ${toCat}</div>
+                    <div class="info-game-reviews">${item.game.recentNumber.toLocaleString()} ${recentReviewsText}</div>
+                    <div class="info-game-details" style="font-size: 10px;">${totalReviewsText}: ${item.game.totalNumber.toLocaleString()}</div>
+                    <button class="remove-game-btn" data-name="${item.game.name}">${removeText}</button>
+                </div>
+            `;
+        }).join('');
         
         document.querySelectorAll('.remove-game-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -1043,14 +1096,14 @@
             
             if (gamesData.length === 0) throw new Error("No valid game data found");
             
-            document.getElementById('dataStats').innerHTML = `${gamesData.length.toLocaleString()} games loaded`;
+            const gamesLoadedMsg = t("games_loaded", "games loaded");
+            document.getElementById('dataStats').innerHTML = `${gamesData.length.toLocaleString()} ${gamesLoadedMsg}`;
             document.getElementById('topControls').style.display = 'flex';
             document.getElementById('visContainer').classList.add('active');
             
             processGameData();
             
             const searchInput = document.getElementById('gameSearch');
-            // Remove old listeners to avoid duplicates
             const newSearchInput = searchInput.cloneNode(true);
             searchInput.parentNode.replaceChild(newSearchInput, searchInput);
             
@@ -1066,6 +1119,8 @@
             document.getElementById('filterDescending').addEventListener('click', () => setFilter('descending'));
             document.getElementById('resetBtn').addEventListener('click', resetPositions);
             document.getElementById('clearAllBtn').addEventListener('click', clearAllGames);
+            
+            updateFooterText();
             
         } catch (error) {
             console.error("Error loading CSV:", error);
@@ -1196,7 +1251,7 @@
         const totalAscending = linksAscending.reduce((sum, l) => sum + l.value, 0);
         const totalDescending = linksDescending.reduce((sum, l) => sum + l.value, 0);
         
-        document.getElementById('scaleInfo').innerHTML = `<span>Ascending: </span><span style="color: #07BC00; font-weight: bold;">${totalAscending.toLocaleString()}</span> | <span>Descending: </span><span style="color: #D02752; font-weight: bold;">${totalDescending.toLocaleString()}</span>`;
+        updateScaleInfo(totalAscending, totalDescending);
         
         drawArcsAndNodes();
     }
@@ -1304,24 +1359,12 @@
             .attr("x", d => d.x)
             .attr("y", d => d.y)
             .style("font-size", d => {
-                if (d.id === "very negative") {
-                    return "7px";
-                }
-                if (d.id === "mostly negative") {
-                    return "9px";
-                }
-                if (d.id === "mixed") {
-                    return "30px";
-                }
-                if (d.id === "overwhelmingly negative") {
-                    return "6px";
-                }
-                if (d.id === "overwhelmingly positive") {
-                    return "28px";
-                }
-                if (d.id === "very positive") {
-                    return "32px";
-                }
+                if (d.id === "very negative") return "7px";
+                if (d.id === "mostly negative") return "9px";
+                if (d.id === "mixed") return "30px";
+                if (d.id === "overwhelmingly negative") return "6px";
+                if (d.id === "overwhelmingly positive") return "28px";
+                if (d.id === "very positive") return "32px";
                 return "19px";
             })
             .style("fill", "#000000")
@@ -1331,32 +1374,44 @@
             .each(function(d) {
                 d3.select(this).selectAll("*").remove();
                 
+                const categoryText = getTranslatedCategory(d.id);
+                
                 if (d.id === "overwhelmingly positive") {
-                    d3.select(this)
-                        .append("tspan")
-                        .attr("dx", 0)
-                        .attr("dy", "-0.6em")
-                        .text("overwhelmingly");
-                    d3.select(this)
-                        .append("tspan")
-                        .attr("dx", "-5em")
-                        .attr("dy", "1.2em")
-                        .text("positive");
+                    const parts = categoryText.split(' ');
+                    if (parts.length >= 2) {
+                        d3.select(this)
+                            .append("tspan")
+                            .attr("dx", 0)
+                            .attr("dy", "-0.6em")
+                            .text(parts[0]);
+                        d3.select(this)
+                            .append("tspan")
+                            .attr("dx", "-5em")
+                            .attr("dy", "1.2em")
+                            .text(parts.slice(1).join(' '));
+                    } else {
+                        d3.select(this).text(categoryText);
+                    }
                 } 
                 else if (d.id === "overwhelmingly negative") {
-                    d3.select(this)
-                        .append("tspan")
-                        .attr("dx", 0)
-                        .attr("dy", "-0.6em")
-                        .text("overwhelmingly");
-                    d3.select(this)
-                        .append("tspan")
-                        .attr("dx", "-5em")
-                        .attr("dy", "1.2em")
-                        .text("negative");
+                    const parts = categoryText.split(' ');
+                    if (parts.length >= 2) {
+                        d3.select(this)
+                            .append("tspan")
+                            .attr("dx", 0)
+                            .attr("dy", "-0.6em")
+                            .text(parts[0]);
+                        d3.select(this)
+                            .append("tspan")
+                            .attr("dx", "-5em")
+                            .attr("dy", "1.2em")
+                            .text(parts.slice(1).join(' '));
+                    } else {
+                        d3.select(this).text(categoryText);
+                    }
                 }
                 else {
-                    d3.select(this).text(d.id);
+                    d3.select(this).text(categoryText);
                 }
             });
     }
@@ -1413,13 +1468,17 @@
     function showSphereTooltip(event, node) {
         if (tooltip) tooltip.remove();
         tooltip = d3.select("body").append("div").attr("class", "custom-tooltip");
-        const displayName = node.id.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        const displayName = getTranslatedDisplayName(node.id);
+        
+        const gamesText = t("tooltip_games", "Games");
+        const totalReviewsText = t("tooltip_total_reviews", "Total Reviews");
+        const recentReviewsText = t("tooltip_recent_reviews", "Recent Reviews");
         
         tooltip.html(`
             <strong>${displayName}</strong><br>
-            Games: ${node.gameCount.toLocaleString()}<br>
-            Total Reviews: ${node.totalReviews.toLocaleString()}<br>
-            Recent Reviews: ${node.recentReviews.toLocaleString()}
+            ${gamesText}: ${node.gameCount.toLocaleString()}<br>
+            ${totalReviewsText}: ${node.totalReviews.toLocaleString()}<br>
+            ${recentReviewsText}: ${node.recentReviews.toLocaleString()}
         `).style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 10) + "px").style("opacity", 1);
     }
     
@@ -1429,8 +1488,13 @@
         
         const arrow = isAscending ? "↑" : "↓";
         const color = isAscending ? "#07BC00" : "#D02752";
+        const toText = t("to", "→");
         
-        const key = `${source.id}|${target.id}`;
+        const sourceName = getTranslatedCategory(source.id);
+        const targetName = getTranslatedCategory(target.id);
+        const recentReviewsText = t("tooltip_recent_reviews_arc", "Recent Reviews");
+        const numberOfGamesText = t("tooltip_number_of_games", "Number of Games");
+        
         let gameCount = 0;
         if (gamesData) {
             gameCount = gamesData.filter(game => 
@@ -1440,9 +1504,9 @@
         }
         
         tooltip.html(`
-            <strong style="color: ${color};">${arrow} ${source.id} → ${target.id}</strong><br>
-            Recent Reviews: ${reviewCount.toLocaleString()}<br>
-            Number of Games: ${gameCount}
+            <strong style="color: ${color};">${arrow} ${sourceName} ${toText} ${targetName}</strong><br>
+            ${recentReviewsText}: ${reviewCount.toLocaleString()}<br>
+            ${numberOfGamesText}: ${gameCount}
         `).style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 10) + "px").style("opacity", 1);
     }
     
@@ -1518,28 +1582,77 @@
             });
     }
     
-    // Initialize language buttons after page loads
+    // Listen for language changes to re-render dynamic content
+    window.addEventListener('languageChanged', function() {
+        if (svg) {
+            const totalAscending = linksAscending.reduce((sum, l) => sum + l.value, 0);
+            const totalDescending = linksDescending.reduce((sum, l) => sum + l.value, 0);
+            updateScaleInfo(totalAscending, totalDescending);
+            updateFooterText();
+            
+            if (persistentGames.length > 0) {
+                updateInfoPanel();
+            }
+            
+            // Update sphere labels
+            labelGroup.selectAll(".label").each(function(d) {
+                const categoryText = getTranslatedCategory(d.id);
+                
+                d3.select(this).selectAll("*").remove();
+                
+                if (d.id === "overwhelmingly positive") {
+                    const parts = categoryText.split(' ');
+                    if (parts.length >= 2) {
+                        d3.select(this)
+                            .append("tspan")
+                            .attr("dx", 0)
+                            .attr("dy", "-0.6em")
+                            .text(parts[0]);
+                        d3.select(this)
+                            .append("tspan")
+                            .attr("dx", "-5em")
+                            .attr("dy", "1.2em")
+                            .text(parts.slice(1).join(' '));
+                    } else {
+                        d3.select(this).text(categoryText);
+                    }
+                } 
+                else if (d.id === "overwhelmingly negative") {
+                    const parts = categoryText.split(' ');
+                    if (parts.length >= 2) {
+                        d3.select(this)
+                            .append("tspan")
+                            .attr("dx", 0)
+                            .attr("dy", "-0.6em")
+                            .text(parts[0]);
+                        d3.select(this)
+                            .append("tspan")
+                            .attr("dx", "-5em")
+                            .attr("dy", "1.2em")
+                            .text(parts.slice(1).join(' '));
+                    } else {
+                        d3.select(this).text(categoryText);
+                    }
+                }
+                else {
+                    d3.select(this).text(categoryText);
+                }
+            });
+        }
+    });
+    
+    // Initialize language buttons setup
     document.addEventListener('DOMContentLoaded', function() {
-        // Setup language switcher if language.js is loaded
-        if (typeof window.initLanguage === 'function') {
-            window.initLanguage();
-        } else if (typeof window.setupLanguageSwitcher === 'function') {
+        if (typeof window.setupLanguageSwitcher === 'function') {
             window.setupLanguageSwitcher();
         } else {
-            // Manual setup for language buttons
             const langButtons = document.querySelectorAll('.lang-btn');
             langButtons.forEach(btn => {
                 btn.addEventListener('click', function() {
                     const lang = this.getAttribute('data-lang');
-                    langButtons.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
                     if (typeof window.setLanguage === 'function') {
                         window.setLanguage(lang);
-                    } else if (typeof window.changeLanguage === 'function') {
-                        window.changeLanguage(lang);
                     } else {
-                        console.log('Language change to:', lang);
-                        // Reload page with language parameter
                         const url = new URL(window.location.href);
                         url.searchParams.set('lang', lang);
                         window.location.href = url.toString();
