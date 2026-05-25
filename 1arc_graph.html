@@ -446,30 +446,30 @@
         <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
         <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
     </div>
-
+    
     <div class="header">
-        <div class="main-title">Gamers do change their opinion about videogames and often not in a better way</div>
-        <div class="sub-title" style="font-size: 14px; margin-top: 5px;">distribution change in gamer's reviews across 3139 top reviewed games in April 2026</div>
+        <div class="main-title" data-i18n="arc_title">Gamers do change their opinion about videogames and often not in a better way</div>
+        <div class="sub-title" style="font-size: 14px; margin-top: 5px;" data-i18n="arc_description">distribution change in gamer's reviews across 3139 top reviewed games in April 2026</div>
     </div>
-
+    
     <div class="controls" id="topControls" style="display: none;">
         <div class="search-container">
-            <input type="text" id="gameSearch" placeholder="Search game..." autocomplete="off">
+            <input type="text" id="gameSearch" data-i18n="search_placeholder" placeholder="Search game..." autocomplete="off">
             <div id="autocompleteList" class="autocomplete-items"></div>
         </div>
         
         <div class="filter-section">
-            <button id="filterBoth" class="filter-btn active">Both</button>
-            <button id="filterAscending" class="filter-btn">Ascending ↑</button>
-            <button id="filterDescending" class="filter-btn">Descending ↓</button>
+            <button id="filterBoth" class="filter-btn active" data-i18n="filter_both">Both</button>
+            <button id="filterAscending" class="filter-btn" data-i18n="filter_ascending">Ascending ↑</button>
+            <button id="filterDescending" class="filter-btn" data-i18n="filter_descending">Descending ↓</button>
         </div>
         
-        <button id="resetBtn" class="reset-btn">Reset Positions</button>
-        <button id="clearAllBtn" class="clear-btn">Clear All</button>
+        <button id="resetBtn" class="reset-btn" data-i18n="reset_positions">Reset Positions</button>
+        <button id="clearAllBtn" class="clear-btn" data-i18n="clear_all">Clear All</button>
     </div>
-
+    
     <div class="info-panel" id="infoPanel">
-        <div class="info-title">Highlighted Games</div>
+        <div class="info-title" data-i18n="compare_games">Highlighted Games</div>
         <div class="info-games-list" id="infoGamesList"></div>
     </div>
 
