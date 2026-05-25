@@ -555,50 +555,57 @@
     const fileInput = document.getElementById('csvFile');
 
     // Translation helper functions
-    function t(key, fallback) {
-        if (typeof window !== 'undefined' && window.t) {
-            const translated = window.t(key);
-            if (translated && translated !== key) return translated;
+    function window.translatekey, fallback) {
+    // Direct access to translations - NO recursion
+        try {
+            if (window.translations && window.currentLanguage) {
+                const translation = window.translations[window.currentLanguage][key];
+                if (translation && typeof translation === 'string') {
+                    return translation;
+                }
+            }
+        } catch(e) {
+            console.warn('Translation error for key:', key, e);
         }
         return fallback || key;
     }
     
     function getTranslatedCategory(category) {
         const categoryMap = {
-            "overwhelmingly positive": t("category_overwhelmingly_positive", "overwhelmingly positive"),
-            "very positive": t("category_very_positive", "very positive"),
-            "mostly positive": t("category_mostly_positive", "mostly positive"),
-            "mixed": t("category_mixed", "mixed"),
-            "mostly negative": t("category_mostly_negative", "mostly negative"),
-            "very negative": t("category_very_negative", "very negative"),
-            "overwhelmingly negative": t("category_overwhelmingly_negative", "overwhelmingly negative")
+            "overwhelmingly positive": window.translate("category_overwhelmingly_positive", "overwhelmingly positive"),
+            "very positive": window.translate("category_very_positive", "very positive"),
+            "mostly positive": window.translate("category_mostly_positive", "mostly positive"),
+            "mixed": window.translate("category_mixed", "mixed"),
+            "mostly negative": window.translate("category_mostly_negative", "mostly negative"),
+            "very negative": window.translate("category_very_negative", "very negative"),
+            "overwhelmingly negative": window.translate("category_overwhelmingly_negative", "overwhelmingly negative")
         };
         return categoryMap[category] || category;
     }
     
     function getTranslatedDisplayName(category) {
         const displayMap = {
-            "overwhelmingly positive": t("category_display_overwhelmingly_positive", "Overwhelmingly Positive"),
-            "very positive": t("category_display_very_positive", "Very Positive"),
-            "mostly positive": t("category_display_mostly_positive", "Mostly Positive"),
-            "mixed": t("category_display_mixed", "Mixed"),
-            "mostly negative": t("category_display_mostly_negative", "Mostly Negative"),
-            "very negative": t("category_display_very_negative", "Very Negative"),
-            "overwhelmingly negative": t("category_display_overwhelmingly_negative", "Overwhelmingly Negative")
+            "overwhelmingly positive": window.translate("category_display_overwhelmingly_positive", "Overwhelmingly Positive"),
+            "very positive": window.translate("category_display_very_positive", "Very Positive"),
+            "mostly positive": window.translate("category_display_mostly_positive", "Mostly Positive"),
+            "mixed": window.translate("category_display_mixed", "Mixed"),
+            "mostly negative": window.translate("category_display_mostly_negative", "Mostly Negative"),
+            "very negative": window.translate("category_display_very_negative", "Very Negative"),
+            "overwhelmingly negative": window.translate("category_display_overwhelmingly_negative", "Overwhelmingly Negative")
         };
         return displayMap[category] || category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
     
     function updateScaleInfo(totalAscending, totalDescending) {
-        const ascendingText = t("scale_ascending", "Ascending");
-        const descendingText = t("scale_descending", "Descending");
+        const ascendingText = window.translate("scale_ascending", "Ascending");
+        const descendingText = window.translate("scale_descending", "Descending");
         document.getElementById('scaleInfo').innerHTML = `<span>${ascendingText}: </span><span style="color: #07BC00; font-weight: bold;">${totalAscending.toLocaleString()}</span> | <span>${descendingText}: </span><span style="color: #D02752; font-weight: bold;">${totalDescending.toLocaleString()}</span>`;
     }
     
     function updateFooterText() {
         const footer = document.querySelector('footer');
         if (footer) {
-            footer.textContent = t("footer_text", "Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.");
+            footer.textContent = window.translate("footer_text", "Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.");
         }
     }
 
@@ -740,7 +747,7 @@
         if (persistentGames.find(p => p.game.name === game.name)) return;
         
         if (persistentGames.length >= 5) {
-            const maxMsg = t("max_games", "Maximum 5 games can be compared at once. Remove a game first.");
+            const maxMsg = window.translate("max_games", "Maximum 5 games can be compared at once. Remove a game first.");
             document.getElementById('infoPanel').innerHTML = `<div class="info-title">${maxMsg}</div>`;
             setTimeout(() => {
                 updateInfoPanel();
@@ -769,11 +776,11 @@
         }
         
         infoPanel.style.display = 'block';
-        const compareGamesText = t("compare_games", "Highlighted Games");
-        const recentReviewsText = t("recent_reviews", "recent reviews");
-        const totalReviewsText = t("total_reviews", "Total reviews");
-        const removeText = t("remove_button", "Remove");
-        const toText = t("to", "→");
+        const compareGamesText = window.translate("compare_games", "Highlighted Games");
+        const recentReviewsText = window.translate("recent_reviews", "recent reviews");
+        const totalReviewsText = window.translate("total_reviews", "Total reviews");
+        const removeText = window.translate("remove_button", "Remove");
+        const toText = window.translate("to", "→");
         
         document.querySelector('#infoPanel .info-title').textContent = compareGamesText;
         
@@ -1096,7 +1103,7 @@
             
             if (gamesData.length === 0) throw new Error("No valid game data found");
             
-            const gamesLoadedMsg = t("games_loaded", "games loaded");
+            const gamesLoadedMsg = window.translate("games_loaded", "games loaded");
             document.getElementById('dataStats').innerHTML = `${gamesData.length.toLocaleString()} ${gamesLoadedMsg}`;
             document.getElementById('topControls').style.display = 'flex';
             document.getElementById('visContainer').classList.add('active');
@@ -1470,9 +1477,9 @@
         tooltip = d3.select("body").append("div").attr("class", "custom-tooltip");
         const displayName = getTranslatedDisplayName(node.id);
         
-        const gamesText = t("tooltip_games", "Games");
-        const totalReviewsText = t("tooltip_total_reviews", "Total Reviews");
-        const recentReviewsText = t("tooltip_recent_reviews", "Recent Reviews");
+        const gamesText = window.translate("tooltip_games", "Games");
+        const totalReviewsText = window.translate("tooltip_total_reviews", "Total Reviews");
+        const recentReviewsText = window.translate("tooltip_recent_reviews", "Recent Reviews");
         
         tooltip.html(`
             <strong>${displayName}</strong><br>
@@ -1488,12 +1495,12 @@
         
         const arrow = isAscending ? "↑" : "↓";
         const color = isAscending ? "#07BC00" : "#D02752";
-        const toText = t("to", "→");
+        const toText = window.translate("to", "→");
         
         const sourceName = getTranslatedCategory(source.id);
         const targetName = getTranslatedCategory(target.id);
-        const recentReviewsText = t("tooltip_recent_reviews_arc", "Recent Reviews");
-        const numberOfGamesText = t("tooltip_number_of_games", "Number of Games");
+        const recentReviewsText = window.translate("tooltip_recent_reviews_arc", "Recent Reviews");
+        const numberOfGamesText = window.translate("tooltip_number_of_games", "Number of Games");
         
         let gameCount = 0;
         if (gamesData) {
