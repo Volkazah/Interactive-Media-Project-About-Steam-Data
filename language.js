@@ -104,7 +104,101 @@ const translations = {
         "month_10": "Month 10",
         "month_11": "Month 11",
         "month_12": "Month 12",
-        "month_13": "Month 13"
+        "month_13": "Month 13",
+        
+        // ===== 3DIAL_GRAPH.HTML =====
+        "dial_title": "BEST OF THE BEST",
+        "dial_subtitle": "Look for the most successful videogames of all time. Choose specific years, metrics and genres. Customise dials to your preferences",
+        "year": "Year",
+        "customize_dials": "Customize Dials",
+        "text_orientation": "Text Orientation",
+        "radial": "Radial",
+        "horizontal": "Horizontal",
+        "reset_filters": "⟳ Reset Filters",
+        "no_data_message": "No data loaded — please import CSV",
+        "no_filters_match": "No games match the current filters — try adjusting the dials",
+        "game_word": "game",
+        "on_word": "on",
+        "in_word": "in",
+        "of_all_time": "of all time",
+        "any_year": "ANY",
+        "single_multi": "Single & Multi",
+        
+        // Dial ring labels
+        "dial_metric": "Metric",
+        "dial_genre": "Genre",
+        "dial_player_type": "Player Type",
+        "dial_supported_os": "Supported OS",
+        "dial_price": "Price",
+        
+        // Metric options
+        "metric_most_recommended": "is the most recommended",
+        "metric_high_rated": "is the highest rated",
+        "metric_most_reviews": "is the most reviewed",
+        "metric_most_achievements": "has the most achievements",
+        "metric_median_playtime": "has the highest median playtime",
+        "metric_peak_ccu": "has the highest CCU peak",
+        "metric_most_followers": "is the most followed",
+        "is_best": "is the best",
+        
+        // Metric option labels (on the rings)
+        "metric_most_recommended_option": "most recommended",
+        "metric_high_rated_option": "high rated",
+        "metric_most_reviews_option": "most reviews",
+        "metric_most_achievements_option": "most achievements",
+        "metric_median_playtime_option": "median playtime",
+        "metric_peak_ccu_option": "peak CCU",
+        "metric_most_followers_option": "most followers",
+        
+        // Genre options
+        "genre_any": "any",
+        "genre_simulation": "simulation",
+        "genre_strategy": "strategy",
+        "genre_action": "action",
+        "genre_rpg": "RPG",
+        "genre_racing": "racing",
+        "genre_indie": "indie",
+        "genre_adventure": "adventure",
+        "genre_casual": "casual",
+        "genre_sports": "sports",
+        
+        // Player type options
+        "player_any": "any",
+        "player_single": "single-player",
+        "player_multi": "multi-player",
+        "player_both": "single&multi-player",
+        "player_single_display": "Singleplayer",
+        "player_multi_display": "Multiplayer",
+        "player_both_display": "Single&Multiplayer",
+        
+        // OS options
+        "os_any": "any",
+        "os_windows": "windows",
+        "os_mac": "mac",
+        "os_linux": "linux",
+        
+        // Price options
+        "price_any": "any",
+        "price_free": "free to play",
+        "price_under_5": "<$5",
+        "price_under_10": "<$10",
+        "price_under_15": "<$15",
+        "price_under_20": "<$20",
+        "price_under_30": "<$30",
+        "price_under_40": "<$40",
+        "price_under_60": "<$60",
+        "price_over_60": ">$60",
+        
+        // Price text descriptions
+        "free": "free",
+        "price_range_under_5": "in a price range under $5",
+        "price_range_5_10": "in a price range from $5 to $10",
+        "price_range_10_15": "in a price range from $10 to $15",
+        "price_range_15_20": "in a price range from $15 to $20",
+        "price_range_20_30": "in a price range from $20 to $30",
+        "price_range_30_40": "in a price range from $30 to $40",
+        "price_range_40_60": "in a price range from $40 to $60",
+        "price_range_60_plus": "in a price range of $60 and more"
     },
     ru: {
         // ===== 1ARC_GRAPH.HTML =====
@@ -210,7 +304,101 @@ const translations = {
         "month_10": "Месяц 10",
         "month_11": "Месяц 11",
         "month_12": "Месяц 12",
-        "month_13": "Месяц 13"
+        "month_13": "Месяц 13",
+        
+        // ===== 3DIAL_GRAPH.HTML =====
+        "dial_title": "ЛУЧШИЕ ИЗ ЛУЧШИХ",
+        "dial_subtitle": "Ищите самые успешные видеоигры всех времен. Выбирайте определенные годы, метрики и жанры. Настраивайте циферблаты по своему вкусу",
+        "year": "Год",
+        "customize_dials": "Настройка циферблатов",
+        "text_orientation": "Ориентация текста",
+        "radial": "Радиальная",
+        "horizontal": "Горизонтальная",
+        "reset_filters": "⟳ Сбросить фильтры",
+        "no_data_message": "Нет данных — пожалуйста, импортируйте CSV",
+        "no_filters_match": "Ни одна игра не соответствует текущим фильтрам — попробуйте настроить циферблаты",
+        "game_word": "игра",
+        "on_word": "на",
+        "in_word": "в",
+        "of_all_time": "за все время",
+        "any_year": "ЛЮБОЙ",
+        "single_multi": "Одиночная и Мульти",
+        
+        // Dial ring labels
+        "dial_metric": "Метрика",
+        "dial_genre": "Жанр",
+        "dial_player_type": "Тип игрока",
+        "dial_supported_os": "Поддерживаемая ОС",
+        "dial_price": "Цена",
+        
+        // Metric options
+        "metric_most_recommended": "чаще всего рекомендуют",
+        "metric_high_rated": "имеет самый высокий рейтинг",
+        "metric_most_reviews": "имеет больше всего обзоров",
+        "metric_most_achievements": "имеет больше всего достижений",
+        "metric_median_playtime": "имеет самое высокое медианное время игры",
+        "metric_peak_ccu": "имеет самый высокий пик CCU",
+        "metric_most_followers": "имеет больше всего подписчиков",
+        "is_best": "является лучшим",
+        
+        // Metric option labels (on the rings)
+        "metric_most_recommended_option": "чаще рекомендуют",
+        "metric_high_rated_option": "высокий рейтинг",
+        "metric_most_reviews_option": "больше обзоров",
+        "metric_most_achievements_option": "больше достижений",
+        "metric_median_playtime_option": "время в игре",
+        "metric_peak_ccu_option": "пик CCU",
+        "metric_most_followers_option": "больше подписчиков",
+        
+        // Genre options
+        "genre_any": "любой",
+        "genre_simulation": "симулятор",
+        "genre_strategy": "стратегия",
+        "genre_action": "экшен",
+        "genre_rpg": "RPG",
+        "genre_racing": "гонки",
+        "genre_indie": "инди",
+        "genre_adventure": "приключения",
+        "genre_casual": "казуальные",
+        "genre_sports": "спорт",
+        
+        // Player type options
+        "player_any": "любой",
+        "player_single": "одиночная игра",
+        "player_multi": "мультиплеер",
+        "player_both": "одиночная и мультиплеер",
+        "player_single_display": "Одиночная",
+        "player_multi_display": "Мультиплеер",
+        "player_both_display": "Одиночная и Мульти",
+        
+        // OS options
+        "os_any": "любая",
+        "os_windows": "windows",
+        "os_mac": "mac",
+        "os_linux": "linux",
+        
+        // Price options
+        "price_any": "любая",
+        "price_free": "бесплатно",
+        "price_under_5": "<5$",
+        "price_under_10": "<10$",
+        "price_under_15": "<15$",
+        "price_under_20": "<20$",
+        "price_under_30": "<30$",
+        "price_under_40": "<40$",
+        "price_under_60": "<60$",
+        "price_over_60": ">60$",
+        
+        // Price text descriptions
+        "free": "бесплатно",
+        "price_range_under_5": "в ценовом диапазоне до $5",
+        "price_range_5_10": "в ценовом диапазоне от $5 до $10",
+        "price_range_10_15": "в ценовом диапазоне от $10 до $15",
+        "price_range_15_20": "в ценовом диапазоне от $15 до $20",
+        "price_range_20_30": "в ценовом диапазоне от $20 до $30",
+        "price_range_30_40": "в ценовом диапазоне от $30 до $40",
+        "price_range_40_60": "в ценовом диапазоне от $40 до $60",
+        "price_range_60_plus": "в ценовом диапазоне от $60 и выше"
     }
 };
 
