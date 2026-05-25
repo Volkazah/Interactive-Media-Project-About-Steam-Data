@@ -556,9 +556,11 @@
 
     // Translation helper functions
     function t(key, fallback) {
-        if (typeof window !== 'undefined' && window.t) {
-            const translated = window.t(key);
-            if (translated && translated !== key) return translated;
+    // Check if translations are available globally
+        if (typeof window !== 'undefined' && window.currentLanguage && window.translations) {
+            const lang = window.currentLanguage;
+            const translation = window.translations[lang] && window.translations[lang][key];
+            if (translation) return translation;
         }
         return fallback || key;
     }
