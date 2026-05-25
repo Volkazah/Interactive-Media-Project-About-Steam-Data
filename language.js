@@ -8,6 +8,7 @@ const translations = {
         "reset_filters": "Reset Filters",
         "search_placeholder": "Search...",
         "games_loaded": "games loaded",
+        "footer_text": "Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.",
         
         // ===== 1ARC_GRAPH.HTML specific =====
         "arc_title": "Gamers do change their opinion about videogames and often not in a better way",
@@ -22,6 +23,45 @@ const translations = {
         "drag_instruction": "Drag spheres • Hover for details",
         "games_loaded": "games loaded",
         "remove": "Remove",
+
+         "category_overwhelmingly_positive": "overwhelmingly positive",
+        "category_very_positive": "very positive",
+        "category_mostly_positive": "mostly positive",
+        "category_mixed": "mixed",
+        "category_mostly_negative": "mostly negative",
+        "category_very_negative": "very negative",
+        "category_overwhelmingly_negative": "overwhelmingly negative",
+        
+        // Tooltip text
+        "tooltip_games": "Games",
+        "tooltip_total_reviews": "Total Reviews",
+        "tooltip_recent_reviews": "Recent Reviews",
+        "tooltip_recent_reviews_arc": "Recent Reviews",
+        "tooltip_number_of_games": "Number of Games",
+        
+        // Scale info
+        "scale_ascending": "Ascending",
+        "scale_descending": "Descending",
+        
+        // Footer
+        "footer_text": "Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.",
+        
+        // Search results text
+        "recent_reviews": "recent reviews",
+        "total_reviews": "Total reviews",
+        "remove_button": "Remove",
+        
+        // Arc direction words
+        "to": "→",
+        
+        // Category display names for tooltips
+        "category_display_overwhelmingly_positive": "Overwhelmingly Positive",
+        "category_display_very_positive": "Very Positive",
+        "category_display_mostly_positive": "Mostly Positive",
+        "category_display_mixed": "Mixed",
+        "category_display_mostly_negative": "Mostly Negative",
+        "category_display_very_negative": "Very Negative",
+        "category_display_overwhelmingly_negative": "Overwhelmingly Negative",
         
         // ===== 2CCU_GRAPH.HTML specific =====
         "ccu_title": "Only a few games are successful at player retention",
@@ -148,6 +188,7 @@ const translations = {
         "reset_filters": "Сбросить фильтры",
         "search_placeholder": "Поиск...",
         "games_loaded": "игр загружено",
+        "footer_text": "Название Steam и логотип Steam являются товарными знаками и/или зарегистрированными товарными знаками компании Valve Corporation. Все прочие товарные знаки принадлежат их соответствующим владельцам.",
         
         // ===== 1ARC_GRAPH.HTML specific =====
         "arc_title": "Геймеры меняют свое мнение о видеоиграх и часто не в лучшую сторону",
@@ -162,6 +203,45 @@ const translations = {
         "drag_instruction": "Перетаскивайте сферы • Наведите для деталей",
         "games_loaded": "игр загружено",
         "remove": "Удалить",
+
+        "category_overwhelmingly_positive": "крайне положительные",
+        "category_very_positive": "очень положительные",
+        "category_mostly_positive": "в основном положительные",
+        "category_mixed": "смешанные",
+        "category_mostly_negative": "в основном отрицательные",
+        "category_very_negative": "очень отрицательные",
+        "category_overwhelmingly_negative": "крайне отрицательные",
+        
+        // Tooltip text
+        "tooltip_games": "Игр",
+        "tooltip_total_reviews": "Всего обзоров",
+        "tooltip_recent_reviews": "Недавних обзоров",
+        "tooltip_recent_reviews_arc": "Недавних обзоров",
+        "tooltip_number_of_games": "Количество игр",
+        
+        // Scale info
+        "scale_ascending": "Возрастание",
+        "scale_descending": "Убывание",
+        
+        // Footer
+        "footer_text": "Название Steam и логотип Steam являются товарными знаками и/или зарегистрированными товарными знаками компании Valve Corporation. Все прочие товарные знаки принадлежат их соответствующим владельцам.",
+        
+        // Search results text
+        "recent_reviews": "недавних обзоров",
+        "total_reviews": "Всего обзоров",
+        "remove_button": "Удалить",
+        
+        // Arc direction words
+        "to": "→",
+        
+        // Category display names for tooltips
+        "category_display_overwhelmingly_positive": "Крайне Положительные",
+        "category_display_very_positive": "Очень Положительные",
+        "category_display_mostly_positive": "В основном Положительные",
+        "category_display_mixed": "Смешанные",
+        "category_display_mostly_negative": "В основном Отрицательные",
+        "category_display_very_negative": "Очень Отрицательные",
+        "category_display_overwhelmingly_negative": "Крайне Отрицательные",
         
         // ===== 2CCU_GRAPH.HTML specific =====
         "ccu_title": "Единицы видеогр успешно удержают игроков",
