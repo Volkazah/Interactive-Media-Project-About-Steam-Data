@@ -799,42 +799,135 @@
         // Draw labels with original formatting and position fixes for Russian
         filteredMetrics.forEach((metric, i) => {
             const angle = angleSlice * i - Math.PI/2;
-            let labelRadius = radius + 40;
-            const isLongMetric = metric.includes("recommendations") || metric.includes("achievements");
-            const isTopPosition = Math.abs(angle + Math.PI/2) < 0.6;
-            const isRightPosition = Math.abs(angle) < 0.3 || Math.abs(angle) > 6.0;
-
-            if (isTopPosition) {
-                labelRadius = radius + 25;
-            } else if (isLongMetric) {
-                labelRadius = radius + 62;
+            
+            // Calculate angle in degrees for easier understanding
+            const angleDeg = (angle * 180 / Math.PI + 360) % 360;
+            
+            // Check if this is a long metric (has multi-word or long text)
+            const metricDisplayText = METRIC_DISPLAY[metric] || [metric.replace("_", " ")];
+            const isLongMetric = metricDisplayText.join(" ").length > 12;
+            
+            let labelRadius;
+            let textAnchor = "middle";
+            let xOffset = 0;
+            let yOffset = 0;
+            
+            // Position-based radius assignment based on angle
+            if (angleDeg >= 345 || angleDeg < 15) {
+                // Position 1: Right
+                if (isLongMetric) {
+                    labelRadius = radius + 55;
+                } else {
+                    labelRadius = radius + 40;
+                }
+                yOffset = 0;
+                textAnchor = "middle";
+                
+            } else if (angleDeg >= 15 && angleDeg < 60) {
+                // Position 2: Top-Right (between 1-2 o'clock)
+                if (isLongMetric) {
+                    labelRadius = radius + 55;
+                } else {
+                    labelRadius = radius + 42;
+                }
+                xOffset = 5;
+                textAnchor = "middle";
+                
+            } else if (angleDeg >= 60 && angleDeg < 105) {
+                // Position 3: bottom-Right
+                if (isLongMetric) {
+                    labelRadius = radius + 30;
+                } else {
+                    labelRadius = radius + 20;
+                }
+                xOffset = 0;
+                textAnchor = "middle";
+                
+            } else if (angleDeg >= 105 && angleDeg < 150) {
+                // Position 4: Bottom-left
+                if (isLongMetric) {
+                    labelRadius = radius + 30;
+                } else {
+                    labelRadius = radius + 22;
+                }
+                xOffset = -10;
+                yOffset = 5;
+                textAnchor = "middle";
+                
+            } else if (angleDeg >= 150 && angleDeg < 210) {
+                // Position 5: Left
+                if (isLongMetric) {
+                    labelRadius = radius + 45;
+                } else {
+                    labelRadius = radius + 35;
+                }
+                xOffset = -15;
+                yOffset = 0;
+                textAnchor = "middle";
+                
+            } else if (angleDeg >= 210 && angleDeg < 255) {
+                // Position 6: Top-left)
+                if (isLongMetric) {
+                    labelRadius = radius + 45;
+                } else {
+                    labelRadius = radius + 30;
+                }
+                xOffset = -15;
+                yOffset = 10;
+                textAnchor = "middle";
+                
+            } else if (angleDeg >= 255 && angleDeg < 300) {
+                // Position 7: top
+                if (isLongMetric) {
+                    labelRadius = radius + 23;
+                } else {
+                    labelRadius = radius + 23;
+                }
+                xOffset = 0;
+                textAnchor = "middle";
+                
+            } else if (angleDeg >= 300 && angleDeg < 345) {
+                // Position 8: Top-right
+                if (isLongMetric) {
+                    labelRadius = radius + 50;
+                } else {
+                    labelRadius = radius + 35;
+                }
+                xOffset = 5;
+                textAnchor = "middle";
+                
             } else {
-                labelRadius = radius + 40;
+                // Default fallback
+                labelRadius = radius + 35;
+                textAnchor = "middle";
             }
             
-            const displayParts = METRIC_DISPLAY[metric] || [metric.replace("_", " ")];
-            
-            let labelX = Math.cos(angle) * labelRadius;
-            let labelY = Math.sin(angle) * labelRadius;
+            // Calculate position with offsets
+            let labelX = Math.cos(angle) * labelRadius + xOffset;
+            let labelY = Math.sin(angle) * labelRadius + yOffset;
             
             const labelGroup = svg.append("g")
                 .attr("transform", `translate(${labelX}, ${labelY})`)
-                .attr("text-anchor", "middle")
+                .attr("text-anchor", textAnchor)
                 .attr("dominant-baseline", "middle");
             
             // Add special class for right position labels in Russian mode
-            if (isRightPosition) {
+            if (angleDeg >= 15 && angleDeg < 105) {
                 labelGroup.attr("class", "radar-label-right");
             }
             
+            const displayParts = metricDisplayText;
             const lineHeight = 16;
             const totalHeight = displayParts.length * lineHeight;
             const startY = -totalHeight / 2 + lineHeight / 2;
             
+            // For left-side labels (text-anchor = "end"), adjust horizontal alignment
+            const xAlignment = (textAnchor === "end") ? -8 : (textAnchor === "start") ? 8 : 0;
+            
             displayParts.forEach((line, lineIdx) => {
-                labelGroup.append("text")
+                const textElement = labelGroup.append("text")
                     .attr("y", startY + lineIdx * lineHeight)
-                    .attr("text-anchor", "middle")
+                    .attr("text-anchor", textAnchor)
                     .style("font-size", "16px")
                     .style("fill", "#EFDFC0")
                     .style("font-weight", "600")
@@ -844,6 +937,11 @@
                     .style("stroke-linecap", "round")
                     .style("stroke-linejoin", "round")
                     .text(line);
+                
+                // Apply x offset if needed
+                if (xAlignment !== 0) {
+                    textElement.attr("x", xAlignment);
+                }
             });
         });
     }
