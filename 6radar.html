@@ -55,28 +55,6 @@
             border-color: #EFDFC0;
         }
 
-        /* Russian language specific styles */
-        :lang(ru) .metrics-title {
-            font-size: 14px;
-        }
-
-        :lang(ru) .dial-label {
-            font-size: 13px;
-        }
-
-        :lang(ru) .game-search {
-            font-size: 14px;
-        }
-
-        :lang(ru) .remove-btn {
-            font-size: 1rem;
-        }
-
-        /* Fix for right middle label overlap in Russian mode */
-        :lang(ru) .radar-label-right {
-            transform: translateX(4px);
-        }
-
         .dashboard {
             max-width: 1600px;
             width: 100%;
@@ -522,9 +500,9 @@
 <div class="dashboard">
     <!-- Language Selector -->
     <div class="language-selector">
-        <button id="mainPageBtn" class="lang-btn" data-i18n="main_page">🏠 Main Page</button>
-        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
-        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+        <button id="mainPageBtn" class="lang-btn" data-i18n="main_page">Main Page</button>
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="ru">RU</button>
     </div>
 
     <div class="header">
@@ -534,7 +512,7 @@
 
     <div class="controls">
         <div class="upload-area">
-            <label for="csv-file-input" data-i18n="radar_upload_csv">📂 Upload CSV</label>
+            <label for="csv-file-input" data-i18n="radar_upload_csv">Upload CSV</label>
             <input type="file" id="csv-file-input" accept=".csv">
             <span id="file-name-display" class="file-name" data-i18n="radar_no_file">No file</span>
         </div>
