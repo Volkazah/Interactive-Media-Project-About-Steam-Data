@@ -597,13 +597,11 @@
 </div>
 
 <script>
-    // Translation helper function
-    function t(key, fallback) {
-        if (typeof window !== 'undefined' && window.translations && window.currentLanguage) {
-            const translation = window.translations[window.currentLanguage][key];
-            if (translation && typeof translation === 'string') {
-                return translation;
-            }
+    // Helper function to get translated text - using window.translate directly
+    function _(key, fallback) {
+        if (typeof window !== 'undefined' && window.translate) {
+            const translated = window.translate(key);
+            if (translated && translated !== key) return translated;
         }
         return fallback || key;
     }
@@ -611,19 +609,19 @@
     // Helper function to get translated month labels
     function getMonthLabels() {
         return [
-            t("month_1", "Month 1"),
-            t("month_2", "Month 2"),
-            t("month_3", "Month 3"),
-            t("month_4", "Month 4"),
-            t("month_5", "Month 5"),
-            t("month_6", "Month 6"),
-            t("month_7", "Month 7"),
-            t("month_8", "Month 8"),
-            t("month_9", "Month 9"),
-            t("month_10", "Month 10"),
-            t("month_11", "Month 11"),
-            t("month_12", "Month 12"),
-            t("month_13", "Month 13")
+            _("month_1", "Month 1"),
+            _("month_2", "Month 2"),
+            _("month_3", "Month 3"),
+            _("month_4", "Month 4"),
+            _("month_5", "Month 5"),
+            _("month_6", "Month 6"),
+            _("month_7", "Month 7"),
+            _("month_8", "Month 8"),
+            _("month_9", "Month 9"),
+            _("month_10", "Month 10"),
+            _("month_11", "Month 11"),
+            _("month_12", "Month 12"),
+            _("month_13", "Month 13")
         ];
     }
 
@@ -1042,8 +1040,7 @@
             .style("fill", "#EFDFC0")
             .style("font-size", "14px")
             .style("font-family", "'Source Sans Pro', monospace")
-            .attr("data-i18n", "months")
-            .text(t("months", "Months →"));
+            .text(_("months", "Months →"));
         
         // Y-Axis Label
         chartGroup.append("text")
@@ -1055,7 +1052,7 @@
             .style("fill", "#EFDFC0")
             .style("font-size", "14px")
             .style("font-family", "'Source Sans Pro', monospace")
-            .text(aggregateMode ? t("player_retention_aggregate", "Percentage of Games in Zone (0-100%)") : t("player_retention", "Player Retention (% of peak)"));
+            .text(aggregateMode ? _("player_retention_aggregate", "Percentage of Games in Zone (0-100%)") : _("player_retention", "Player Retention (% of peak)"));
     }
     
     function updateChart() {
@@ -1064,8 +1061,8 @@
             const container = document.getElementById("line-chart");
             container.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:600px; color:#EFDFC0; font-family:'Source Sans Pro', monospace; flex-direction:column;">
                 <div style="font-size:48px; margin-bottom:16px;">📊</div>
-                <div data-i18n="no_games">No games to display</div>
-                <div style="font-size:14px; margin-top:8px;">${filteredGames.length === 0 ? (t('filtered_empty', 'Filtered games empty')) : (t('no_svg', 'No SVG'))}</div>
+                <div>${_("no_games", "No games to display")}</div>
+                <div style="font-size:14px; margin-top:8px;">${filteredGames.length === 0 ? (_('filtered_empty', 'Filtered games empty')) : (_('no_svg', 'No SVG'))}</div>
             </div>`;
             return;
         }
@@ -1081,9 +1078,9 @@
             const aggregateData = calculateAggregateData();
             if (aggregateData) {
                 const zones = [
-                    { name: t('high_retention_range', 'High (67-100%)'), data: aggregateData.high, color: AGGREGATE_COLORS[0], zoneType: 'high', yRange: [67, 100] },
-                    { name: t('medium_retention_range', 'Medium (34-66%)'), data: aggregateData.medium, color: AGGREGATE_COLORS[1], zoneType: 'medium', yRange: [34, 66] },
-                    { name: t('low_retention_range', 'Low (0-33%)'), data: aggregateData.low, color: AGGREGATE_COLORS[2], zoneType: 'low', yRange: [0, 33] }
+                    { name: _('high_retention_range', 'High (67-100%)'), data: aggregateData.high, color: AGGREGATE_COLORS[0], zoneType: 'high', yRange: [67, 100] },
+                    { name: _('medium_retention_range', 'Medium (34-66%)'), data: aggregateData.medium, color: AGGREGATE_COLORS[1], zoneType: 'medium', yRange: [34, 66] },
+                    { name: _('low_retention_range', 'Low (0-33%)'), data: aggregateData.low, color: AGGREGATE_COLORS[2], zoneType: 'low', yRange: [0, 33] }
                 ];
                 
                 zones.forEach(zone => {
@@ -1149,53 +1146,53 @@
         legendDiv.html("");
         
         if (aggregateMode) {
-            legendDiv.append("span").attr("class", "legend-title").text(t('aggregate_mode_title', "Aggregate Mode (Scaled to zones):"));
+            legendDiv.append("span").attr("class", "legend-title").text(_('aggregate_mode_title', "Aggregate Mode (Scaled to zones):"));
             legendDiv.append("div").attr("class", "legend-item")
-                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[0]};"></div><span>${t('high_retention_legend', 'High Retention (67-100%)')} - % of games</span>`);
+                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[0]};"></div><span>${_('high_retention_legend', 'High Retention (67-100%)')} - % of games</span>`);
             legendDiv.append("div").attr("class", "legend-item")
-                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[1]};"></div><span>${t('medium_retention_legend', 'Medium Retention (34-66%)')} - % of games</span>`);
+                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[1]};"></div><span>${_('medium_retention_legend', 'Medium Retention (34-66%)')} - % of games</span>`);
             legendDiv.append("div").attr("class", "legend-item")
-                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[2]};"></div><span>${t('low_retention_legend', 'Low Retention (0-33%)')} - % of games</span>`);
+                .html(`<div class="legend-color" style="background: ${AGGREGATE_COLORS[2]};"></div><span>${_('low_retention_legend', 'Low Retention (0-33%)')} - % of games</span>`);
             legendDiv.append("div").attr("class", "legend-item")
-                .html(`<span style="font-size:11px; opacity:0.8;">⚠️ ${t('incomplete_data_warning', 'Games with incomplete data excluded from aggregate')}</span>`);
+                .html(`<span style="font-size:11px; opacity:0.8;">⚠️ ${_('incomplete_data_warning', 'Games with incomplete data excluded from aggregate')}</span>`);
         } else {
-            legendDiv.append("span").attr("class", "legend-title").text(t('player_types', "Player Types:"));
+            legendDiv.append("span").attr("class", "legend-title").text(_('player_types', "Player Types:"));
             
             const uniquePlayerTypes = [...new Set(filteredGames.map(g => g.player_type))].sort();
             uniquePlayerTypes.forEach(playerType => {
                 const color = getColorForPlayerType(playerType, false);
                 let displayName = playerType;
-                if (playerType === "Multi-player") displayName = t("player_type_multi", "Multi-player");
-                else if (playerType === "Single-player") displayName = t("player_type_single", "Single-player");
-                else if (playerType === "Single&Multi-player") displayName = t("player_type_both", "Single&Multi-player");
+                if (playerType === "Multi-player") displayName = _("player_type_multi", "Multi-player");
+                else if (playerType === "Single-player") displayName = _("player_type_single", "Single-player");
+                else if (playerType === "Single&Multi-player") displayName = _("player_type_both", "Single&Multi-player");
                 legendDiv.append("div").attr("class", "legend-item")
                     .html(`<div class="legend-color" style="background: ${color};"></div><span>${displayName}</span>`);
             });
             
             if (highlightedGames.size > 0) {
                 legendDiv.append("div").attr("class", "legend-item")
-                    .html(`<div class="highlight-legend" style="background: #D98D00;"></div><span>${t('highlighted_game', 'Highlighted Game')}</span>`);
+                    .html(`<div class="highlight-legend" style="background: #D98D00;"></div><span>${_('highlighted_game', 'Highlighted Game')}</span>`);
             }
             
             if (displayMode === "points" || displayMode === "both") {
                 legendDiv.append("div").attr("class", "legend-item")
-                    .html(`<div class="circle-legend"></div><span>${t('monthly_data_point', 'Monthly Data Point')}</span>`);
+                    .html(`<div class="circle-legend"></div><span>${_('monthly_data_point', 'Monthly Data Point')}</span>`);
             }
             
             const hasDashedLines = filteredGames.some(game => game.hasMissingData);
             if (hasDashedLines) {
                 legendDiv.append("div").attr("class", "legend-item")
-                    .html(`<div style="width:24px; height:2px; background: repeating-linear-gradient(90deg, #EFDFC0, #EFDFC0 6px, transparent 6px, transparent 12px);"></div><span>${t('incomplete_data', 'Incomplete Data (dashed line)')}</span>`);
+                    .html(`<div style="width:24px; height:2px; background: repeating-linear-gradient(90deg, #EFDFC0, #EFDFC0 6px, transparent 6px, transparent 12px);"></div><span>${_('incomplete_data', 'Incomplete Data (dashed line)')}</span>`);
             }
         }
         
         if (selectedGenres.size > 0) {
             legendDiv.append("div").attr("class", "legend-item")
-                .html(`<span style="font-size:12px;">${t('genres_label', 'Genres')}: ${Array.from(selectedGenres).join(", ")}</span>`);
+                .html(`<span style="font-size:12px;">${_('genres_label', 'Genres')}: ${Array.from(selectedGenres).join(", ")}</span>`);
         }
         
         legendDiv.append("div").attr("class", "legend-item")
-            .html(`<span style="font-size:15px;">${filteredGames.length} ${t('games_displayed', 'games displayed')}</span>`);
+            .html(`<span style="font-size:15px;">${filteredGames.length} ${_('games_displayed', 'games displayed')}</span>`);
     }
     
     function applyFilters() {
@@ -1398,7 +1395,7 @@
                     const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
                     
                     tooltipDiv.style("opacity", 1)
-                        .html(`<strong>${game.gameName}</strong><br>${t('genres', 'Genres')}: ${genresDisplay}<br>${t('type', 'Type')}: ${game.player_type}<br>${monthLabelsArray[monthIndex]}<br>${t('retention', 'Retention')}: ${retentionVal !== null ? retentionVal.toFixed(1) + '%' : 'N/A'}`)
+                        .html(`<strong>${game.gameName}</strong><br>${_('genres', 'Genres')}: ${genresDisplay}<br>${_('type', 'Type')}: ${game.player_type}<br>${monthLabelsArray[monthIndex]}<br>${_('retention', 'Retention')}: ${retentionVal !== null ? retentionVal.toFixed(1) + '%' : 'N/A'}`)
                         .style("left", (event.pageX + 12) + "px")
                         .style("top", (event.pageY - 30) + "px");
                 })
@@ -1449,7 +1446,7 @@
                             const monthLabelsArray = getMonthLabels();
                             
                             tooltipDiv.style("opacity", 1)
-                                .html(`<strong>${game.gameName}</strong><br>${t('genres', 'Genres')}: ${genresDisplay}<br>${t('type', 'Type')}: ${game.player_type}<br>${monthLabelsArray[idx]}<br>${t('retention', 'Retention')}: ${retentionVal.toFixed(1)}%`)
+                                .html(`<strong>${game.gameName}</strong><br>${_('genres', 'Genres')}: ${genresDisplay}<br>${_('type', 'Type')}: ${game.player_type}<br>${monthLabelsArray[idx]}<br>${_('retention', 'Retention')}: ${retentionVal.toFixed(1)}%`)
                                 .style("left", (event.pageX + 12) + "px")
                                 .style("top", (event.pageY - 30) + "px");
                         })
@@ -1523,10 +1520,10 @@
             aggregateMode = !aggregateMode;
             if (aggregateMode) {
                 this.classList.add("active");
-                this.textContent = t("hide_aggregate", "Hide Aggregate Lines");
+                this.textContent = _("hide_aggregate", "Hide Aggregate Lines");
             } else {
                 this.classList.remove("active");
-                this.textContent = t("show_aggregate", "Show Aggregate Lines");
+                this.textContent = _("show_aggregate", "Show Aggregate Lines");
             }
             applyFilters();
         });
@@ -1543,9 +1540,9 @@
         const sortedTypes = Array.from(allPlayerTypes).sort();
         
         const playerTypeTranslationMap = {
-            "Multi-player": t("player_type_multi", "Multi-player"),
-            "Single-player": t("player_type_single", "Single-player"),
-            "Single&Multi-player": t("player_type_both", "Single&Multi-player")
+            "Multi-player": _("player_type_multi", "Multi-player"),
+            "Single-player": _("player_type_single", "Single-player"),
+            "Single&Multi-player": _("player_type_both", "Single&Multi-player")
         };
         
         sortedTypes.forEach(type => {
@@ -1611,7 +1608,7 @@
                 const toggleBtn = document.getElementById("aggregate-toggle");
                 if (toggleBtn) {
                     toggleBtn.classList.remove("active");
-                    toggleBtn.textContent = t("show_aggregate", "Show Aggregate Lines");
+                    toggleBtn.textContent = _("show_aggregate", "Show Aggregate Lines");
                 }
                 
                 renderFilterUI();
@@ -1675,9 +1672,9 @@
         const toggleBtn = document.getElementById("aggregate-toggle");
         if (toggleBtn) {
             if (aggregateMode) {
-                toggleBtn.textContent = t("hide_aggregate", "Hide Aggregate Lines");
+                toggleBtn.textContent = _("hide_aggregate", "Hide Aggregate Lines");
             } else {
-                toggleBtn.textContent = t("show_aggregate", "Show Aggregate Lines");
+                toggleBtn.textContent = _("show_aggregate", "Show Aggregate Lines");
             }
         }
         
