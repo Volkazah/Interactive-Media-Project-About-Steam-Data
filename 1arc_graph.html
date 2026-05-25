@@ -443,8 +443,9 @@
 <div class="dashboard">
     <!-- Language Selector -->
     <div class="language-selector">
-        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
-        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+        <button id="mainPageBtn" class="lang-btn" data-i18n="main_page">Main Page</button>
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="ru">RU</button>
     </div>
 
     <div class="header">
@@ -1650,21 +1651,32 @@
     
     // Initialize language buttons setup
     document.addEventListener('DOMContentLoaded', function() {
-        if (typeof window.setupLanguageSwitcher === 'function') {
-            window.setupLanguageSwitcher();
-        } else {
-            const langButtons = document.querySelectorAll('.lang-btn');
-            langButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const lang = this.getAttribute('data-lang');
-                    if (typeof window.setLanguage === 'function') {
-                        window.setLanguage(lang);
-                    } else {
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('lang', lang);
-                        window.location.href = url.toString();
-                    }
-                });
+    // Setup language switcher
+    if (typeof window.setupLanguageSwitcher === 'function') {
+        window.setupLanguageSwitcher();
+    } else {
+        const langButtons = document.querySelectorAll('.lang-btn[data-lang]');
+        langButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const lang = this.getAttribute('data-lang');
+                if (typeof window.setLanguage === 'function') {
+                    window.setLanguage(lang);
+                } else {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('lang', lang);
+                    window.location.href = url.toString();
+                }
+            });
+        });
+    }
+    
+    // Add click handler for the Main Page button
+    const mainPageBtn = document.getElementById('mainPageBtn');
+        if (mainPageBtn) {
+            mainPageBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Navigate to the main page
+                window.location.href = 'https://volkazah.github.io/Interactive-Media-Project-About-Steam-Data/';
             });
         }
     });
