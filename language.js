@@ -64,6 +64,7 @@ const translations = {
         "low_retention": "Low Retention (0-33%)",
         "months": "Months →",
         "player_retention": "Player Retention (% of peak)",
+        "player_retention_aggregate": "Percentage of Games in Zone (0-100%)",
         "no_games": "No games to display",
         "filtered_empty": "Filtered games empty",
         "no_svg": "No SVG",
@@ -83,7 +84,27 @@ const translations = {
         "retention": "Retention",
         "high_retention_range": "High (67-100%)",
         "medium_retention_range": "Medium (34-66%)",
-        "low_retention_range": "Low (0-33%)"
+        "low_retention_range": "Low (0-33%)",
+        
+        // Player type button labels
+        "player_type_multi": "Multi-player",
+        "player_type_single": "Single-player",
+        "player_type_both": "Single&Multi-player",
+        
+        // Month labels
+        "month_1": "Month 1",
+        "month_2": "Month 2",
+        "month_3": "Month 3",
+        "month_4": "Month 4",
+        "month_5": "Month 5",
+        "month_6": "Month 6",
+        "month_7": "Month 7",
+        "month_8": "Month 8",
+        "month_9": "Month 9",
+        "month_10": "Month 10",
+        "month_11": "Month 11",
+        "month_12": "Month 12",
+        "month_13": "Month 13"
     },
     ru: {
         // ===== 1ARC_GRAPH.HTML =====
@@ -149,6 +170,7 @@ const translations = {
         "low_retention": "Низкое удержание (0-33%)",
         "months": "Месяцы →",
         "player_retention": "Удержание игроков (% от пика)",
+        "player_retention_aggregate": "Процент игр в зоне (0-100%)",
         "no_games": "Нет игр для отображения",
         "filtered_empty": "Нет игр по фильтрам",
         "no_svg": "Нет SVG",
@@ -168,14 +190,31 @@ const translations = {
         "retention": "Удержание",
         "high_retention_range": "Высокое (67-100%)",
         "medium_retention_range": "Среднее (34-66%)",
-        "low_retention_range": "Низкое (0-33%)"
+        "low_retention_range": "Низкое (0-33%)",
+        
+        // Player type button labels
+        "player_type_multi": "Мультиплеер",
+        "player_type_single": "Одиночная игра",
+        "player_type_both": "Одиночная и Мультиплеер",
+        
+        // Month labels
+        "month_1": "Месяц 1",
+        "month_2": "Месяц 2",
+        "month_3": "Месяц 3",
+        "month_4": "Месяц 4",
+        "month_5": "Месяц 5",
+        "month_6": "Месяц 6",
+        "month_7": "Месяц 7",
+        "month_8": "Месяц 8",
+        "month_9": "Месяц 9",
+        "month_10": "Месяц 10",
+        "month_11": "Месяц 11",
+        "month_12": "Месяц 12",
+        "month_13": "Месяц 13"
     }
 };
 
 let currentLanguage = 'en';
-
-// NO global t() function to avoid recursion!
-// We'll expose a different method
 
 window.translations = translations;
 window.currentLanguage = currentLanguage;
