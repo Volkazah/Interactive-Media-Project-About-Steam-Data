@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Publishers and Developers Distribution</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Language support -->
+    <script src="language.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -19,6 +21,38 @@
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        /* Language Selector Styles */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: rgba(239, 223, 192, 0.1);
+            border: 1px solid rgba(239, 223, 192, 0.3);
+            color: #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        .lang-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+            border-color: #EFDFC0;
         }
 
         .dashboard {
@@ -323,10 +357,6 @@
             line-height: 1.4;
             max-width: 280px;
             font-family: 'Source Sans Pro', monospace;
-            bottom: auto;
-            top: auto;
-            left: auto;
-            right: auto;
         }
 
         .tooltip strong {
@@ -533,7 +563,7 @@
             margin-top: 4px;
             font-family: 'Source Sans Pro', monospace;
             text-align: center;
-            display:none;
+            display: none;
         }
 
         text {
@@ -545,77 +575,70 @@
             font-weight: 400 !important;
         }
 
-        .language-selector {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
+        /* Russian language specific styles */
+        :lang(ru) .control-group label {
+            font-size: 16px;
         }
 
-        .lang-btn {
-            background: rgba(239, 223, 192, 0.1);
-            border: 1px solid rgba(239, 223, 192, 0.3);
-            color: #EFDFC0;
-            padding: 8px 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-family: 'Source Sans Pro', monospace;
-            font-size: 14px;
-            transition: all 0.2s;
+        :lang(ru) .layer-indicator {
+            font-size: 16px;
         }
 
-        .lang-btn:hover {
-            background: rgba(239, 223, 192, 0.2);
+        :lang(ru) .header h1 {
+            font-size: 48px;
         }
 
-        .lang-btn.active {
-            background: #EFDFC0;
-            color: #1B1B1B;
-            border-color: #EFDFC0;
+        :lang(ru) .header p {
+            font-size: 36px;
         }
     </style>
 </head>
 <body>
 <div class="dashboard">
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <button id="mainPageBtn" class="lang-btn" data-i18n="main_page">🏠 Main Page</button>
+        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
+        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+    </div>
+
     <div class="header">
-        <h1>Indie Publishers Hold Their Ground Against AAA</h1>
-        <p>Publishers and Developers Distribution on Steam</p>
+        <h1 data-i18n="treemap_title">Indie Publishers Hold Their Ground Against AAA</h1>
+        <p data-i18n="treemap_subtitle">Publishers and Developers Distribution on Steam</p>
     </div>
 
     <div class="controls">
         <div class="left-controls">
             <div class="control-group">
-                <label>Tiling:</label>
+                <label data-i18n="tiling">Tiling:</label>
                 <select id="tiling-algorithm" class="control-select">
                     <option value="treemapSquarify">treemapSquarify</option>
                     <option value="treemapBinary" selected>treemapBinary</option>
                 </select>
             </div>
             <div class="control-group">
-                <label>Sorting:</label>
+                <label data-i18n="sorting">Sorting:</label>
                 <select id="sort-order" class="control-select">
-                    <option value="desc" selected>Descending (largest first)</option>
-                    <option value="asc">Ascending (smallest first)</option>
+                    <option value="desc" selected data-i18n="descending">Descending (largest first)</option>
+                    <option value="asc" data-i18n="ascending">Ascending (smallest first)</option>
                 </select>
             </div>
         </div>
         
         <div class="search-section">
             <div class="search-container">
-                <input type="text" id="search-input" class="search-input" placeholder="Search game, publisher, developer... (up to 5 items)" autocomplete="off">
+                <input type="text" id="search-input" class="search-input" data-i18n="search_placeholder" placeholder="Search game, publisher, developer... (up to 5 items)" autocomplete="off">
                 <div id="autocomplete-list" class="autocomplete-list" style="display: none;"></div>
             </div>
             <div class="search-tags" id="search-tags"></div>
-            <div class="search-hint">Add up to 5 items to compare publishers side by side</div>
+            <div class="search-hint" data-i18n="search_hint">Add up to 5 items to compare publishers side by side</div>
         </div>
 
         <div class="layer-control">
             <div class="layer-status">
-                <span class="layer-indicator" id="layer-label">Layer 1 Top 40 Publishers</span>
+                <span class="layer-indicator" id="layer-label" data-i18n="layer1_label">Layer 1 Top 40 Publishers</span>
             </div>
-            <button id="back-to-treemap-btn" class="back-from-dendro" style="display: none;">Back to Treemap</button>
+            <button id="back-to-treemap-btn" class="back-from-dendro" style="display: none;" data-i18n="back_to_treemap">Back to Treemap</button>
         </div>
     </div>
 
@@ -623,52 +646,56 @@
         <div id="treemap-view" style="display: block;">
             <div class="treemap-header">
                 <div class="stats-header">
-                    <span id="pub-count">0</span> publishers | <span id="game-count">0</span> games
+                    <span id="pub-count">0</span> <span data-i18n="publishers">publishers</span> | <span id="game-count">0</span> <span data-i18n="games">games</span>
                 </div>
             </div>
             <div class="treemap-wrapper" id="treemap-container">
-                <div class="empty-state">
+                <div class="empty-state" data-i18n="upload_prompt">
                     Upload CSV file with Steam data<br>
                     <span style="font-size:0.7rem;">Required columns: estimated_owners, rating, game_name, developer, publisher</span>
                 </div>
             </div>
         </div>
 
-        <div class="language-selector">
-            <button class="lang-btn active" data-lang="en">EN</button>
-            <button class="lang-btn" data-lang="ru">RU</button>
-        </div>
-
         <div id="dendro-view" style="display: none;">
             <div class="dendro-header">
                 <div class="dendro-scale-control">
-                    <span>Zoom:</span>
+                    <span data-i18n="zoom">Zoom:</span>
                     <input type="range" id="dendro-scale-slider" class="scale-slider" min="0.5" max="1.8" step="0.01" value="1">
                     <span id="scale-value" style="font-size:14px; min-width: 40px;">1.0x</span>
                 </div>
                 <div class="color-legend">
-                    <span>Game Rating</span>
+                    <span data-i18n="game_rating">Game Rating</span>
                     <div class="color-gradient"></div>
-                    <span>Low → High</span>
+                    <span data-i18n="low_to_high">Low → High</span>
                 </div>
-                <button id="close-dendro-btn" class="layer-btn">Close</button>
+                <button id="close-dendro-btn" class="layer-btn" data-i18n="close">Close</button>
             </div>
             <div class="dendro-wrapper" id="dendro-container"></div>
         </div>
     </div>
     <footer>
         <div class="upload-area">
-            <label for="csv-file-input">Upload CSV</label>
+            <label for="csv-file-input" data-i18n="upload_csv">Upload CSV</label>
             <input type="file" id="csv-file-input" accept=".csv">
-            <span id="file-name-display" class="file-name">No file</span>
+            <span id="file-name-display" class="file-name" data-i18n="no_file">No file</span>
         </div>
-        <div class="footer-credit">
+        <div class="footer-credit" data-i18n="footer_credit">
             Steam name and Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.
         </div>
     </footer>
 </div>
 
 <script>
+    // Helper function to get translated text - using window.translate
+    function _(key, fallback) {
+        if (typeof window !== 'undefined' && window.translate) {
+            const translated = window.translate(key);
+            if (translated && translated !== key) return translated;
+        }
+        return fallback || key;
+    }
+
     // ---------- GLOBALS ----------
     let rawGameData = [];
     let currentView = "treemap";
@@ -807,7 +834,7 @@
     
     function addSearchItem(item) {
         if (searchItems.length >= 5) {
-            alert("Maximum 5 search items allowed.");
+            alert(_("max_search_items", "Maximum 5 search items allowed."));
             return false;
         }
         if (searchItems.some(si => si.name === item.name)) return false;
@@ -844,7 +871,7 @@
         });
         const clearBtn = document.createElement("button");
         clearBtn.className = "clear-all-btn";
-        clearBtn.innerHTML = "Clear all";
+        clearBtn.innerHTML = _("clear_all", "Clear all");
         clearBtn.onclick = () => clearAllSearchItems();
         tagsContainer.appendChild(clearBtn);
     }
@@ -909,7 +936,11 @@
         results.forEach(result => {
             const item = document.createElement("div");
             item.className = "autocomplete-item";
-            item.innerHTML = `${result.name} <span style="color:#94a3b8; font-size:0.7rem;">(${result.type})</span>`;
+            let typeLabel = "";
+            if (result.type === 'publisher') typeLabel = _("publisher_type", "publisher");
+            else if (result.type === 'developer') typeLabel = _("developer_type", "developer");
+            else if (result.type === 'game') typeLabel = _("game_type", "game");
+            item.innerHTML = `${result.name} <span style="color:#94a3b8; font-size:0.7rem;">(${typeLabel})</span>`;
             item.onclick = () => {
                 document.getElementById("search-input").value = "";
                 listDiv.style.display = "none";
@@ -1128,7 +1159,7 @@
         
         const hierarchy = buildDendrogramHierarchy(publisherName);
         if (!hierarchy || hierarchy.children.length === 0) {
-            container.html(`<div class="empty-state">No games found for publisher: ${publisherName}</div>`);
+            container.html(`<div class="empty-state">${_("no_games_found", "No games found for publisher:")} ${publisherName}</div>`);
             return;
         }
         
@@ -1222,24 +1253,24 @@
                     let contentText = `<strong>${d.data.name}</strong><br>`;
                     
                     if (d.depth === 1) {
-                        contentText += `Games: ${d.data.gamesCount}<br>Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}`;
+                        contentText += `${_("games_count", "Games")}: ${d.data.gamesCount}<br>${_("total_owners", "Total Owners")}: ${(d.data.totalOwners || 0).toLocaleString()}`;
                     } else if (d.depth === 2) {
-                        contentText += `Game<br>Owners: ${(d.data.value || 0).toLocaleString()}`;
+                        contentText += `${_("game", "Game")}<br>${_("owners", "Owners")}: ${(d.data.value || 0).toLocaleString()}`;
                         if (d.data.rating && d.data.rating > 0) {
-                            contentText += `<br>Rating: <strong>${d.data.rating}%</strong>`;
+                            contentText += `<br>${_("rating", "Rating")}: <strong>${d.data.rating}%</strong>`;
                             if (d.data.rating >= 90) {
-                                contentText += ` (Excellent)`;
+                                contentText += ` (${_("excellent", "Excellent")})`;
                             } else if (d.data.rating >= 80) {
-                                contentText += ` (Very Good)`;
+                                contentText += ` (${_("very_good", "Very Good")})`;
                             } else if (d.data.rating >= 70) {
-                                contentText += ` (Good)`;
+                                contentText += ` (${_("good", "Good")})`;
                             } else if (d.data.rating >= 60) {
-                                contentText += ` (Mixed)`;
+                                contentText += ` (${_("mixed", "Mixed")})`;
                             } else if (d.data.rating > 0) {
-                                contentText += ` (Poor)`;
+                                contentText += ` (${_("poor", "Poor")})`;
                             }
                         } else {
-                            contentText += `<br>Rating: No data`;
+                            contentText += `<br>${_("rating", "Rating")}: ${_("no_data", "No data")}`;
                         }
                     }
                     
@@ -1331,24 +1362,24 @@
                     let contentText = `<strong>${d.data.name}</strong><br>`;
                     
                     if (d.depth === 1) {
-                        contentText += `Games: ${d.data.gamesCount}<br>Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}`;
+                        contentText += `${_("games_count", "Games")}: ${d.data.gamesCount}<br>${_("total_owners", "Total Owners")}: ${(d.data.totalOwners || 0).toLocaleString()}`;
                     } else if (d.depth === 2) {
-                        contentText += `Game<br>Owners: ${(d.data.value || 0).toLocaleString()}`;
+                        contentText += `${_("game", "Game")}<br>${_("owners", "Owners")}: ${(d.data.value || 0).toLocaleString()}`;
                         if (d.data.rating && d.data.rating > 0) {
-                            contentText += `<br>Rating: <strong>${d.data.rating}%</strong>`;
+                            contentText += `<br>${_("rating", "Rating")}: <strong>${d.data.rating}%</strong>`;
                             if (d.data.rating >= 90) {
-                                contentText += ` (Excellent)`;
+                                contentText += ` (${_("excellent", "Excellent")})`;
                             } else if (d.data.rating >= 80) {
-                                contentText += ` (Very Good)`;
+                                contentText += ` (${_("very_good", "Very Good")})`;
                             } else if (d.data.rating >= 70) {
-                                contentText += ` (Good)`;
+                                contentText += ` (${_("good", "Good")})`;
                             } else if (d.data.rating >= 60) {
-                                contentText += ` (Mixed)`;
+                                contentText += ` (${_("mixed", "Mixed")})`;
                             } else if (d.data.rating > 0) {
-                                contentText += ` (Poor)`;
+                                contentText += ` (${_("poor", "Poor")})`;
                             }
                         } else {
-                            contentText += `<br>Rating: No data`;
+                            contentText += `<br>${_("rating", "Rating")}: ${_("no_data", "No data")}`;
                         }
                     }
                     
@@ -1391,7 +1422,7 @@
     
     function drawTreemap(publishersList, title, isLayer2 = false) {
         if (!publishersList || publishersList.length === 0) {
-            d3.select("#treemap-container").html('<div class="empty-state">No publishers to display</div>');
+            d3.select("#treemap-container").html('<div class="empty-state">' + _("no_publishers", "No publishers to display") + '</div>');
             return;
         }
         
@@ -1407,7 +1438,7 @@
             const othersTotalOwners = othersPublishers.reduce((sum, p) => sum + p.totalOwners, 0);
             const othersGamesCount = othersPublishers.reduce((sum, p) => sum + p.gamesCount, 0);
             children.push({
-                name: "Others 3879 publishers",
+                name: `${_("others", "Others")} ${othersPublishers.length} ${_("publishers_lower", "publishers")}`,
                 totalOwners: othersTotalOwners,
                 gamesCount: othersGamesCount,
                 isOthersGroup: true
@@ -1463,7 +1494,7 @@
                 cleanupTooltip();
                 if (d.data.isOthersGroup && !isLayer2 && othersPublishers.length > 0) {
                     currentLayer = 2;
-                    const newTitle = `Layer 2 Remaining Publishers (${othersPublishers.length})`;
+                    const newTitle = `${_("layer2_title", "Layer 2 Remaining Publishers")} (${othersPublishers.length})`;
                     drawTreemap(othersPublishers, newTitle, true);
                     const layerLabel = document.getElementById("layer-label");
                     layerLabel.innerHTML = newTitle;
@@ -1480,21 +1511,18 @@
             .on("mouseover", function(event, d) {
                 const tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
                 if (d.data.isOthersGroup && !isLayer2) {
-                    tooltip.html(`<strong>${d.data.name}</strong><br>Games: ${d.data.gamesCount || 0}<br>Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}<br>Click to explore Layer 2 (${othersPublishers.length} publishers)`);
+                    tooltip.html(`<strong>${d.data.name}</strong><br>${_("games_count", "Games")}: ${d.data.gamesCount || 0}<br>${_("total_owners", "Total Owners")}: ${(d.data.totalOwners || 0).toLocaleString()}<br>${_("click_to_expand", "Click to explore")} ${_("layer2", "Layer 2")} (${othersPublishers.length} ${_("publishers_lower", "publishers")})`);
                 } else {
                     let normalized = maxPublisherRichness > 0 ? (d.data.richness || 1) / maxPublisherRichness : 0;
                     normalized = Math.min(1, Math.max(0.15, normalized));
                     const colorIntensity = Math.floor(normalized * 100);
-                    tooltip.html(`<strong>${d.data.name}</strong><br>Games: ${d.data.gamesCount || 0}<br>Developers: ${d.data.developersCount || 0}<br>Total Owners: ${(d.data.totalOwners || 0).toLocaleString()}<br>Orange intensity: ${colorIntensity}%<br>Click to explore game hierarchy`);
+                    tooltip.html(`<strong>${d.data.name}</strong><br>${_("games_count", "Games")}: ${d.data.gamesCount || 0}<br>${_("developers_count", "Developers")}: ${d.data.developersCount || 0}<br>${_("total_owners", "Total Owners")}: ${(d.data.totalOwners || 0).toLocaleString()}<br>${_("orange_intensity", "Orange intensity")}: ${colorIntensity}%<br>${_("click_to_explore", "Click to explore game hierarchy")}`);
                 }
                 
-                // Position tooltip below the cursor
                 const tooltipNode = tooltip.node();
                 tooltip.style("opacity", 1)
                     .style("left", (event.pageX - tooltipNode.offsetWidth / 2) + "px")
-                    .style("top", (event.pageY + 20) + "px")
-                    .style("bottom", "auto")
-                    .style("right", "auto");
+                    .style("top", (event.pageY + 20) + "px");
                 activeTooltip = tooltip;
             })
             .on("mouseout", () => cleanupTooltip());
@@ -1533,7 +1561,7 @@
                         .attr("font-weight", "400")
                         .attr("fill", "#000000")
                         .classed("treemap-text", true)
-                        .text(`${d.data.gamesCount} games | ${d.data.developersCount || 0} devs`);
+                        .text(`${d.data.gamesCount} ${_("games_lower", "games")} | ${d.data.developersCount || 0} ${_("devs_lower", "devs")}`);
                 }
             } else if (rectW > 35 && rectH > 25) {
                 group.append("text")
@@ -1562,7 +1590,7 @@
                     .attr("font-size", 8)
                     .attr("font-weight", "400")
                     .attr("fill", "#000000")
-                    .text("click to expand");
+                    .text(_("click_to_expand", "click to expand"));
             }
         });
         
@@ -1579,9 +1607,11 @@
         top40Publishers = allPublishers.slice(0, 40);
         othersPublishers = allPublishers.slice(40);
         if (currentLayer === 1) {
-            drawTreemap(top40Publishers, `Layer 1 Top 40 Publishers`, false);
+            const title = `${_("layer1", "Layer 1 Top 40")} ${_("publishers_lower", "publishers")}`;
+            drawTreemap(top40Publishers, title, false);
         } else if (currentLayer === 2 && othersPublishers.length > 0) {
-            drawTreemap(othersPublishers, `Layer 2 Remaining Publishers (${othersPublishers.length})`, true);
+            const title = `${_("layer2", "Layer 2 Remaining")} ${_("publishers_lower", "publishers")} (${othersPublishers.length})`;
+            drawTreemap(othersPublishers, title, true);
         }
     }
     
@@ -1589,7 +1619,7 @@
         cleanupTooltip();
         const parsed = parseCSVToObjects(csvString);
         if (parsed.length === 0) {
-            alert("Invalid CSV. Required columns: estimated_owners, rating, game_name, developer, publisher");
+            alert(_("invalid_csv", "Invalid CSV. Required columns: estimated_owners, rating, game_name, developer, publisher"));
             return;
         }
         rawGameData = parsed;
@@ -1613,7 +1643,7 @@
             .then(csvText => {
                 const parsed = parseCSVToObjects(csvText);
                 if (parsed.length === 0) {
-                    document.getElementById("file-name-display").innerText = "Auto-load failed";
+                    document.getElementById("file-name-display").innerText = _("auto_load_failed", "Auto-load failed");
                     return;
                 }
                 rawGameData = parsed;
@@ -1622,11 +1652,11 @@
                 updateSearchTags();
                 currentLayer = 1;
                 renderTreemap();
-                document.getElementById("file-name-display").innerText = "data/4_treemap.csv (auto-loaded)";
+                document.getElementById("file-name-display").innerText = "4_treemap.csv (" + _("auto_loaded", "auto-loaded") + ")";
             })
             .catch(error => {
                 console.error('Error loading CSV:', error);
-                document.getElementById("file-name-display").innerHTML = `<span style="color: #ff9f4a;">Could not auto-load data/4_treemap.csv</span>`;
+                document.getElementById("file-name-display").innerHTML = `<span style="color: #ff9f4a;">${_("could_not_load", "Could not auto-load")} 4_treemap.csv</span>`;
             });
     }
 
@@ -1717,15 +1747,53 @@
         });
     }
     
-    window.removeSearchItem = removeSearchItem;
-    window.clearAllSearchItems = clearAllSearchItems;
-    
-    document.addEventListener("DOMContentLoaded", () => {
+    // Initialize language and main page button
+    document.addEventListener('DOMContentLoaded', () => {
+        // Setup language switcher
+        if (typeof window.setupLanguageSwitcher === 'function') {
+            window.setupLanguageSwitcher();
+        } else {
+            const langButtons = document.querySelectorAll('.lang-btn[data-lang]');
+            langButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    if (typeof window.setLanguage === 'function') {
+                        window.setLanguage(lang);
+                    } else {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('lang', lang);
+                        window.location.href = url.toString();
+                    }
+                });
+            });
+        }
+        
+        // Add click handler for the Main Page button
+        const mainPageBtn = document.getElementById('mainPageBtn');
+        if (mainPageBtn) {
+            mainPageBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'https://volkazah.github.io/Interactive-Media-Project-About-Steam-Data/';
+            });
+        }
+        
         setupFileUpload();
         setupNavigation();
         setupSearch();
         autoLoadCSV();
     });
+    
+    // Listen for language changes to update dynamic content
+    window.addEventListener('languageChanged', function() {
+        if (currentView === "treemap" && rawGameData.length) {
+            renderTreemap();
+        } else if (currentView === "dendrogram" && selectedPublisher) {
+            drawCircularDendrogram(selectedPublisher, currentScale);
+        }
+    });
+    
+    window.removeSearchItem = removeSearchItem;
+    window.clearAllSearchItems = clearAllSearchItems;
 </script>
 </body>
 </html>
