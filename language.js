@@ -39,6 +39,7 @@ const translations = {
         "scale_ascending": "Ascending",
         "scale_descending": "Descending",
         "footer_text": "Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.",
+        "footer": "Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.",
         "recent_reviews": "recent reviews",
         "total_reviews": "Total reviews",
         "main_page": "🏠 Main Page",
@@ -323,6 +324,7 @@ const translations = {
         "of_all_time": "за все время",
         "any_year": "ЛЮБОЙ",
         "single_multi": "Одиночная и Мульти",
+        "footer": "Название Steam и логотип Steam являются товарными знаками и/или зарегистрированными товарными знаками компании Valve Corporation. Все прочие товарные знаки принадлежат их соответствующим владельцам.",
         
         // Dial ring labels
         "dial_metric": "Метрика",
