@@ -10,16 +10,18 @@ const translations = {
         "games_loaded": "games loaded",
         
         // ===== 1ARC_GRAPH.HTML specific =====
-        "arc_title": "Gamers do change their opinion about videogames",
-        "arc_subtitle": "and often not in a better way",
+        "arc_title": "Gamers do change their opinion about videogames and often not in a better way",
         "arc_description": "distribution change in gamer's reviews across 3139 top reviewed games in April 2026",
+        "search_placeholder": "Search game...",
         "filter_both": "Both",
         "filter_ascending": "Ascending ↑",
         "filter_descending": "Descending ↓",
         "reset_positions": "Reset Positions",
-        "clear_all": "🗑 Clear All",
-        "compare_games": "Compare up to 5 Games",
-        "drag_instruction": "💡 Drag spheres • Hover for details",
+        "clear_all": "Clear All",
+        "compare_games": "Highlighted Games",
+        "drag_instruction": "Drag spheres • Hover for details",
+        "games_loaded": "games loaded",
+        "remove": "Remove",
         
         // ===== 2CCU_GRAPH.HTML specific =====
         "ccu_title": "Only a few games are successful at player retention",
@@ -148,16 +150,18 @@ const translations = {
         "games_loaded": "игр загружено",
         
         // ===== 1ARC_GRAPH.HTML specific =====
-        "arc_title": "Геймеры меняют свое мнение о видеоиграх",
-        "arc_subtitle": "и часто не в лучшую сторону",
-        "arc_description": "Распределение пользовательских отзывов среди 3139 ниаболее популярных игр в апреле 2026",
-        "filter_both": "Оба варианта",
+        "arc_title": "Геймеры меняют свое мнение о видеоиграх и часто не в лучшую сторону",
+        "arc_description": "изменение распределения отзывов геймеров среди 3139 лучших игр апреля 2026",
+        "search_placeholder": "Поиск игры...",
+        "filter_both": "Оба",
         "filter_ascending": "Возрастание ↑",
         "filter_descending": "Убывание ↓",
-        "reset_positions": "Сброс по умолчанию",
-        "clear_all": "Очистить выделения",
-        "compare_games": "Сравнение до 5 видеоигр",
-        "drag_instruction": "Сферы можно свободно перемещать, для доп информации наведитесь на элементы",
+        "reset_positions": "Сбросить позиции",
+        "clear_all": "Очистить всё",
+        "compare_games": "Выделенные игры",
+        "drag_instruction": "Перетаскивайте сферы • Наведите для деталей",
+        "games_loaded": "игр загружено",
+        "remove": "Удалить",
         
         // ===== 2CCU_GRAPH.HTML specific =====
         "ccu_title": "Единицы видеогр успешно удержают игроков",
@@ -273,20 +277,11 @@ const translations = {
 // Language management
 let currentLanguage = 'en';
 
-function setLanguage(lang) {
-    if (translations[lang]) {
-        currentLanguage = lang;
-        localStorage.setItem('preferred_language', lang);
-        applyTranslationsToPage();
-        updateActiveLanguageButton(lang);
-    }
-}
-
 function t(key) {
     return translations[currentLanguage][key] || key;
 }
 
-function applyTranslationsToPage() {
+function applyTranslations() {
     // Translate all elements with data-i18n attribute
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
@@ -303,41 +298,98 @@ function applyTranslationsToPage() {
         }
     });
     
-    // Trigger page-specific update if needed
-    if (typeof updateDynamicTranslations === 'function') {
-        updateDynamicTranslations();
+    // Update the page title
+    const titleElement = document.querySelector('title');
+    if (titleElement) {
+        const currentTitle = titleElement.textContent;
+        // Don't translate title if it's not in translations
+    }
+    
+    console.log('Translations applied for language:', currentLanguage);
+}
+
+function setLanguage(lang) {
+    if (translations[lang]) {
+        currentLanguage = lang;
+        localStorage.setItem('preferred_language', lang);
+        applyTranslations();
+        
+        // Update active button state
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            if (btn.getAttribute('data-lang') === lang) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        // Dispatch custom event for any page-specific updates
+        window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
     }
 }
 
-function updateActiveLanguageButton(lang) {
+function initLanguage() {
+    // Check URL parameter first
+    const urlParams = new URLSearchParams(window.location.search);
+    let lang = urlParams.get('lang');
+    
+    // Then check localStorage
+    if (!lang) {
+        lang = localStorage.getItem('preferred_language');
+    }
+    
+    // Default to English
+    if (!lang || !translations[lang]) {
+        lang = 'en';
+    }
+    
+    currentLanguage = lang;
+    applyTranslations();
+    
+    // Update URL without reloading
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('lang') !== lang) {
+        url.searchParams.set('lang', lang);
+        window.history.pushState({}, '', url);
+    }
+    
+    // Update active buttons
     document.querySelectorAll('.lang-btn').forEach(btn => {
-        if (btn.dataset.lang === lang) {
+        if (btn.getAttribute('data-lang') === lang) {
             btn.classList.add('active');
         } else {
             btn.classList.remove('active');
         }
     });
+    
+    console.log('Language initialized to:', lang);
 }
 
-function initLanguage() {
-    // Check localStorage and URL parameter
-    const savedLang = localStorage.getItem('preferred_language');
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlLang = urlParams.get('lang');
-    
-    const lang = urlLang || savedLang || 'en';
-    
-    if (translations[lang]) {
-        currentLanguage = lang;
-        applyTranslationsToPage();
-        updateActiveLanguageButton(lang);
-    }
-    
-    // Set up language switcher buttons
+// Setup language switcher buttons
+function setupLanguageSwitcher() {
     document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const lang = this.getAttribute('data-lang');
+            if (lang && translations[lang]) {
+                // Update URL parameter
+                const url = new URL(window.location.href);
+                url.searchParams.set('lang', lang);
+                window.history.pushState({}, '', url);
+                // Apply translation without reload
+                setLanguage(lang);
+            }
+        });
     });
 }
 
-// Auto-initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', initLanguage);
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initLanguage();
+        setupLanguageSwitcher();
+    });
+} else {
+    initLanguage();
+    setupLanguageSwitcher();
+}
