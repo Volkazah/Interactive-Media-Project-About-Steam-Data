@@ -70,7 +70,7 @@ const translations = {
         "ascending": "Ascending (smallest first)",
         "zoom": "Zoom",
         "game_rating": "Game Rating",
-        "low_to_high": "Low → High"
+        "low_to_high": "Low → High",
 
         // ===== 5spiral.HTML specific =====
         "spiral_title": "How prices for videogames on Steam changed for the last 30 years",
