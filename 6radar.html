@@ -72,6 +72,11 @@
             font-size: 1rem;
         }
 
+        /* Fix for right middle label overlap in Russian mode */
+        :lang(ru) .radar-label-right {
+            transform: translateX(4px);
+        }
+
         .dashboard {
             max-width: 1600px;
             width: 100%;
@@ -473,7 +478,6 @@
 
         button, .upload-label {
             font-family: 'Source Sans Pro', monospace;
-            display: none;
         }
 
         @media (max-width: 900px) {
@@ -573,7 +577,7 @@
     const MIN_RADARS = 2;
     
     // Map metrics to user-friendly display names with translation support
-    const METRIC_DISPLAY = {
+    let METRIC_DISPLAY = {
         "recommendations_count": [_("radar_metric_recommendations", "recommendations"), _("radar_count", "count")],
         "reviews": [_("radar_metric_reviews", "reviews")],
         "rating%": [_("radar_metric_rating", "rating %")],
@@ -755,6 +759,17 @@
                     const info = valuesForTooltip[idx];
                     let rawVal = info.raw;
                     let displayValue = rawVal;
+                    let metricDisplay = info.metric.replace("_", " ");
+                    
+                    // Translate metric name in tooltip
+                    if (info.metric === "recommendations_count") metricDisplay = _("radar_metric_recommendations", "recommendations");
+                    else if (info.metric === "reviews") metricDisplay = _("radar_metric_reviews", "reviews");
+                    else if (info.metric === "rating%") metricDisplay = _("radar_metric_rating", "rating %");
+                    else if (info.metric === "median_playtime_minutes") metricDisplay = _("radar_metric_playtime", "playtime (min)");
+                    else if (info.metric === "peak_players") metricDisplay = _("radar_metric_peak", "peak players");
+                    else if (info.metric === "achievements_count") metricDisplay = _("radar_metric_achievements", "achievements");
+                    else if (info.metric === "follows") metricDisplay = _("radar_metric_follows", "follows");
+                    
                     if (typeof rawVal === 'number') {
                         if (info.metric === "rating%") displayValue = rawVal.toFixed(1) + "%";
                         else if (info.metric === "median_playtime_minutes") displayValue = Math.round(rawVal) + " min";
@@ -772,7 +787,7 @@
                     const maxText = _("radar_max", "Max (100%)");
                     const proportionText = _("radar_proportion", "Proportion");
                     globalTooltip.style("opacity", 1)
-                        .html(`<strong>${info.metric.replace("_"," ")}</strong><br/>${valueText}: ${displayValue}<br/>${maxText}: ${maxDisplay}<br/><span style="font-size:15px;">${proportionText}: ${(info.norm*100).toFixed(1)}%</span>`)
+                        .html(`<strong>${metricDisplay}</strong><br/>${valueText}: ${displayValue}<br/>${maxText}: ${maxDisplay}<br/><span style="font-size:15px;">${proportionText}: ${(info.norm*100).toFixed(1)}%</span>`)
                         .style("left", (event.pageX + 12) + "px")
                         .style("top", (event.pageY - 28) + "px");
                 })
@@ -781,12 +796,13 @@
                 });
         });
         
-        // Draw labels with original formatting
+        // Draw labels with original formatting and position fixes for Russian
         filteredMetrics.forEach((metric, i) => {
             const angle = angleSlice * i - Math.PI/2;
             let labelRadius = radius + 40;
             const isLongMetric = metric.includes("recommendations") || metric.includes("achievements");
             const isTopPosition = Math.abs(angle + Math.PI/2) < 0.6;
+            const isRightPosition = Math.abs(angle) < 0.3 || Math.abs(angle) > 6.0;
 
             if (isTopPosition) {
                 labelRadius = radius + 25;
@@ -805,6 +821,11 @@
                 .attr("transform", `translate(${labelX}, ${labelY})`)
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "middle");
+            
+            // Add special class for right position labels in Russian mode
+            if (isRightPosition) {
+                labelGroup.attr("class", "radar-label-right");
+            }
             
             const lineHeight = 16;
             const totalHeight = displayParts.length * lineHeight;
@@ -1273,6 +1294,11 @@
                 e.preventDefault();
                 window.location.href = 'https://volkazah.github.io/Interactive-Media-Project-About-Steam-Data/';
             });
+        }
+        
+        // Initial render
+        if (fullDataset.length) {
+            refreshAllRadars();
         }
     });
     
