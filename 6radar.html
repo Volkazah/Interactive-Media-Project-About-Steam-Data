@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Game Performance Radar Tool</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Language support -->
+    <script src="language.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -19,6 +21,55 @@
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        /* Language Selector Styles */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            background: rgba(239, 223, 192, 0.1);
+            border: 1px solid rgba(239, 223, 192, 0.3);
+            color: #EFDFC0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Source Sans Pro', monospace;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(239, 223, 192, 0.2);
+        }
+
+        .lang-btn.active {
+            background: #EFDFC0;
+            color: #1B1B1B;
+            border-color: #EFDFC0;
+        }
+
+        /* Russian language specific styles */
+        :lang(ru) .metrics-title {
+            font-size: 14px;
+        }
+
+        :lang(ru) .dial-label {
+            font-size: 13px;
+        }
+
+        :lang(ru) .game-search {
+            font-size: 14px;
+        }
+
+        :lang(ru) .remove-btn {
+            font-size: 1rem;
         }
 
         .dashboard {
@@ -77,7 +128,7 @@
             gap: 12px;
             border: 1px solid #D98D00;
             transition: 0.2s;
-            display:none;
+            display: none;
         }
 
         .upload-area label {
@@ -89,12 +140,12 @@
             font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.2s;
-            display:none;
+            display: none;
         }
 
         .upload-area label:hover {
             background: #c47d00;
-            display:none;
+            display: none;
         }
 
         #csv-file-input {
@@ -422,7 +473,7 @@
 
         button, .upload-label {
             font-family: 'Source Sans Pro', monospace;
-            display:none;
+            display: none;
         }
 
         @media (max-width: 900px) {
@@ -465,25 +516,32 @@
 </head>
 <body>
 <div class="dashboard">
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <button id="mainPageBtn" class="lang-btn" data-i18n="main_page">🏠 Main Page</button>
+        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
+        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+    </div>
+
     <div class="header">
-        <h1>Game Performance Radar Tool</h1>
-        <p>Compare up to 5 games · Interactive radar charts with semi-transparent overlays</p>
+        <h1 data-i18n="radar_title">Game Performance Radar Tool</h1>
+        <p data-i18n="radar_subtitle">Compare up to 5 games · Interactive radar charts with semi-transparent overlays</p>
     </div>
 
     <div class="controls">
         <div class="upload-area">
-            <label for="csv-file-input">📂 Upload CSV</label>
+            <label for="csv-file-input" data-i18n="radar_upload_csv">📂 Upload CSV</label>
             <input type="file" id="csv-file-input" accept=".csv">
-            <span id="file-name-display" class="file-name">No file</span>
+            <span id="file-name-display" class="file-name" data-i18n="radar_no_file">No file</span>
         </div>
         
         <div class="stats-badge">
-            🎮 <span id="game-count">0</span> games loaded
+            🎮 <span id="game-count">0</span> <span data-i18n="radar_games_loaded">games loaded</span>
         </div>
 
         <div class="metrics-group">
-            <div class="metrics-title">Active metrics</div>
-            <div class="metrics-count" id="metricsCount">(7/7 selected)</div>
+            <div class="metrics-title" data-i18n="radar_active_metrics">Active metrics</div>
+            <div class="metrics-count" id="metricsCount">(7/7 <span data-i18n="radar_selected">selected</span>)</div>
             <div id="scaleTogglesContainer" class="metrics-dials"></div>
         </div>
     </div>
@@ -492,12 +550,21 @@
         <div id="radarGrid" class="radar-grid"></div>
     </div>
 
-    <footer>
+    <footer data-i18n="footer_credit">
         Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.
     </footer>
 </div>
 
 <script>
+    // Helper function to get translated text - using window.translate
+    function _(key, fallback) {
+        if (typeof window !== 'undefined' && window.translate) {
+            const translated = window.translate(key);
+            if (translated && translated !== key) return translated;
+        }
+        return fallback || key;
+    }
+
     // ----- CONSTANTS -----
     const ALL_METRICS = ["recommendations_count", "reviews", "rating%", "median_playtime_minutes", "peak_players", "achievements_count", "follows"];
     const DEFAULT_GAMES = ["Lethal Company", "R.E.P.O.", "KLETKA", "Content Warning", "PEAK"];
@@ -505,15 +572,15 @@
     const MAX_RADARS = 5;
     const MIN_RADARS = 2;
     
-    // Map metrics to user-friendly display names
+    // Map metrics to user-friendly display names with translation support
     const METRIC_DISPLAY = {
-        "recommendations_count": ["recommendations", "count"],
-        "reviews": ["reviews"],
-        "rating%": ["rating", "%"],
-        "median_playtime_minutes": ["playtime", "(min)"],
-        "peak_players": ["peak", "players"],
-        "achievements_count": ["achievements", "count"],
-        "follows": ["follows"]
+        "recommendations_count": [_("radar_metric_recommendations", "recommendations"), _("radar_count", "count")],
+        "reviews": [_("radar_metric_reviews", "reviews")],
+        "rating%": [_("radar_metric_rating", "rating %")],
+        "median_playtime_minutes": [_("radar_metric_playtime", "playtime (min)")],
+        "peak_players": [_("radar_metric_peak", "peak players")],
+        "achievements_count": [_("radar_metric_achievements", "achievements"), _("radar_count", "count")],
+        "follows": [_("radar_metric_follows", "follows")]
     };
     
     // ----- GLOBAL STATE -----
@@ -557,8 +624,9 @@
         
         const filteredMetrics = activeMetrics.filter(m => mainGameObj && mainGameObj[m] !== undefined);
         if (!mainGameObj || filteredMetrics.length < 3) {
+            const needMetricsText = _("radar_need_metrics", "⚠️ Need at least 3 metrics selected<br/>Enable more metrics above.");
             container.append("div").style("text-align","center").style("padding","2rem").style("color","#EFDFC0")
-                .html(`⚠️ Need at least 3 metrics selected<br/>Enable more metrics above.`);
+                .html(needMetricsText);
             return;
         }
         
@@ -700,8 +768,11 @@
                         else if (info.metric === "price$") maxDisplay = "$" + maxDisplay.toFixed(2);
                         else maxDisplay = maxDisplay.toLocaleString();
                     }
+                    const valueText = _("radar_value", "Value");
+                    const maxText = _("radar_max", "Max (100%)");
+                    const proportionText = _("radar_proportion", "Proportion");
                     globalTooltip.style("opacity", 1)
-                        .html(`<strong>${info.metric.replace("_"," ")}</strong><br/>Value: ${displayValue}<br/>Max (100%): ${maxDisplay}<br/><span style="font-size:15px;">Proportion: ${(info.norm*100).toFixed(1)}%</span>`)
+                        .html(`<strong>${info.metric.replace("_"," ")}</strong><br/>${valueText}: ${displayValue}<br/>${maxText}: ${maxDisplay}<br/><span style="font-size:15px;">${proportionText}: ${(info.norm*100).toFixed(1)}%</span>`)
                         .style("left", (event.pageX + 12) + "px")
                         .style("top", (event.pageY - 28) + "px");
                 })
@@ -735,11 +806,9 @@
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "middle");
             
-            // Add semi-transparent background for better readability
             const lineHeight = 16;
             const totalHeight = displayParts.length * lineHeight;
             const startY = -totalHeight / 2 + lineHeight / 2;
-            
             
             displayParts.forEach((line, lineIdx) => {
                 labelGroup.append("text")
@@ -760,6 +829,19 @@
     
     function refreshAllRadars() {
         const gridDiv = d3.select("#radarGrid");
+        
+        // If no data, show empty state
+        if (!fullDataset.length) {
+            gridDiv.html(`
+                <div class="empty-state">
+                    <div style="font-size:48px; margin-bottom:16px;">📊</div>
+                    <div data-i18n="radar_no_data">No data loaded</div>
+                    <div style="font-size:14px; margin-top:8px;" data-i18n="radar_upload_prompt">Upload a CSV file or wait for auto-load</div>
+                    <button onclick="document.getElementById('csv-file-input').click()" data-i18n="radar_upload_csv_btn">Upload CSV</button>
+                </div>
+            `);
+            return;
+        }
         
         // Ensure minimum 2 active radars
         let activeCount = activeRadarIndices.filter(v => v === true).length;
@@ -796,7 +878,8 @@
                     .attr("class", "add-button-large")
                     .on("click", () => {
                         if (activeRadarIndices.filter(v => v === true).length >= MAX_RADARS) {
-                            alert(`Maximum ${MAX_RADARS} radars allowed`);
+                            const maxWarnText = _("radar_max_radars_warning", `Maximum ${MAX_RADARS} radars allowed`).replace('{max}', MAX_RADARS);
+                            alert(maxWarnText);
                             return;
                         }
                         activeRadarIndices[slot] = true;
@@ -832,10 +915,11 @@
             const headerDiv = cardDiv.append("div").attr("class", "radar-header");
             
             const searchWrapper = headerDiv.append("div").attr("class", "game-search-wrapper");
+            const searchPlaceholder = _("radar_search_placeholder", "Search game...");
             const searchInput = searchWrapper.append("input")
                 .attr("type", "text")
                 .attr("class", "game-search")
-                .attr("placeholder", "Search game...")
+                .attr("placeholder", searchPlaceholder)
                 .attr("autocomplete", "off")
                 .property("value", radarGames[slot].game_name);
             
@@ -845,7 +929,8 @@
             removeBtn.on("click", () => {
                 const activeCountAfter = activeRadarIndices.filter(v => v === true).length;
                 if (activeCountAfter <= MIN_RADARS) {
-                    alert(`Cannot remove: minimum ${MIN_RADARS} radars required`);
+                    const minWarnText = _("radar_min_radars_warning", `Cannot remove: minimum ${MIN_RADARS} radars required`).replace('{min}', MIN_RADARS);
+                    alert(minWarnText);
                     return;
                 }
                 activeRadarIndices[slot] = false;
@@ -952,7 +1037,8 @@
                 const firstRow = parsed[0];
                 const missing = requiredCols.filter(col => !(col in firstRow));
                 if (missing.length) {
-                    alert(`CSV missing required columns: ${missing.join(", ")}`);
+                    const missingText = _("radar_csv_missing_columns", "CSV missing required columns: {columns}").replace('{columns}', missing.join(", "));
+                    alert(missingText);
                     return;
                 }
                 
@@ -970,7 +1056,8 @@
                 }).filter(d => d.game_name && d.game_name !== "");
                 
                 if (!fullDataset.length) {
-                    alert("No valid game entries found.");
+                    const noGamesText = _("radar_no_valid_games", "No valid game entries found.");
+                    alert(noGamesText);
                     return;
                 }
                 
@@ -994,10 +1081,14 @@
                 refreshAllRadars();
             } catch(err) {
                 console.error(err);
-                alert("Error parsing CSV: " + err.message);
+                const errorText = _("radar_error_parsing", "Error parsing CSV: {error}").replace('{error}', err.message);
+                alert(errorText);
             }
         };
-        reader.onerror = () => alert("Failed to read file.");
+        reader.onerror = () => {
+            const failedText = _("radar_failed_read", "Failed to read file.");
+            alert(failedText);
+        };
         reader.readAsText(file);
     }
     
@@ -1007,7 +1098,13 @@
         
         ALL_METRICS.forEach(metric => {
             const isActive = activeMetrics.includes(metric);
-            const displayName = metric.replace("_", " ").replace("rating%", "rating %");
+            let displayName = metric.replace("_", " ").replace("rating%", _("radar_metric_rating", "rating %"));
+            if (metric === "recommendations_count") displayName = _("radar_metric_recommendations", "recommendations");
+            else if (metric === "reviews") displayName = _("radar_metric_reviews", "reviews");
+            else if (metric === "median_playtime_minutes") displayName = _("radar_metric_playtime", "playtime (min)");
+            else if (metric === "peak_players") displayName = _("radar_metric_peak", "peak players");
+            else if (metric === "achievements_count") displayName = _("radar_metric_achievements", "achievements");
+            else if (metric === "follows") displayName = _("radar_metric_follows", "follows");
             
             const dial = container.append("div")
                 .attr("class", `metric-dial ${isActive ? 'active' : ''}`)
@@ -1023,12 +1120,14 @@
                 const currentlyActive = activeMetrics.includes(metric);
                 
                 if (!currentlyActive && activeMetrics.length >= 7) {
-                    alert("Maximum 7 metrics allowed");
+                    const maxMetricText = _("radar_max_metrics_warning", "Maximum 7 metrics allowed");
+                    alert(maxMetricText);
                     return;
                 }
                 
                 if (currentlyActive && activeMetrics.length <= 3) {
-                    alert("Minimum 3 metrics required for radar charts");
+                    const minMetricText = _("radar_min_metrics_warning", "Minimum 3 metrics required for radar charts");
+                    alert(minMetricText);
                     return;
                 }
                 
@@ -1041,14 +1140,16 @@
                 }
                 
                 const countSpan = document.getElementById("metricsCount");
-                if (countSpan) countSpan.innerHTML = `(${activeMetrics.length}/7 selected)`;
+                const selectedText = _("radar_selected", "selected");
+                if (countSpan) countSpan.innerHTML = `(${activeMetrics.length}/7 ${selectedText})`;
                 
                 if (fullDataset.length) refreshAllRadars();
             });
         });
         
         const countSpan = document.getElementById("metricsCount");
-        if (countSpan) countSpan.innerHTML = `(${activeMetrics.length}/7 selected)`;
+        const selectedText = _("radar_selected", "selected");
+        if (countSpan) countSpan.innerHTML = `(${activeMetrics.length}/7 ${selectedText})`;
     }
     
     function bindEvents() {
@@ -1066,20 +1167,7 @@
         });
     }
     
-    function init() {
-        buildScaleToggles();
-        bindEvents();
-        fullDataset = [];
-        activeRadarIndices = [true, true, true, true, true];
-        radarGames = [null, null, null, null, null];
-        refreshAllRadars();
-        updateGameCount();
-        updateFileName("No file");
-    }
-    
-    init();
-      function autoLoadCSV() {
-        // Full URL to the CSV file
+    function autoLoadCSV() {
         const csvPath = 'https://volkazah.github.io/Interactive-Media-Project-About-Steam-Data/6_radar.csv';
         
         console.log('Auto-loading CSV from:', csvPath);
@@ -1127,7 +1215,7 @@
                 }
                 
                 updateGameCount();
-                updateFileName("6_radar.csv (auto-loaded)");
+                updateFileName(_("radar_auto_loaded", "6_radar.csv (auto-loaded)"));
                 
                 activeRadarIndices = [true, true, true, true, true];
                 radarGames = [null, null, null, null, null];
@@ -1149,23 +1237,76 @@
                 if (radarGrid) {
                     radarGrid.innerHTML = `<div class="empty-state">
                         <div style="font-size:48px; margin-bottom:16px;">📁</div>
-                        <div>Could not auto-load 6_radar.csv</div>
-                        <div style="font-size:14px; margin-top:8px;">Please use the Upload button below</div>
-                        <button onclick="document.getElementById('csv-file-input').click()" style="margin-top:16px; background:#D98D00; color:#1B1B1B; border:none; padding:8px 24px; border-radius:40px; cursor:pointer;">📂 Upload CSV</button>
+                        <div>${_("radar_auto_load_error", "Could not auto-load 6_radar.csv")}</div>
+                        <div style="font-size:14px; margin-top:8px;">${_("radar_manual_upload_prompt", "Please use the Upload button below")}</div>
+                        <button onclick="document.getElementById('csv-file-input').click()" style="margin-top:16px; background:#D98D00; color:#1B1B1B; border:none; padding:8px 24px; border-radius:40px; cursor:pointer;">📂 ${_("radar_upload_csv_btn", "Upload CSV")}</button>
                     </div>`;
                 }
             });
     }
     
-    // ✅ CRITICAL: Initialize the container FIRST
-    // Make sure refreshAllRadars can show empty state
-    refreshAllRadars();
+    // Initialize language and main page button
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup language switcher
+        if (typeof window.setupLanguageSwitcher === 'function') {
+            window.setupLanguageSwitcher();
+        } else {
+            const langButtons = document.querySelectorAll('.lang-btn[data-lang]');
+            langButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    if (typeof window.setLanguage === 'function') {
+                        window.setLanguage(lang);
+                    } else {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('lang', lang);
+                        window.location.href = url.toString();
+                    }
+                });
+            });
+        }
+        
+        // Add click handler for the Main Page button
+        const mainPageBtn = document.getElementById('mainPageBtn');
+        if (mainPageBtn) {
+            mainPageBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'https://volkazah.github.io/Interactive-Media-Project-About-Steam-Data/';
+            });
+        }
+    });
     
-    // ✅ THEN auto-load data
+    // Listen for language changes to update dynamic content
+    window.addEventListener('languageChanged', function() {
+        // Update METRIC_DISPLAY with new translations
+        METRIC_DISPLAY["recommendations_count"] = [_("radar_metric_recommendations", "recommendations"), _("radar_count", "count")];
+        METRIC_DISPLAY["reviews"] = [_("radar_metric_reviews", "reviews")];
+        METRIC_DISPLAY["rating%"] = [_("radar_metric_rating", "rating %")];
+        METRIC_DISPLAY["median_playtime_minutes"] = [_("radar_metric_playtime", "playtime (min)")];
+        METRIC_DISPLAY["peak_players"] = [_("radar_metric_peak", "peak players")];
+        METRIC_DISPLAY["achievements_count"] = [_("radar_metric_achievements", "achievements"), _("radar_count", "count")];
+        METRIC_DISPLAY["follows"] = [_("radar_metric_follows", "follows")];
+        
+        // Rebuild scale toggles and refresh radars
+        buildScaleToggles();
+        if (fullDataset.length) {
+            refreshAllRadars();
+        }
+    });
+    
+    function init() {
+        buildScaleToggles();
+        bindEvents();
+        fullDataset = [];
+        activeRadarIndices = [true, true, true, true, true];
+        radarGames = [null, null, null, null, null];
+        refreshAllRadars();
+        updateGameCount();
+        updateFileName(_("radar_no_file", "No file"));
+    }
+    
+    init();
     autoLoadCSV();
-    
-    // Bind upload button events
-    bindEvents();
 </script>
 </body>
 </html>
