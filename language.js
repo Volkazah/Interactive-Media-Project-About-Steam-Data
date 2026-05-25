@@ -284,7 +284,44 @@ const translations = {
         "spiral_under_40": "<30-40$",
         "spiral_over_40": ">40$",
         "genre_any": "Any",
-        "footer_credit": "Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners."
+        "footer_credit": "Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.",
+        
+        // ===== 6RADAR_GRAPH.HTML =====
+        "radar_title": "Game Performance Radar Tool",
+        "radar_subtitle": "Compare up to 5 games · Interactive radar charts with semi-transparent overlays",
+        "radar_active_metrics": "Active metrics",
+        "radar_selected": "selected",
+        "radar_games_loaded": "games loaded",
+        "radar_no_file": "No file",
+        "radar_auto_loaded": "6_radar.csv (auto-loaded)",
+        "radar_auto_load_error": "Could not auto-load 6_radar.csv",
+        "radar_manual_upload_prompt": "Please use the Upload button below",
+        "radar_upload_csv_btn": "Upload CSV",
+        "radar_no_data": "No data loaded",
+        "radar_upload_prompt": "Upload a CSV file or wait for auto-load",
+        "radar_search_placeholder": "Search game...",
+        "radar_need_metrics": "Need at least 3 metrics selected<br/>Enable more metrics above.",
+        "radar_max_radars_warning": "Maximum {max} radars allowed",
+        "radar_min_radars_warning": "Cannot remove: minimum {min} radars required",
+        "radar_max_metrics_warning": "Maximum 7 metrics allowed",
+        "radar_min_metrics_warning": "Minimum 3 metrics required for radar charts",
+        "radar_csv_missing_columns": "CSV missing required columns: {columns}",
+        "radar_no_valid_games": "No valid game entries found.",
+        "radar_error_parsing": "Error parsing CSV: {error}",
+        "radar_failed_read": "Failed to read file.",
+        "radar_value": "Value",
+        "radar_max": "Max (100%)",
+        "radar_proportion": "Proportion",
+        "radar_count": "count",
+        
+        // Radar metric labels
+        "radar_metric_recommendations": "recommendations",
+        "radar_metric_reviews": "reviews",
+        "radar_metric_rating": "rating %",
+        "radar_metric_playtime": "playtime (min)",
+        "radar_metric_peak": "peak players",
+        "radar_metric_achievements": "achievements",
+        "radar_metric_follows": "follows"
     },
     ru: {
         // ===== 1ARC_GRAPH.HTML =====
@@ -569,7 +606,43 @@ const translations = {
         "spiral_under_40": "<30-40$",
         "spiral_over_40": ">40$",
         "genre_any": "Любой",
-        "footer_credit": "Название Steam и логотип Steam являются товарными знаками и/или зарегистрированными товарными знаками компании Valve Corporation. Все прочие товарные знаки принадлежат их соответствующим владельцам."
+        "footer_credit": "Название Steam и логотип Steam являются товарными знаками и/или зарегистрированными товарными знаками компании Valve Corporation. Все прочие товарные знаки принадлежат их соответствующим владельцам.",
+        // ===== 6RADAR_GRAPH.HTML =====
+        "radar_title": "Инструмент сравнения производительности игр",
+        "radar_subtitle": "Сравните до 5 игр · Интерактивные радарные диаграммы с полупрозрачными наложениями",
+        "radar_active_metrics": "Активные метрики",
+        "radar_selected": "выбрано",
+        "radar_games_loaded": "игр загружено",
+        "radar_no_file": "Нет файла",
+        "radar_auto_loaded": "6_radar.csv (автозагружено)",
+        "radar_auto_load_error": "Не удалось автозагрузить 6_radar.csv",
+        "radar_manual_upload_prompt": "Пожалуйста, используйте кнопку загрузки ниже",
+        "radar_upload_csv_btn": "Загрузить CSV",
+        "radar_no_data": "Нет данных",
+        "radar_upload_prompt": "Загрузите CSV файл или дождитесь автозагрузки",
+        "radar_search_placeholder": "Поиск игры...",
+        "radar_need_metrics": "Нужно минимум 3 выбранные метрики<br/>Включите больше метрик выше.",
+        "radar_max_radars_warning": "Максимум {max} радаров разрешено",
+        "radar_min_radars_warning": "Нельзя удалить: минимум {min} радаров требуется",
+        "radar_max_metrics_warning": "Максимум 7 метрик разрешено",
+        "radar_min_metrics_warning": "Минимум 3 метрики требуется для радарных диаграмм",
+        "radar_csv_missing_columns": "В CSV отсутствуют обязательные столбцы: {columns}",
+        "radar_no_valid_games": "Не найдено действительных записей об играх.",
+        "radar_error_parsing": "Ошибка парсинга CSV: {error}",
+        "radar_failed_read": "Не удалось прочитать файл.",
+        "radar_value": "Значение",
+        "radar_max": "Максимум (100%)",
+        "radar_proportion": "Доля",
+        "radar_count": "количество",
+        
+        // Radar metric labels
+        "radar_metric_recommendations": "рекомендации",
+        "radar_metric_reviews": "обзоры",
+        "radar_metric_rating": "рейтинг %",
+        "radar_metric_playtime": "время (мин)",
+        "radar_metric_peak": "пик игроков",
+        "radar_metric_achievements": "достижения",
+        "radar_metric_follows": "подписчики"
     }
 };
 
