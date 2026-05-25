@@ -631,7 +631,21 @@
     
     let svg, chartGroup, clipGroup, xScale, yScale, lineGenerator, tooltipDiv;
     
-    const monthLabels = Array.from({ length: 13 }, (_, i) => `Month ${i+1}`);
+    const const monthLabels = [
+        t("month_1", "Month 1"),
+        t("month_2", "Month 2"),
+        t("month_3", "Month 3"),
+        t("month_4", "Month 4"),
+        t("month_5", "Month 5"),
+        t("month_6", "Month 6"),
+        t("month_7", "Month 7"),
+        t("month_8", "Month 8"),
+        t("month_9", "Month 9"),
+        t("month_10", "Month 10"),
+        t("month_11", "Month 11"),
+        t("month_12", "Month 12"),
+        t("month_13", "Month 13")
+    ];
     const HIGHLIGHT_COLOR = "#D98D00";
     const CIRCLE_COLOR = "#9929EA";
     const AGGREGATE_COLORS = ["#D98D00", "#E7BB66", "#F0D9A8"];
@@ -1040,7 +1054,7 @@
             .style("font-size", "14px")
             .style("font-family", "'Source Sans Pro', monospace")
             .attr("data-i18n", "player_retention")
-            .text(aggregateMode ? "Percentage of Games in Zone (0-100%)" : "Player Retention (% of peak)");
+            .text(aggregateMode ? t("player_retention_aggregate", "Percentage of Games in Zone (0-100%)") : t("player_retention", "Player Retention (% of peak)"));
     }
     
     function updateChart() {
@@ -1540,9 +1554,17 @@
         filterButtonsContainer.innerHTML = "";
         const sortedTypes = Array.from(allPlayerTypes).sort();
         
+        // Map for player type translations
+        const playerTypeTranslationMap = {
+            "Multi-player": t("player_type_multi", "Multi-player"),
+            "Single-player": t("player_type_single", "Single-player"),
+            "Single&Multi-player": t("player_type_both", "Single&Multi-player")
+        };
+        
         sortedTypes.forEach(type => {
             const btn = document.createElement("button");
-            btn.textContent = type;
+            // Use translated label
+            btn.textContent = playerTypeTranslationMap[type] || type;
             btn.classList.add("type-btn");
             if (activeTypes.includes(type)) btn.classList.add("active");
             btn.addEventListener("click", () => {
@@ -1650,6 +1672,55 @@
                 });
             });
         }
+        
+    window.addEventListener('languageChanged', function() {
+        const toggleBtn = document.getElementById("aggregate-toggle");
+        if (toggleBtn) {
+            if (aggregateMode) {
+                toggleBtn.textContent = t("hide_aggregate", "Hide Aggregate Lines");
+            } else {
+                toggleBtn.textContent = t("show_aggregate", "Show Aggregate Lines");
+            }
+        }
+        
+        // Update month labels if chart is visible
+        if (svg) {
+            // Update month labels array
+            const newMonthLabels = [
+                t("month_1", "Month 1"),
+                t("month_2", "Month 2"),
+                t("month_3", "Month 3"),
+                t("month_4", "Month 4"),
+                t("month_5", "Month 5"),
+                t("month_6", "Month 6"),
+                t("month_7", "Month 7"),
+                t("month_8", "Month 8"),
+                t("month_9", "Month 9"),
+                t("month_10", "Month 10"),
+                t("month_11", "Month 11"),
+                t("month_12", "Month 12"),
+                t("month_13", "Month 13")
+            ];
+            
+            // Update x-axis labels if chart exists
+            chartGroup.selectAll(".x-axis").call(
+                d3.axisBottom(xScale).tickFormat(d => newMonthLabels[Math.round(d)])
+            );
+            
+            // Update y-axis label
+            chartGroup.selectAll(".y-axis-label").remove();
+            chartGroup.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("x", -(height - margin.top - margin.bottom) / 2)
+                .attr("y", -50)
+                .attr("text-anchor", "middle")
+                .style("fill", "#EFDFC0")
+                .style("font-size", "14px")
+                .style("font-family", "'Source Sans Pro', monospace")
+                .attr("class", "y-axis-label")
+                .text(aggregateMode ? t("player_retention_aggregate", "Percentage of Games in Zone (0-100%)") : t("player_retention", "Player Retention (% of peak)"));
+        }
+    });
         
         // Add click handler for the Main Page button
         const mainPageBtn = document.getElementById('mainPageBtn');
