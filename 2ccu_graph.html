@@ -501,12 +501,6 @@
             display: none;
         }
 
-        .footer-file-label:hover {
-            background: #c47d00;
-            transform: scale(1.02);
-            display: none;
-        }
-
         .footer-status {
             display: none;
         }
@@ -614,6 +608,25 @@
         return fallback || key;
     }
 
+    // Helper function to get translated month labels
+    function getMonthLabels() {
+        return [
+            t("month_1", "Month 1"),
+            t("month_2", "Month 2"),
+            t("month_3", "Month 3"),
+            t("month_4", "Month 4"),
+            t("month_5", "Month 5"),
+            t("month_6", "Month 6"),
+            t("month_7", "Month 7"),
+            t("month_8", "Month 8"),
+            t("month_9", "Month 9"),
+            t("month_10", "Month 10"),
+            t("month_11", "Month 11"),
+            t("month_12", "Month 12"),
+            t("month_13", "Month 13")
+        ];
+    }
+
     let rawData = [];
     let filteredGames = [];
     let allPlayerTypes = new Set();
@@ -631,21 +644,6 @@
     
     let svg, chartGroup, clipGroup, xScale, yScale, lineGenerator, tooltipDiv;
     
-    const monthLabels = [
-        t("month_1", "Month 1"),
-        t("month_2", "Month 2"),
-        t("month_3", "Month 3"),
-        t("month_4", "Month 4"),
-        t("month_5", "Month 5"),
-        t("month_6", "Month 6"),
-        t("month_7", "Month 7"),
-        t("month_8", "Month 8"),
-        t("month_9", "Month 9"),
-        t("month_10", "Month 10"),
-        t("month_11", "Month 11"),
-        t("month_12", "Month 12"),
-        t("month_13", "Month 13")
-    ];
     const HIGHLIGHT_COLOR = "#D98D00";
     const CIRCLE_COLOR = "#9929EA";
     const AGGREGATE_COLORS = ["#D98D00", "#E7BB66", "#F0D9A8"];
@@ -857,7 +855,14 @@
             .attr("width", innerWidth)
             .attr("height", innerHeight);
         
-        chartGroup.selectAll("*:not(g[clip-path])").remove();
+        // Remove old axis elements to prevent duplicates
+        chartGroup.selectAll(".x-axis").remove();
+        chartGroup.selectAll(".y-axis").remove();
+        chartGroup.selectAll(".y-axis-label").remove();
+        chartGroup.selectAll(".x-axis-label").remove();
+        chartGroup.selectAll(".zone-line").remove();
+        chartGroup.selectAll(".zone-rect").remove();
+        
         clipGroup.selectAll("*").remove();
         
         lineGenerator = d3.line()
@@ -870,6 +875,8 @@
             .defined(d => d !== null)
             .curve(d3.curveMonotoneX);
         
+        // X-Axis with translated month labels
+        const monthLabels = getMonthLabels();
         chartGroup.append("g")
             .attr("class", "x-axis")
             .attr("transform", `translate(0, ${innerHeight})`)
@@ -913,23 +920,6 @@
                         return "";
                     });
             }
-            else if (currentZoomRange[0] === 0 && currentZoomRange[1] === 100) {
-                yAxis = d3.axisLeft(yScale).tickValues([0, 11, 22, 33, 34.5, 50, 65.5, 67, 80, 90, 100])
-                    .tickFormat(d => {
-                        if (d === 0) return "0%";
-                        if (d === 11) return "25%";
-                        if (d === 22) return "50%";
-                        if (d === 33) return "100%";
-                        if (d === 34.5) return "⌵";
-                        if (d === 50) return "50%";
-                        if (d === 65.5) return "100%";
-                        if (d === 67) return "⌵";
-                        if (d === 80) return "50%";
-                        if (d === 90) return "75%";
-                        if (d === 100) return "100%";
-                        return "";
-                    });
-            }
             else {
                 yAxis = d3.axisLeft(yScale).ticks(8).tickFormat(d => d + "%");
             }
@@ -965,6 +955,7 @@
         
         if (currentZoomRange[0] === 0 && currentZoomRange[1] === 100) {
             chartGroup.append("line")
+                .attr("class", "zone-line")
                 .attr("x1", 0)
                 .attr("y1", yScale(66))
                 .attr("x2", innerWidth)
@@ -975,6 +966,7 @@
                 .attr("opacity", 0.5);
             
             chartGroup.append("line")
+                .attr("class", "zone-line")
                 .attr("x1", 0)
                 .attr("y1", yScale(33))
                 .attr("x2", innerWidth)
@@ -986,6 +978,7 @@
             
             if (aggregateMode) {
                 chartGroup.append("rect")
+                    .attr("class", "zone-rect")
                     .attr("x", 0)
                     .attr("y", yScale(33))
                     .attr("width", innerWidth)
@@ -994,6 +987,7 @@
                     .attr("opacity", 0.05);
                 
                 chartGroup.append("rect")
+                    .attr("class", "zone-rect")
                     .attr("x", 0)
                     .attr("y", yScale(66))
                     .attr("width", innerWidth)
@@ -1002,6 +996,7 @@
                     .attr("opacity", 0.05);
                 
                 chartGroup.append("rect")
+                    .attr("class", "zone-rect")
                     .attr("x", 0)
                     .attr("y", yScale(100))
                     .attr("width", innerWidth)
@@ -1011,6 +1006,7 @@
             }
         } else if (aggregateMode && currentZoomRange[0] === 67 && currentZoomRange[1] === 100) {
             chartGroup.append("rect")
+                .attr("class", "zone-rect")
                 .attr("x", 0)
                 .attr("y", yScale(100))
                 .attr("width", innerWidth)
@@ -1019,6 +1015,7 @@
                 .attr("opacity", 0.08);
         } else if (aggregateMode && currentZoomRange[0] === 34 && currentZoomRange[1] === 66) {
             chartGroup.append("rect")
+                .attr("class", "zone-rect")
                 .attr("x", 0)
                 .attr("y", yScale(66))
                 .attr("width", innerWidth)
@@ -1027,6 +1024,7 @@
                 .attr("opacity", 0.08);
         } else if (aggregateMode && currentZoomRange[0] === 0 && currentZoomRange[1] === 33) {
             chartGroup.append("rect")
+                .attr("class", "zone-rect")
                 .attr("x", 0)
                 .attr("y", yScale(33))
                 .attr("width", innerWidth)
@@ -1035,7 +1033,9 @@
                 .attr("opacity", 0.08);
         }
         
+        // X-Axis Label
         chartGroup.append("text")
+            .attr("class", "x-axis-label")
             .attr("x", innerWidth / 2)
             .attr("y", innerHeight + 40)
             .attr("text-anchor", "middle")
@@ -1043,9 +1043,11 @@
             .style("font-size", "14px")
             .style("font-family", "'Source Sans Pro', monospace")
             .attr("data-i18n", "months")
-            .text("Months →");
+            .text(t("months", "Months →"));
         
+        // Y-Axis Label
         chartGroup.append("text")
+            .attr("class", "y-axis-label")
             .attr("transform", "rotate(-90)")
             .attr("x", -innerHeight / 2)
             .attr("y", -50)
@@ -1053,17 +1055,11 @@
             .style("fill", "#EFDFC0")
             .style("font-size", "14px")
             .style("font-family", "'Source Sans Pro', monospace")
-            .attr("data-i18n", "player_retention")
             .text(aggregateMode ? t("player_retention_aggregate", "Percentage of Games in Zone (0-100%)") : t("player_retention", "Player Retention (% of peak)"));
     }
     
     function updateChart() {
-        console.log('updateChart called');
-        console.log('svg exists?', !!svg);
-        console.log('filteredGames length:', filteredGames.length);
-        
         if (!svg || filteredGames.length === 0) {
-            console.log('No svg or no games, showing empty state');
             d3.select("#line-chart svg").remove();
             const container = document.getElementById("line-chart");
             container.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:600px; color:#EFDFC0; font-family:'Source Sans Pro', monospace; flex-direction:column;">
@@ -1074,13 +1070,8 @@
             return;
         }
         
-        console.log('Proceeding to draw chart with', filteredGames.length, 'games');
-        
         const existingSvg = d3.select("#line-chart svg").node();
-        console.log('Existing SVG node?', !!existingSvg);
-        
         if (!existingSvg) {
-            console.log('No existing SVG, calling initChart');
             initChart();
         }
         
@@ -1173,8 +1164,12 @@
             const uniquePlayerTypes = [...new Set(filteredGames.map(g => g.player_type))].sort();
             uniquePlayerTypes.forEach(playerType => {
                 const color = getColorForPlayerType(playerType, false);
+                let displayName = playerType;
+                if (playerType === "Multi-player") displayName = t("player_type_multi", "Multi-player");
+                else if (playerType === "Single-player") displayName = t("player_type_single", "Single-player");
+                else if (playerType === "Single&Multi-player") displayName = t("player_type_both", "Single&Multi-player");
                 legendDiv.append("div").attr("class", "legend-item")
-                    .html(`<div class="legend-color" style="background: ${color};"></div><span>${playerType}</span>`);
+                    .html(`<div class="legend-color" style="background: ${color};"></div><span>${displayName}</span>`);
             });
             
             if (highlightedGames.size > 0) {
@@ -1204,34 +1199,25 @@
     }
     
     function applyFilters() {
-        console.log('applyFilters - rawData length:', rawData.length);
-        
         if (!rawData.length) {
-            console.log('No rawData, skipping');
             filteredGames = [];
             updateChart();
             return;
         }
         
         let games = [...rawData];
-        console.log('Initial games count:', games.length);
         
         if (activeTypes.length > 0) {
             games = games.filter(game => activeTypes.includes(game.player_type));
-            console.log('After player type filter:', games.length);
         }
         
         if (selectedGenres.size > 0) {
             games = games.filter(game => 
                 game.genres.some(genre => selectedGenres.has(genre))
             );
-            console.log('After genre filter:', games.length);
         }
         
         filteredGames = games;
-        console.log('Final filteredGames length:', filteredGames.length);
-        console.log('First filtered game sample:', filteredGames[0]);
-        
         updateChart();
     }
     
@@ -1407,11 +1393,12 @@
                     const xDate = xScale.invert(mouseX);
                     let monthIndex = Math.round(xDate);
                     monthIndex = Math.min(12, Math.max(0, monthIndex));
+                    const monthLabelsArray = getMonthLabels();
                     const retentionVal = lineData[monthIndex];
                     const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
                     
                     tooltipDiv.style("opacity", 1)
-                        .html(`<strong>${game.gameName}</strong><br>${t('genres', 'Genres')}: ${genresDisplay}<br>${t('type', 'Type')}: ${game.player_type}<br>${monthLabels[monthIndex]}<br>${t('retention', 'Retention')}: ${retentionVal !== null ? retentionVal.toFixed(1) + '%' : 'N/A'}`)
+                        .html(`<strong>${game.gameName}</strong><br>${t('genres', 'Genres')}: ${genresDisplay}<br>${t('type', 'Type')}: ${game.player_type}<br>${monthLabelsArray[monthIndex]}<br>${t('retention', 'Retention')}: ${retentionVal !== null ? retentionVal.toFixed(1) + '%' : 'N/A'}`)
                         .style("left", (event.pageX + 12) + "px")
                         .style("top", (event.pageY - 30) + "px");
                 })
@@ -1459,9 +1446,10 @@
                         .on("mousemove", function(event) {
                             const retentionVal = val;
                             const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
+                            const monthLabelsArray = getMonthLabels();
                             
                             tooltipDiv.style("opacity", 1)
-                                .html(`<strong>${game.gameName}</strong><br>${t('genres', 'Genres')}: ${genresDisplay}<br>${t('type', 'Type')}: ${game.player_type}<br>${monthLabels[idx]}<br>${t('retention', 'Retention')}: ${retentionVal.toFixed(1)}%`)
+                                .html(`<strong>${game.gameName}</strong><br>${t('genres', 'Genres')}: ${genresDisplay}<br>${t('type', 'Type')}: ${game.player_type}<br>${monthLabelsArray[idx]}<br>${t('retention', 'Retention')}: ${retentionVal.toFixed(1)}%`)
                                 .style("left", (event.pageX + 12) + "px")
                                 .style("top", (event.pageY - 30) + "px");
                         })
@@ -1535,10 +1523,10 @@
             aggregateMode = !aggregateMode;
             if (aggregateMode) {
                 this.classList.add("active");
-                this.textContent = t('hide_aggregate', "Hide Aggregate Lines");
+                this.textContent = t("hide_aggregate", "Hide Aggregate Lines");
             } else {
                 this.classList.remove("active");
-                this.textContent = t('show_aggregate', "Show Aggregate Lines");
+                this.textContent = t("show_aggregate", "Show Aggregate Lines");
             }
             applyFilters();
         });
@@ -1554,7 +1542,6 @@
         filterButtonsContainer.innerHTML = "";
         const sortedTypes = Array.from(allPlayerTypes).sort();
         
-        // Map for player type translations
         const playerTypeTranslationMap = {
             "Multi-player": t("player_type_multi", "Multi-player"),
             "Single-player": t("player_type_single", "Single-player"),
@@ -1563,7 +1550,6 @@
         
         sortedTypes.forEach(type => {
             const btn = document.createElement("button");
-            // Use translated label
             btn.textContent = playerTypeTranslationMap[type] || type;
             btn.classList.add("type-btn");
             if (activeTypes.includes(type)) btn.classList.add("active");
@@ -1625,7 +1611,7 @@
                 const toggleBtn = document.getElementById("aggregate-toggle");
                 if (toggleBtn) {
                     toggleBtn.classList.remove("active");
-                    toggleBtn.textContent = t('show_aggregate', "Show Aggregate Lines");
+                    toggleBtn.textContent = t("show_aggregate", "Show Aggregate Lines");
                 }
                 
                 renderFilterUI();
@@ -1673,55 +1659,6 @@
             });
         }
         
-    window.addEventListener('languageChanged', function() {
-        const toggleBtn = document.getElementById("aggregate-toggle");
-        if (toggleBtn) {
-            if (aggregateMode) {
-                toggleBtn.textContent = t("hide_aggregate", "Hide Aggregate Lines");
-            } else {
-                toggleBtn.textContent = t("show_aggregate", "Show Aggregate Lines");
-            }
-        }
-        
-        // Update month labels if chart is visible
-        if (svg) {
-            // Update month labels array
-            const newMonthLabels = [
-                t("month_1", "Month 1"),
-                t("month_2", "Month 2"),
-                t("month_3", "Month 3"),
-                t("month_4", "Month 4"),
-                t("month_5", "Month 5"),
-                t("month_6", "Month 6"),
-                t("month_7", "Month 7"),
-                t("month_8", "Month 8"),
-                t("month_9", "Month 9"),
-                t("month_10", "Month 10"),
-                t("month_11", "Month 11"),
-                t("month_12", "Month 12"),
-                t("month_13", "Month 13")
-            ];
-            
-            // Update x-axis labels if chart exists
-            chartGroup.selectAll(".x-axis").call(
-                d3.axisBottom(xScale).tickFormat(d => newMonthLabels[Math.round(d)])
-            );
-            
-            // Update y-axis label
-            chartGroup.selectAll(".y-axis-label").remove();
-            chartGroup.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("x", -(height - margin.top - margin.bottom) / 2)
-                .attr("y", -50)
-                .attr("text-anchor", "middle")
-                .style("fill", "#EFDFC0")
-                .style("font-size", "14px")
-                .style("font-family", "'Source Sans Pro', monospace")
-                .attr("class", "y-axis-label")
-                .text(aggregateMode ? t("player_retention_aggregate", "Percentage of Games in Zone (0-100%)") : t("player_retention", "Player Retention (% of peak)"));
-        }
-    });
-        
         // Add click handler for the Main Page button
         const mainPageBtn = document.getElementById('mainPageBtn');
         if (mainPageBtn) {
@@ -1732,8 +1669,30 @@
         }
     });
     
-    console.log('line-chart container exists?', document.getElementById('line-chart'));
-    console.log('radarGrid container exists?', document.getElementById('radarGrid'));
+    // Listen for language changes to update dynamic content
+    window.addEventListener('languageChanged', function() {
+        // Update aggregate button text
+        const toggleBtn = document.getElementById("aggregate-toggle");
+        if (toggleBtn) {
+            if (aggregateMode) {
+                toggleBtn.textContent = t("hide_aggregate", "Hide Aggregate Lines");
+            } else {
+                toggleBtn.textContent = t("show_aggregate", "Show Aggregate Lines");
+            }
+        }
+        
+        // Update player type buttons
+        renderFilterUI();
+        
+        // Update legend
+        updateLegend();
+        
+        // Redraw chart to update labels
+        if (svg) {
+            updateScalesAndAxes();
+            updateChart();
+        }
+    });
     
     initChart();
     autoLoadCSV();
