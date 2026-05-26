@@ -456,13 +456,13 @@ const translations = {
         "dial_price": "Цена",
         
         // Metric options
-        "metric_most_recommended": "самая рекомендованная игра",
-        "metric_high_rated": "самая высокоцененная игра",
-        "metric_most_reviews": "самая обозреваемая игра",
+        "metric_most_recommended": "самая рекомендованная",
+        "metric_high_rated": "самая высокоцененная",
+        "metric_most_reviews": "самая обозреваемая",
         "metric_most_achievements": "имеет больше всего достижений",
         "metric_median_playtime": "имеет самое высокое медианное время в игре",
-        "metric_peak_ccu": "достигла наибольшего значения одновременных игроков",
-        "metric_most_followers": "самая отслеживаемая игра",
+        "metric_peak_ccu": "имеет наибольшее значение одновременных игроков",
+        "metric_most_followers": "самая отслеживаемая",
         "is_best": "является лучшей",
         
         // Metric option labels (on the rings)
@@ -476,15 +476,15 @@ const translations = {
         
         // Genre options
         "genre_any": "любой",
-        "genre_simulation": "симулятор",
+        "genre_simulation": "симуляция",
         "genre_strategy": "стратегия",
-        "genre_action": "экшен",
+        "genre_action": "экшен-игра",
         "genre_rpg": "РПГ",
-        "genre_racing": "гонки",
+        "genre_racing": "гонка",
         "genre_indie": "инди",
         "genre_adventure": "адвенчура",
         "genre_casual": "казуальная",
-        "genre_sports": "спорт",
+        "genre_sports": "спортивная",
         
         // Player type options
         "player_any": "любая",
