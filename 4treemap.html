@@ -409,7 +409,7 @@
         .dendro-scale-control {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .dendro-scale-control span {
@@ -419,16 +419,67 @@
         }
 
         .scale-slider {
-            width: 150px;
+            -webkit-appearance: none;
+            appearance: none;
+            width: 180px;
+            height: 6px;
+            background: #2a2a2a;
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .scale-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #EFDFC0;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .scale-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            background: #D98D00;
+        }
+        
+        .scale-slider::-moz-range-track {
+            width: 180px;
+            height: 6px;
+            background: #2a2a2a;
+            border-radius: 10px;
+        }
+        
+        .scale-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #EFDFC0;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        
+        .scale-slider::-moz-range-thumb:hover {
+            transform: scale(1.15);
+            background: #D98D00;
+        }
+        
+        .scale-slider:focus {
+            outline: none;
         }
 
         .color-legend {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 12px;
+            font-size: 16px;
             background: #1B1B1B;
-            padding: 4px 12px;
+            padding: 0px 0px;
             border-radius: 20px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             color: #EFDFC0;
@@ -597,9 +648,9 @@
 <div class="dashboard">
     <!-- Language Selector -->
     <div class="language-selector">
-        <button id="mainPageBtn" class="lang-btn" data-i18n="main_page">🏠 Main Page</button>
-        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
-        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+        <button id="mainPageBtn" class="lang-btn" data-i18n="main_page">Main Page</button>
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="ru">RU</button>
     </div>
 
     <div class="header">
