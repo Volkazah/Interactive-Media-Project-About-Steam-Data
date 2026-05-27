@@ -571,9 +571,9 @@ dominant-baseline: middle;
 <div class="dashboard">
 <!-- Language Selector -->
 <div class="language-selector">
-<button id="mainPageBtn" class="lang-btn" data-i18n="main_page">Main Page</button>
-<button class="lang-btn active" data-lang="en">EN</button>
-<button class="lang-btn" data-lang="ru">RU</button>
+<button id="mainPageBtn" class="lang-btn" data-i18n="main_page">🏠 Main Page</button>
+<button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
+<button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
 </div>
 
 <div class="header">
@@ -587,8 +587,8 @@ dominant-baseline: middle;
 <div class="genre-header">
 <h3 data-i18n="spiral_genre">Genre</h3>
 <div class="logic-buttons">
-<button id="genreOrBtn" class="logic-btn active">Or</button>
-<button id="genreAndBtn" class="logic-btn">And</button>
+<button id="genreOrBtn" class="logic-btn active" data-i18n="filter_or">Or</button>
+<button id="genreAndBtn" class="logic-btn" data-i18n="filter_and">And</button>
 </div>
 </div>
 <div id="genreGrid" class="genre-grid"></div>
@@ -644,6 +644,32 @@ const translated = window.translate(key);
 if (translated && translated !== key) return translated;
 }
 return fallback || key;
+}
+
+// Translation helper for genre and player type options
+function translateFilterOption(type, option, defaultValue) {
+if (type === 'genre') {
+const genreMap = {
+'Action': _('genre_action', 'Action'),
+'Adventure': _('genre_adventure', 'Adventure'),
+'RPG': _('genre_rpg', 'RPG'),
+'Strategy': _('genre_strategy', 'Strategy'),
+'Simulation': _('genre_simulation', 'Simulation'),
+'Casual': _('genre_casual', 'Casual'),
+'Indie': _('genre_indie', 'Indie'),
+'Racing': _('genre_racing', 'Racing'),
+'Sports': _('genre_sports', 'Sports')
+};
+return genreMap[option] || defaultValue;
+} else if (type === 'player_type') {
+const playerMap = {
+'Single-player': _('player_type_single', 'Single-player'),
+'Multi-player': _('player_type_multi', 'Multi-player'),
+'Single&Multi-player': _('player_type_both', 'Single&Multi-player')
+};
+return playerMap[option] || defaultValue;
+}
+return defaultValue;
 }
 
 const PRICE_BINS = [
@@ -798,7 +824,8 @@ label.className = 'toggle-label genre-label';
 if (isLongLabel(genre)) {
 label.classList.add('long-label');
 }
-label.textContent = genre;
+// Translate genre name
+label.textContent = translateFilterOption('genre', genre, genre);
 const toggle = document.createElement('div');
 toggle.className = 'toggle-switch';
 if (activeGenres.has(genre)) {
@@ -842,7 +869,8 @@ label.className = `toggle-label ${labelSizeClass}`;
 if (isLongLabel(item)) {
 label.classList.add('long-label');
 }
-label.textContent = item;
+// Translate player type
+label.textContent = translateFilterOption('player_type', item, item);
 const toggle = document.createElement('div');
 toggle.className = 'toggle-switch';
 if (activeSet.has(item)) {
@@ -1480,6 +1508,8 @@ PRICE_BINS[5].label = _("spiral_under_30", "<30$");
 PRICE_BINS[6].label = _("spiral_under_40", "<40$");
 PRICE_BINS[7].label = _("spiral_over_40", ">40$");
 
+// Update genre and player type displays
+updateFilterSets();
 applyFilters();
 }
 });
