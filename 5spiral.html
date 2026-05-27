@@ -148,18 +148,23 @@ padding-bottom: 8px;
 /* AND/OR buttons container */
 .genre-header {
 display: flex;
-justify-content: space-between;
+justify-content: center;
 align-items: center;
+position: relative;
 margin-bottom: 15px;
 }
 
 .genre-header h3 {
 margin-bottom: 0;
+text-align: center;
+flex: 1;
 }
 
 .logic-buttons {
 display: flex;
 gap: 8px;
+position: absolute;
+right: 0;
 }
 
 .logic-btn {
@@ -169,7 +174,7 @@ border: none;
 padding: 6px 16px;
 border-radius: 25px;
 cursor: pointer;
-font-size: 13px;
+font-size: 18px;
 font-weight: bold;
 transition: all 0.2s;
 font-family: 'Consolas', monospace;
@@ -566,14 +571,14 @@ dominant-baseline: middle;
 <div class="dashboard">
 <!-- Language Selector -->
 <div class="language-selector">
-<button id="mainPageBtn" class="lang-btn" data-i18n="main_page">🏠 Main Page</button>
-<button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
-<button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+<button id="mainPageBtn" class="lang-btn" data-i18n="main_page">Main Page</button>
+<button class="lang-btn active" data-lang="en">EN</button>
+<button class="lang-btn" data-lang="ru">RU</button>
 </div>
 
 <div class="header">
 <h1 data-i18n="spiral_title">How prices for videogames on Steam changed for the last 30 years</h1>
-<p data-i18n="spiral_subtitle">Games distribution between price categories throughout the years and genres</p>
+<p data-i18n="spiral_subtitle">Games distribution between price categories, years and genres</p>
 </div>
 
 <div class="controls">
@@ -582,8 +587,8 @@ dominant-baseline: middle;
 <div class="genre-header">
 <h3 data-i18n="spiral_genre">Genre</h3>
 <div class="logic-buttons">
-<button id="genreOrBtn" class="logic-btn active">OR</button>
-<button id="genreAndBtn" class="logic-btn">AND</button>
+<button id="genreOrBtn" class="logic-btn active">Or</button>
+<button id="genreAndBtn" class="logic-btn">And</button>
 </div>
 </div>
 <div id="genreGrid" class="genre-grid"></div>
@@ -619,7 +624,7 @@ dominant-baseline: middle;
 <div class="vis-container">
 <div id="spiral-container"></div>
 <div class="legend" id="priceLegend"></div>
-<div class="status-msg" id="statusMsg" data-i18n="spiral_no_data">No data loaded. Please upload a CSV file below.</div>
+<div class="status-msg" id="statusMsg" data-i18n="spiral_no_data">No data found. Try another set of filters</div>
 </div>
 
 <div class="footer">
@@ -1388,7 +1393,7 @@ return false;
 
 updateFilterSets();
 applyFilters();
-const loadedMsg = _("games_loaded_message", "✅ Loaded {count} games! Spiral ready.").replace("{count}", originalGames.length);
+const loadedMsg = _("games_loaded_message", "Loaded {count} games! Spiral ready.").replace("{count}", originalGames.length);
 document.getElementById('statusMsg').innerHTML = loadedMsg;
 return true;
 }
@@ -1408,7 +1413,7 @@ loadCSVData(csvText);
 })
 .catch(error => {
 console.error('Error loading CSV:', error);
-const errorMsg = _("auto_load_error", "⚠️ Could not auto-load 5_spiral.csv: {error}").replace("{error}", error.message);
+const errorMsg = _("auto_load_error", "Could not auto-load 5_spiral.csv: {error}").replace("{error}", error.message);
 document.getElementById('statusMsg').innerHTML = errorMsg;
 });
 }
