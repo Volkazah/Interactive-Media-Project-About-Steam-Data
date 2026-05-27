@@ -108,8 +108,8 @@ const translations = {
         "month_13": "Month 13",
         
         // ===== 3DIAL_GRAPH.HTML =====
-        "dial_title": "Best Of The Best",
-        "dial_subtitle": "Look for the most successful videogames of all time. Choose specific years, metrics and genres. Customise dials to your preferences",
+        "dial_title": "Which Games Are Statistically Best Of The Best?",
+        "dial_subtitle": "Videogame Leaders Determination Tool",
         "year": "Year",
         "customize_dials": "Customize Dials",
         "text_orientation": "Text Orientation",
@@ -301,8 +301,8 @@ const translations = {
         "player_type_both": "Hybrid",
 
         // ===== 6RADAR_GRAPH.HTML =====
-        "radar_title": "Game Performance Radar Tool",
-        "radar_subtitle": "Compare up to 5 games · Interactive radar charts with semi-transparent overlays",
+        "radar_title": "Can inspired games be more successful than a pioneer?",
+        "radar_subtitle": "Game Success Comparison Radar Tool",
         "radar_active_metrics": "Active metrics",
         "radar_selected": "selected",
         "radar_games_loaded": "games loaded",
@@ -444,8 +444,8 @@ const translations = {
         "month_13": "13 Месяц",
         
         // ===== 3DIAL_GRAPH.HTML =====
-        "dial_title": "Лучшие Из Лучших",
-        "dial_subtitle": "График с наиболее успешными играми. Можно фильтровать по годам, метрикам и жанрам. Диски можно настраивать под свои запросы",
+        "dial_title": "Какие игры можно назвать лучшими из лучших?",
+        "dial_subtitle": "Инструмент определения видеоигровых лидеров в разных категориях",
         "year": "Год",
         "customize_dials": "Настройка дисков",
         "text_orientation": "Наклон текста",
@@ -638,8 +638,8 @@ const translations = {
         "player_type_both": "Смешанные",
         
         // ===== 6RADAR_GRAPH.HTML =====
-        "radar_title": "Инструмент сравнения производительности игр",
-        "radar_subtitle": "Сравните до 5 игр · Интерактивные радарные диаграммы с полупрозрачными наложениями",
+        "radar_title": "Могут ли последователи быть успешнее оригинала?",
+        "radar_subtitle": "Инструмент сравнения успешности видеоигр",
         "radar_active_metrics": "Активные метрики",
         "radar_selected": "выбрано",
         "radar_games_loaded": "игр загружено",
