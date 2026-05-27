@@ -1566,7 +1566,7 @@
                     let normalized = maxPublisherRichness > 0 ? (d.data.richness || 1) / maxPublisherRichness : 0;
                     normalized = Math.min(1, Math.max(0.15, normalized));
                     const colorIntensity = Math.floor(normalized * 100);
-                    tooltip.html(`<strong>${d.data.name}</strong><br>${_("games_count", "Games")}: ${d.data.gamesCount || 0}<br>${_("developers_count", "Developers")}: ${d.data.developersCount || 0}<br>${_("total_owners", "Total Owners")}: ${(d.data.totalOwners || 0).toLocaleString()}<br>${_("orange_intensity", "Orange intensity")}: ${colorIntensity}%<br>${_("click_to_explore", "Click to explore game hierarchy")}`);
+                    tooltip.html(`<strong>${d.data.name}</strong><br>${_("games_count", "Games")}: ${d.data.gamesCount || 0}<br>${_("developers_count", "Developers")}: ${d.data.developersCount || 0}<br>${_("total_owners", "Total Owners")}: ${(d.data.totalOwners || 0).toLocaleString()}<br>${_("click_to_explore", "Click to explore game hierarchy")}`);
                 }
                 
                 const tooltipNode = tooltip.node();
