@@ -58,25 +58,18 @@
         }
 
         /* Russian language specific styles */
-        :lang(ru) .toggle-label {
-            font-size: 16px;
+        .logic-btn {
+            transition: all 0.2s ease;
         }
-
-        :lang(ru) .genre-label {
-            font-size: 14px;
+        
+        .logic-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
         }
-
-        :lang(ru) .large-label {
-            font-size: 18px;
-        }
-
-        :lang(ru) .reset-btn {
-            font-size: 0.8rem;
-            padding: 0.5rem 1.5rem;
-        }
-
-        :lang(ru) .info-text {
-            font-size: 0.65rem;
+        
+        .logic-btn.active {
+            background: #D98D00 !important;
+            color: #1B1B1B !important;
         }
 
         .dashboard {
@@ -548,9 +541,9 @@
 <div class="dashboard">
     <!-- Language Selector -->
     <div class="language-selector">
-        <button id="mainPageBtn" class="lang-btn" data-i18n="main_page">🏠 Main Page</button>
-        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
-        <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+        <button id="mainPageBtn" class="lang-btn" data-i18n="main_page">Main Page</button>
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="ru">RU</button>
     </div>
 
     <div class="header">
@@ -561,7 +554,13 @@
     <div class="controls">
         <div class="filters-container">
             <div class="toggle-panel genre-panel">
-                <h3 data-i18n="spiral_genre">Genre</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin-bottom: 0;">Genre</h3>
+                    <div style="display: flex; gap: 8px;">
+                        <button id="genreOrBtn" class="logic-btn active" style="background: #D98D00; color: #1B1B1B; border: none; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold;">OR</button>
+                        <button id="genreAndBtn" class="logic-btn" style="background: #3a3a3a; color: #EFDFC0; border: none; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold;">AND</button>
+                    </div>
+                </div>
                 <div id="genreGrid" class="genre-grid"></div>
             </div>
             
@@ -595,7 +594,6 @@
     <div class="vis-container">
         <div id="spiral-container"></div>
         <div class="legend" id="priceLegend"></div>
-        <div class="status-msg" id="statusMsg" data-i18n="spiral_no_data">No data loaded. Please upload a CSV file below.</div>
     </div>
 
     <div class="footer">
@@ -637,6 +635,7 @@
     let activePlayerTypes = new Set();
     let activePlatforms = new Set();
     let selectedGames = new Map();
+    let genreLogicMode = 'OR';
 
     function categorizePrice(priceVal) {
         if (priceVal === undefined || priceVal === null || priceVal === '') return _("spiral_over_40", ">40$");
@@ -947,19 +946,32 @@
 
     function applyFilters() {
         filteredGames = originalGames.filter(game => {
-            if (activeGenres.has('ANY')) {
-            } else if (activeGenres.size > 0) {
-                const hasGenre = game.steam_genres.some(genre => activeGenres.has(genre));
-                if (!hasGenre) return false;
+            // Genre filter logic with AND/OR support
+            if (!activeGenres.has('ANY') && activeGenres.size > 0) {
+                if (genreLogicMode === 'OR') {
+                    // OR logic: game needs at least one of the selected genres
+                    const hasGenre = game.steam_genres.some(genre => activeGenres.has(genre));
+                    if (!hasGenre) return false;
+                } else if (genreLogicMode === 'AND') {
+                    // AND logic: game needs ALL selected genres
+                    const selectedGenresList = Array.from(activeGenres);
+                    const hasAllGenres = selectedGenresList.every(genre => game.steam_genres.includes(genre));
+                    if (!hasAllGenres) return false;
+                }
             }
+            
+            // Player type filter (OR logic only - keep as is)
             if (activePlayerTypes.size > 0) {
                 const hasPlayerType = game.player_type.some(pt => activePlayerTypes.has(pt));
                 if (!hasPlayerType) return false;
             }
+            
+            // Platform filter (OR logic only - keep as is)
             if (activePlatforms.size > 0) {
                 const hasPlatform = game.supported_platforms.some(plat => activePlatforms.has(plat));
                 if (!hasPlatform) return false;
             }
+            
             return true;
         });
         
@@ -969,8 +981,8 @@
         const filtersActiveText = _("spiral_filters_active", "Filters active.");
         const noMatchText = _("spiral_no_match", "No games match.");
         
-        document.getElementById('statusMsg').innerHTML = `${showingText} ${filteredGames.length} ${gamesText} ${originalGames.length} ${totalText} | ${filtersActiveText}`;
-        if (filteredGames.length === 0) document.getElementById('statusMsg').innerHTML += ` ${noMatchText}`;
+        document.getElementById('statusMsg').innerHTML = `Showing ${filteredGames.length} games (of ${originalGames.length} total) | Filters active. | Genre mode: ${genreLogicMode}`;
+        if (filteredGames.length === 0) document.getElementById('statusMsg').innerHTML += `No games match.`;
         renderSpiralCondegram();
     }
 
@@ -1448,6 +1460,31 @@
             reader.readAsText(file);
         }
     });
+
+    const orBtn = document.getElementById('genreOrBtn');
+    const andBtn = document.getElementById('genreAndBtn');
+    
+    orBtn.addEventListener('click', () => {
+        genreLogicMode = 'OR';
+        orBtn.classList.add('active');
+        andBtn.classList.remove('active');
+        orBtn.style.background = '#D98D00';
+        orBtn.style.color = '#1B1B1B';
+        andBtn.style.background = '#3a3a3a';
+        andBtn.style.color = '#EFDFC0';
+        applyFilters();
+    });
+    
+    andBtn.addEventListener('click', () => {
+        genreLogicMode = 'AND';
+        andBtn.classList.add('active');
+        orBtn.classList.remove('active');
+        andBtn.style.background = '#D98D00';
+        andBtn.style.color = '#1B1B1B';
+        orBtn.style.background = '#3a3a3a';
+        orBtn.style.color = '#EFDFC0';
+        applyFilters();
+    });
     
     document.getElementById('resetFiltersBtn').addEventListener('click', () => {
         activeGenres.clear();
@@ -1457,6 +1494,16 @@
         activePlatforms.clear();
         platformSet.forEach(p => activePlatforms.add(p));
         selectedGames.clear();
+        
+        // Reset genre logic mode to OR
+        genreLogicMode = 'OR';
+        orBtn.classList.add('active');
+        andBtn.classList.remove('active');
+        orBtn.style.background = '#D98D00';
+        orBtn.style.color = '#1B1B1B';
+        andBtn.style.background = '#3a3a3a';
+        andBtn.style.color = '#EFDFC0';
+        
         updateSelectedGamesDisplay();
         renderGenreGrid();
         renderTogglePanel('playerTypeList', playerSet, activePlayerTypes, 'large-label');
