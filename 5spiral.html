@@ -571,9 +571,9 @@ dominant-baseline: middle;
 <div class="dashboard">
 <!-- Language Selector -->
 <div class="language-selector">
-<button id="mainPageBtn" class="lang-btn" data-i18n="main_page">🏠 Main Page</button>
-<button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
-<button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+<button id="mainPageBtn" class="lang-btn" data-i18n="main_page">Main Page</button>
+<button class="lang-btn active" data-lang="en">EN</button>
+<button class="lang-btn" data-lang="ru">RU</button>
 </div>
 
 <div class="header">
@@ -639,37 +639,54 @@ dominant-baseline: middle;
 <script>
 // Helper function to get translated text - using window.translate
 function _(key, fallback) {
-if (typeof window !== 'undefined' && window.translate) {
-const translated = window.translate(key);
-if (translated && translated !== key) return translated;
-}
-return fallback || key;
+    if (typeof window !== 'undefined' && window.translate) {
+        const translated = window.translate(key);
+        if (translated && translated !== key) return translated;
+    }
+    return fallback || key;
 }
 
 // Translation helper for genre and player type options
 function translateFilterOption(type, option, defaultValue) {
-if (type === 'genre') {
-const genreMap = {
-'Action': _('genre_action', 'Action'),
-'Adventure': _('genre_adventure', 'Adventure'),
-'RPG': _('genre_rpg', 'RPG'),
-'Strategy': _('genre_strategy', 'Strategy'),
-'Simulation': _('genre_simulation', 'Simulation'),
-'Casual': _('genre_casual', 'Casual'),
-'Indie': _('genre_indie', 'Indie'),
-'Racing': _('genre_racing', 'Racing'),
-'Sports': _('genre_sports', 'Sports')
-};
-return genreMap[option] || defaultValue;
-} else if (type === 'player_type') {
-const playerMap = {
-'Single-player': _('player_type_single', 'Single-player'),
-'Multi-player': _('player_type_multi', 'Multi-player'),
-'Single&Multi-player': _('player_type_both', 'Single&Multi-player')
-};
-return playerMap[option] || defaultValue;
-}
-return defaultValue;
+    if (type === 'genre') {
+        // Normalize the option: capitalize first letter for lookup
+        const normalizedOption = option.charAt(0).toUpperCase() + option.slice(1).toLowerCase();
+        const genreMap = {
+            'Action': _('genre_action', 'Action'),
+            'Adventure': _('genre_adventure', 'Adventure'),
+            'RPG': _('genre_rpg', 'RPG'),
+            'Strategy': _('genre_strategy', 'Strategy'),
+            'Simulation': _('genre_simulation', 'Simulation'),
+            'Casual': _('genre_casual', 'Casual'),
+            'Indie': _('genre_indie', 'Indie'),
+            'Racing': _('genre_racing', 'Racing'),
+            'Sports': _('genre_sports', 'Sports')
+        };
+        // Try normalized version first, then original
+        if (genreMap[normalizedOption]) return genreMap[normalizedOption];
+        if (genreMap[option]) return genreMap[option];
+        // Also check lowercase version
+        const lowerOption = option.toLowerCase();
+        for (let [key, value] of Object.entries(genreMap)) {
+            if (key.toLowerCase() === lowerOption) return value;
+        }
+        return defaultValue;
+    } else if (type === 'player_type') {
+        const playerMap = {
+            'single-player': _('player_type_single', 'Single-player'),
+            'multi-player': _('player_type_multi', 'Multi-player'),
+            'single&multi-player': _('player_type_both', 'Single&Multi-player'),
+            // Also handle capitalized versions
+            'Single-player': _('player_type_single', 'Single-player'),
+            'Multi-player': _('player_type_multi', 'Multi-player'),
+            'Single&Multi-player': _('player_type_both', 'Single&Multi-player')
+        };
+        const lowerOption = option.toLowerCase();
+        if (playerMap[lowerOption]) return playerMap[lowerOption];
+        if (playerMap[option]) return playerMap[option];
+        return defaultValue;
+    }
+    return defaultValue;
 }
 
 const PRICE_BINS = [
