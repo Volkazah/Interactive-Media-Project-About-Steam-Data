@@ -1073,6 +1073,7 @@
         }
         
         updateScalesAndAxes();
+        chartGroup.selectAll(".line-hover").remove();
         
         if (aggregateMode) {
             const aggregateData = calculateAggregateData();
@@ -1368,59 +1369,70 @@
                 .attr("stroke-linecap", "round")
                 .attr("stroke-dasharray", game.hasMissingData ? "6,4" : "none");
             
-            // Only add hover line if the game is currently displayed in filteredGames
-            // Check if game is in current filteredGames (displayed)
-            const isGameDisplayed = filteredGames.some(g => g.gameName === game.gameName);
-            
-            if (isGameDisplayed) {
-                const hoverLine = chartGroup.append("path")
-                    .datum(lineData)
-                    .attr("class", "line-hover")
-                    .attr("d", d => lineGenerator(d))
-                    .attr("fill", "none")
-                    .attr("stroke", "transparent")
-                    .attr("stroke-width", 12)
-                    .attr("stroke-opacity", 0)
-                    .style("cursor", "pointer")
-                    .on("mouseenter", function() {
-                        if (isHighlightingModeActive) {
-                            d3.select(this.previousSibling).attr("stroke-width", 5).attr("stroke-opacity", 0.8);
-                        } else {
-                            clipGroup.selectAll(".line-path").attr("stroke-width", 1.5).attr("stroke-opacity", 0.3);
-                            d3.select(this.previousSibling).attr("stroke-width", 4).attr("stroke-opacity", 1);
-                        }
-                    })
-                    .on("mousemove", function(event) {
-                        const mouseX = d3.pointer(event, chartGroup.node())[0];
-                        const xDate = xScale.invert(mouseX);
-                        let monthIndex = Math.round(xDate);
-                        monthIndex = Math.min(12, Math.max(0, monthIndex));
-                        const monthLabelsArray = getMonthLabels();
-                        const retentionVal = lineData[monthIndex];
-                        const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
-                        
-                        tooltipDiv.style("opacity", 1)
-                            .html(`<strong>${game.gameName}</strong><br>${_('genres', 'Genres')}: ${genresDisplay}<br>${_('type', 'Type')}: ${game.player_type}<br>${monthLabelsArray[monthIndex]}<br>${_('retention', 'Retention')}: ${retentionVal !== null ? retentionVal.toFixed(1) + '%' : 'N/A'}`)
-                            .style("left", (event.pageX + 12) + "px")
-                            .style("top", (event.pageY - 30) + "px");
-                    })
-                    .on("mouseleave", function() {
-                        if (isHighlightingModeActive) {
-                            d3.select(this.previousSibling).attr("stroke-width", 4.5).attr("stroke-opacity", 1);
-                        } else {
-                            clipGroup.selectAll(".line-path").attr("stroke-width", d => {
-                                const idx = Array.from(clipGroup.selectAll(".line-path").nodes()).indexOf(this.previousSibling);
-                                const gameName = filteredGames[idx]?.gameName;
-                                return highlightedGames.has(gameName) ? 4.5 : 2;
-                            }).attr("stroke-opacity", d => {
-                                const idx = Array.from(clipGroup.selectAll(".line-path").nodes()).indexOf(this.previousSibling);
-                                const gameName = filteredGames[idx]?.gameName;
-                                return highlightedGames.has(gameName) ? 1 : 0.6;
-                            });
-                        }
-                        tooltipDiv.style("opacity", 0);
-                    });
-            }
+            // Always create hover line but store game name for validation
+            const hoverLine = chartGroup.append("path")
+                .datum(lineData)
+                .attr("class", "line-hover")
+                .attr("data-game-name", game.gameName)  // Store game name
+                .attr("d", d => lineGenerator(d))
+                .attr("fill", "none")
+                .attr("stroke", "transparent")
+                .attr("stroke-width", 12)
+                .attr("stroke-opacity", 0)
+                .style("cursor", "pointer")
+                .on("mouseenter", function() {
+                    // Check if this game is still in filteredGames (visible)
+                    const gameName = d3.select(this).attr("data-game-name");
+                    const isGameVisible = filteredGames.some(g => g.gameName === gameName);
+                    if (!isGameVisible) return; // Exit if game is not visible
+                    
+                    if (isHighlightingModeActive) {
+                        d3.select(this.previousSibling).attr("stroke-width", 5).attr("stroke-opacity", 0.8);
+                    } else {
+                        clipGroup.selectAll(".line-path").attr("stroke-width", 1.5).attr("stroke-opacity", 0.3);
+                        d3.select(this.previousSibling).attr("stroke-width", 4).attr("stroke-opacity", 1);
+                    }
+                })
+                .on("mousemove", function(event) {
+                    // Check if this game is still in filteredGames (visible)
+                    const gameName = d3.select(this).attr("data-game-name");
+                    const isGameVisible = filteredGames.some(g => g.gameName === gameName);
+                    if (!isGameVisible) return; // Exit if game is not visible
+                    
+                    const mouseX = d3.pointer(event, chartGroup.node())[0];
+                    const xDate = xScale.invert(mouseX);
+                    let monthIndex = Math.round(xDate);
+                    monthIndex = Math.min(12, Math.max(0, monthIndex));
+                    const monthLabelsArray = getMonthLabels();
+                    const retentionVal = lineData[monthIndex];
+                    const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
+                    
+                    tooltipDiv.style("opacity", 1)
+                        .html(`<strong>${game.gameName}</strong><br>${_('genres', 'Genres')}: ${genresDisplay}<br>${_('type', 'Type')}: ${game.player_type}<br>${monthLabelsArray[monthIndex]}<br>${_('retention', 'Retention')}: ${retentionVal !== null ? retentionVal.toFixed(1) + '%' : 'N/A'}`)
+                        .style("left", (event.pageX + 12) + "px")
+                        .style("top", (event.pageY - 30) + "px");
+                })
+                .on("mouseleave", function() {
+                    // Check if this game is still in filteredGames (visible)
+                    const gameName = d3.select(this).attr("data-game-name");
+                    const isGameVisible = filteredGames.some(g => g.gameName === gameName);
+                    if (!isGameVisible) return; // Exit if game is not visible
+                    
+                    if (isHighlightingModeActive) {
+                        d3.select(this.previousSibling).attr("stroke-width", 4.5).attr("stroke-opacity", 1);
+                    } else {
+                        clipGroup.selectAll(".line-path").attr("stroke-width", d => {
+                            const idx = Array.from(clipGroup.selectAll(".line-path").nodes()).indexOf(this.previousSibling);
+                            const gameName = filteredGames[idx]?.gameName;
+                            return highlightedGames.has(gameName) ? 4.5 : 2;
+                        }).attr("stroke-opacity", d => {
+                            const idx = Array.from(clipGroup.selectAll(".line-path").nodes()).indexOf(this.previousSibling);
+                            const gameName = filteredGames[idx]?.gameName;
+                            return highlightedGames.has(gameName) ? 1 : 0.6;
+                        });
+                    }
+                    tooltipDiv.style("opacity", 0);
+                });
         }
         
         if (displayMode === "points" || displayMode === "both") {
@@ -1442,11 +1454,21 @@
                         .attr("stroke-width", 2)
                         .attr("opacity", isHighlightingModeActive ? (isHighlighted ? 0.9 : 0.4) : 0.9)
                         .attr("class", "data-circle")
+                        .attr("data-game-name", game.gameName)  // Store game name on circle
                         .style("cursor", "pointer")
                         .on("mouseenter", function() {
+                            // Check if game is visible
+                            const gameName = d3.select(this).attr("data-game-name");
+                            const isGameVisible = filteredGames.some(g => g.gameName === gameName);
+                            if (!isGameVisible) return;
                             d3.select(this).attr("r", isHighlighted ? 9 : 6);
                         })
                         .on("mousemove", function(event) {
+                            // Check if game is visible
+                            const gameName = d3.select(this).attr("data-game-name");
+                            const isGameVisible = filteredGames.some(g => g.gameName === gameName);
+                            if (!isGameVisible) return;
+                            
                             const retentionVal = val;
                             const genresDisplay = game.genres.length > 0 ? game.genres.join(", ") : "None";
                             const monthLabelsArray = getMonthLabels();
@@ -1457,6 +1479,11 @@
                                 .style("top", (event.pageY - 30) + "px");
                         })
                         .on("mouseleave", function() {
+                            // Check if game is visible
+                            const gameName = d3.select(this).attr("data-game-name");
+                            const isGameVisible = filteredGames.some(g => g.gameName === gameName);
+                            if (!isGameVisible) return;
+                            
                             if (isHighlightingModeActive) {
                                 d3.select(this).attr("r", isHighlighted ? 7 : 3);
                             } else {
