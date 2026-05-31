@@ -13,14 +13,20 @@
             font-family: 'Source Sans Pro', 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
         }
 
-        body {
+       body {
             background: #1B1B1B;
             margin: 0;
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+        
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
         }
 
         /* Language Selector Styles */
@@ -252,9 +258,15 @@
 
         .radar-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            grid-template-columns: 1fr;
             gap: 1.5rem;
             margin-top: 0;
+        }
+        
+        @media (min-width: 768px) {
+            .radar-grid {
+                grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            }
         }
 
         .radar-card {
@@ -264,11 +276,12 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
             position: relative;
             transition: all 0.2s ease;
-            min-height: 420px;
+            min-height: auto;
             display: flex;
             flex-direction: column;
             width: 100%;
             max-width: 100%;
+            overflow-x: auto;
         }
 
         .radar-card:hover {
@@ -391,8 +404,14 @@
             width: 100%;
             display: flex;
             justify-content: center;
-            min-height: 340px;
+            min-height: auto;
             flex: 1;
+            overflow-x: auto;
+        }
+        
+        .chart-container svg {
+            max-width: 100%;
+            height: auto;
         }
 
         svg {
@@ -475,15 +494,23 @@
         .radar-grid > div[style*="display: flex"] {
             display: flex !important;
             justify-content: center !important;
-            gap: 1.5rem !important;
+            gap: 1rem !important;
             grid-column: 1 / -1 !important;
             width: 100% !important;
+            flex-wrap: wrap !important;
         }
-
+        
         .radar-grid > div[style*="display: flex"] .radar-card {
             flex: 0 0 auto;
-            width: calc((100% - 1.5rem) / 2);
-            max-width: 500px;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        @media (min-width: 768px) {
+            .radar-grid > div[style*="display: flex"] .radar-card {
+                width: calc((100% - 1.5rem) / 2);
+                max-width: 500px;
+            }
         }
 
         @keyframes fadeIn {
@@ -612,7 +639,9 @@
             return;
         }
         
-        const width = 320, height = 320;
+        const containerWidth = document.querySelector(containerId).parentElement.clientWidth;
+        const size = Math.min(containerWidth - 20, 320); // Max 320px, but shrinks on mobile
+        const width = size, height = size;
         const radius = Math.min(width, height) * 0.34;
         const centerX = width/2, centerY = height/2;
         const angleSlice = Math.PI * 2 / filteredMetrics.length;
@@ -1407,7 +1436,15 @@
         updateGameCount();
         updateFileName(_("radar_no_file", "No file"));
     }
-    
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+            if (fullDataset.length) {
+                refreshAllRadars();
+            }
+        }, 250);
+    });
     init();
     autoLoadCSV();
 </script>
