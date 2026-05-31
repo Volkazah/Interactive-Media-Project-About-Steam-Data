@@ -79,9 +79,10 @@
             text-align: center;
         }
 
+        /* Responsive header text */
         .main-title {
             font-family: 'Consolas', 'Source Sans Pro', monospace;
-            font-size: 60px;
+            font-size: clamp(24px, 5vw, 60px);
             color: #EFDFC0;
             font-weight: 400;
             letter-spacing: -0.3px;
@@ -90,32 +91,32 @@
 
         .sub-title {
             font-family: 'Source Sans Pro', monospace;
-            font-size: 46px;
+            font-size: clamp(18px, 4vw, 46px);
             color: #EFDFC0;
             opacity: 0.75;
             margin-top: 8px;
         }
 
         .controls {
-            padding: 1.5rem 2rem;
+            padding: 1rem 2rem;
             background: #1B1B1B;
             border-bottom: 1px solid #D98D00;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
         }
 
         .search-container {
             position: relative;
-            width: 350px;
+            width: 300px;
         }
 
         #gameSearch {
             width: 100%;
-            padding: 12px 20px;
-            font-size: 16px;
+            padding: 10px 18px;
+            font-size: 14px;
             border: 1px solid #D98D00;
             border-radius: 40px;
             background: #2a2a2a;
@@ -145,23 +146,23 @@
         }
 
         .autocomplete-item {
-            padding: 12px 18px;
+            padding: 10px 15px;
             cursor: pointer;
             transition: background 0.2s;
-            font-size: 14px;
+            font-size: 13px;
             border-bottom: 1px solid rgba(239,223,192,0.1);
             color: #EFDFC0;
         }
 
         .filter-section {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
         }
 
         .filter-btn {
-            padding: 8px 24px;
-            font-size: 20px;
+            padding: 6px 20px;
+            font-size: clamp(14px, 2vw, 20px);
             background: #2a2a2a;
             border: 1px solid #D98D00;
             border-radius: 40px;
@@ -177,8 +178,8 @@
         }
 
         .reset-btn, .clear-btn {
-            padding: 8px 24px;
-            font-size: 20px;
+            padding: 6px 20px;
+            font-size: clamp(14px, 2vw, 20px);
             background: #2a2a2a;
             border: 1px solid #D98D00;
             border-radius: 40px;
@@ -194,16 +195,16 @@
         .info-panel {
             background: #2a2a2a;
             border-radius: 16px;
-            padding: 15px 20px;
+            padding: 12px 18px;
             margin: 0 20px 20px 20px;
             border: 1px solid #D98D00;
             display: none;
         }
 
         .info-title {
-            font-size: 18px;
+            font-size: clamp(14px, 2vw, 18px);
             color: #D98D00;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-weight: bold;
             font-family: 'Source Sans Pro', monospace;
         }
@@ -211,37 +212,37 @@
         .info-games-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             max-height: 200px;
             overflow-y: auto;
         }
 
         .info-game-item {
-            padding: 10px;
+            padding: 8px;
             background: #1B1B1B;
             border-radius: 16px;
             border-left: 3px solid;
         }
 
         .info-game-name {
-            font-size: 18px;
+            font-size: clamp(12px, 1.8vw, 18px);
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .info-game-details {
-            font-size: 16px;
+            font-size: clamp(10px, 1.5vw, 16px);
             color: #aaa;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .info-game-reviews {
-            font-size: 16px;
+            font-size: clamp(10px, 1.5vw, 16px);
             color: #6bcf7f;
         }
 
         .remove-game-btn {
-            margin-top: 5px;
+            margin-top: 4px;
             padding: 2px 8px;
             font-size: 10px;
             background: #D98D00;
@@ -328,7 +329,7 @@
         }
 
         .scale-info {
-            font-size: 16px;
+            font-size: clamp(12px, 2vw, 16px);
             text-align: center;
             margin-top: 8px;
             padding-top: 6px;
@@ -338,7 +339,6 @@
 
         .label {
             font-family: 'Source Sans Pro', monospace;
-            font-size: 30px;
             font-weight: 600;
             text-anchor: middle;
             dominant-baseline: middle;
@@ -440,6 +440,38 @@
             font-size: 10px;
             color: #EFDFC0;
             border-top: 1px solid #D98D00;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .controls {
+                padding: 0.8rem 1rem;
+                gap: 10px;
+            }
+            .search-container {
+                width: 250px;
+            }
+            .filter-btn, .reset-btn, .clear-btn {
+                padding: 4px 12px;
+                font-size: 12px;
+            }
+            .info-panel {
+                padding: 10px 15px;
+                margin: 0 15px 15px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .controls {
+                flex-direction: column;
+            }
+            .search-container {
+                width: 100%;
+            }
+            .filter-section {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -551,17 +583,54 @@
     let animationInterval = null;
     let pulseQueues = {};
     
-    let minSphereRadius = 20;
-    let maxSphereRadius = 130;
-    let minArcThickness = 1;
-    let maxArcThickness = 14;
+    // Responsive scaling variables - will be set based on screen size
+    let minSphereRadius, maxSphereRadius, minArcThickness, maxArcThickness;
+    let resizeTimeout;
     
     const uploadSection = document.getElementById('uploadSection');
     const fileInput = document.getElementById('csvFile');
-
+    
+    // Function to calculate responsive sizes based on screen dimensions
+    function updateResponsiveSizes() {
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const baseWidth = 1920;
+        const baseHeight = 1080;
+        const scale = Math.min(1, Math.min(screenWidth / baseWidth, screenHeight / baseHeight));
+        
+        // Responsive sphere sizes
+        minSphereRadius = Math.max(12, 20 * scale);
+        maxSphereRadius = Math.max(60, 130 * scale);
+        
+        // Responsive arc thickness
+        minArcThickness = Math.max(1, 1 * scale);
+        maxArcThickness = Math.max(4, 14 * scale);
+        
+        return scale;
+    }
+    
+    // Function to get responsive font size for labels
+    function getResponsiveFontSize(category, scaledRadius) {
+        const screenScale = Math.min(1, window.innerWidth / 1920);
+        const radiusScale = scaledRadius / 100;
+        
+        const fontSizes = {
+            "very negative": 7,
+            "mostly negative": 9,
+            "mixed": 30,
+            "overwhelmingly negative": 6,
+            "overwhelmingly positive": 28,
+            "very positive": 32
+        };
+        
+        let baseSize = fontSizes[category] || 19;
+        let scaledSize = baseSize * screenScale;
+        let finalSize = Math.max(5, Math.min(scaledSize, scaledSize * radiusScale));
+        return `${finalSize}px`;
+    }
+    
     // Translation helper functions
     function t(key, fallback) {
-    // Direct access to translations - NO recursion
         try {
             if (window.translations && window.currentLanguage) {
                 const translation = window.translations[window.currentLanguage][key];
@@ -881,49 +950,6 @@
         }
     }
     
-    function startPulseQueue(sphereId, colorIndex, color) {
-        if (!pulseQueues[sphereId]) {
-            pulseQueues[sphereId] = [];
-            pulseQueues[sphereId].isPlaying = false;
-        }
-        
-        pulseQueues[sphereId].push({ colorIndex, color });
-        
-        if (!pulseQueues[sphereId].isPlaying) {
-            processPulseQueue(sphereId);
-        }
-    }
-    
-    function processPulseQueue(sphereId) {
-        if (!pulseQueues[sphereId] || pulseQueues[sphereId].length === 0) {
-            if (pulseQueues[sphereId]) pulseQueues[sphereId].isPlaying = false;
-            return;
-        }
-        
-        pulseQueues[sphereId].isPlaying = true;
-        const currentPulse = pulseQueues[sphereId].shift();
-        
-        const sphere = nodeGroup.selectAll(".sphere").filter(function() {
-            return d3.select(this).attr("data-category") === sphereId;
-        });
-        
-        if (sphere.size() > 0) {
-            sphere.style("filter", `drop-shadow(0 0 15px ${currentPulse.color})`);
-            sphere.attr("stroke-width", 6);
-            
-            setTimeout(() => {
-                sphere.style("filter", null);
-                sphere.attr("stroke-width", 4);
-                
-                setTimeout(() => {
-                    processPulseQueue(sphereId);
-                }, 500);
-            }, 800);
-        } else {
-            processPulseQueue(sphereId);
-        }
-    }
-    
     function applyContinuousAnimation(game, colorIndex) {
         const color = ANIMATION_COLORS[colorIndex];
         const isAscending = CATEGORY_ORDER[game.totalCategory] < CATEGORY_ORDER[game.recentCategory];
@@ -1184,6 +1210,10 @@
         const container = document.getElementById('vis');
         container.innerHTML = '';
         
+        // Update responsive sizes based on current screen
+        const screenScale = updateResponsiveSizes();
+        
+        // Responsive dimensions
         width = Math.max(500, window.innerWidth - 200);
         height = Math.max(250, window.innerHeight - 400);
         
@@ -1204,6 +1234,7 @@
         labelGroup = svg.append("g").attr("class", "labels");
         animationGroup = svg.append("g").attr("class", "animations");
         
+        // Responsive layout radius (38% of smaller dimension)
         const radius = Math.min(width, height) * 0.38;
         const centerX = width / 2;
         const centerY = height / 2;
@@ -1299,18 +1330,22 @@
         const dy = targetNode.y - sourceNode.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
+        // Responsive offset based on screen scale
+        const screenScale = Math.min(1, window.innerWidth / 1920);
+        const baseOffset = 25;
+        const parallelOffset = offsetMultiplier * baseOffset * screenScale;
+        
         const perpX = -dy / distance;
         const perpY = dx / distance;
-        const parallelOffset = offsetMultiplier * 25;
         const midX = (sourceNode.x + targetNode.x) / 2 + perpX * parallelOffset;
         const midY = (sourceNode.y + targetNode.y) / 2 + perpY * parallelOffset;
         
-        let cx = midX + (dy * 0.4);
-        let cy = midY - (dx * 0.4);
+        let cx = midX + (dy * (0.4 * screenScale));
+        let cy = midY - (dx * (0.4 * screenScale));
         
         if (distance < 200) {
-            cx = midX + (dy * 0.6);
-            cy = midY - (dx * 0.6);
+            cx = midX + (dy * (0.6 * screenScale));
+            cy = midY - (dx * (0.6 * screenScale));
         }
         
         const path = d3.path();
@@ -1370,15 +1405,7 @@
             .attr("class", "label")
             .attr("x", d => d.x)
             .attr("y", d => d.y)
-            .style("font-size", d => {
-                if (d.id === "very negative") return "7px";
-                if (d.id === "mostly negative") return "9px";
-                if (d.id === "mixed") return "30px";
-                if (d.id === "overwhelmingly negative") return "6px";
-                if (d.id === "overwhelmingly positive") return "28px";
-                if (d.id === "very positive") return "32px";
-                return "19px";
-            })
+            .style("font-size", d => getResponsiveFontSize(d.id, d.scaledRadius))
             .style("fill", "#000000")
             .style("font-weight", "normal")
             .style("text-anchor", "middle")
@@ -1575,6 +1602,25 @@
         redrawArcs();
     }
     
+    // Window resize handler for responsive scaling
+    function handleResize() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (nodes.length > 0) {
+                // Update responsive sizes
+                updateResponsiveSizes();
+                // Re-create visualization with new sizes
+                createVisualization();
+                // Reapply animations after resize
+                persistentGames.forEach(item => {
+                    applyContinuousAnimation(item.game, item.colorIndex);
+                });
+            }
+        }, 250);
+    }
+    
+    window.addEventListener('resize', handleResize);
+    
     function autoLoadCSV() {
         const csvPath = '1_arc.csv';
         fetch(csvPath)
@@ -1655,35 +1701,37 @@
     
     // Initialize language buttons setup
     document.addEventListener('DOMContentLoaded', function() {
-    // Setup language switcher
-    if (typeof window.setupLanguageSwitcher === 'function') {
-        window.setupLanguageSwitcher();
-    } else {
-        const langButtons = document.querySelectorAll('.lang-btn[data-lang]');
-        langButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const lang = this.getAttribute('data-lang');
-                if (typeof window.setLanguage === 'function') {
-                    window.setLanguage(lang);
-                } else {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('lang', lang);
-                    window.location.href = url.toString();
-                }
+        // Setup language switcher
+        if (typeof window.setupLanguageSwitcher === 'function') {
+            window.setupLanguageSwitcher();
+        } else {
+            const langButtons = document.querySelectorAll('.lang-btn[data-lang]');
+            langButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    if (typeof window.setLanguage === 'function') {
+                        window.setLanguage(lang);
+                    } else {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('lang', lang);
+                        window.location.href = url.toString();
+                    }
+                });
             });
-        });
-    }
-    
-    // Add click handler for the Main Page button
-    const mainPageBtn = document.getElementById('mainPageBtn');
+        }
+        
+        // Add click handler for the Main Page button
+        const mainPageBtn = document.getElementById('mainPageBtn');
         if (mainPageBtn) {
             mainPageBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                // Navigate to the main page
                 window.location.href = 'https://volkazah.github.io/Interactive-Media-Project-About-Steam-Data/';
             });
         }
     });
+    
+    // Initialize responsive sizes before loading data
+    updateResponsiveSizes();
     
     // Start the application
     autoLoadCSV();
