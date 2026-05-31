@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Steam Spiral Pricing | Condegram Style</title>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <!-- Language support -->
@@ -277,13 +277,44 @@ left: 23px;
 background: #1B1B1B;
 }
 
+.toggle-item, .logic-btn, .reset-btn, .suggestion-item {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.toggle-switch {
+    cursor: pointer;
+    /* Ensure toggle is large enough for touch */
+    min-width: 44px;
+    min-height: 22px;
+}
+
+@media (max-width: 768px) {
+    .toggle-switch {
+        min-width: 44px;
+        min-height: 22px;
+    }
+    
+    .toggle-switch::after {
+        width: 16px;
+        height: 16px;
+    }
+}
+
 .reset-container {
-display: flex;
-justify-content: center;
-gap: 1rem;
-margin-top: 0.5rem;
-align-items: center;
-flex-wrap: wrap;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .reset-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 .reset-btn {
@@ -565,6 +596,193 @@ font-size: 9px;
 fill: #EFDFC0aa;
 text-anchor: middle;
 dominant-baseline: middle;
+}
+@media (max-width: 1200px) {
+    .dashboard {
+        max-width: 100%;
+    }
+    
+    .filters-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .genre-panel, .right-panels {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .right-panels {
+        flex-direction: column;
+    }
+    
+    .genre-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    
+    .toggle-panel {
+        padding: 12px;
+    }
+    
+    .toggle-panel h3 {
+        font-size: 16px;
+    }
+    
+    .genre-label, .large-label {
+        font-size: 14px;
+    }
+    
+    .reset-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .toggle-panel.small {
+        width: 100%;
+    }
+    
+    .search-input {
+        width: 100%;
+    }
+    
+    .logic-buttons {
+        gap: 4px;
+    }
+    
+    .logic-btn {
+        padding: 4px 12px;
+        font-size: 11px;
+    }
+    
+    .reset-btn {
+        width: 100%;
+        padding: 0.5rem 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .header h1 {
+        font-size: 24px;
+    }
+    
+    .header p {
+        font-size: 14px;
+    }
+    
+    .controls {
+        padding: 0.5rem 1rem;
+    }
+    
+    .genre-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+    
+    .toggle-item {
+        padding: 6px 0;
+    }
+    
+    .toggle-switch {
+        width: 36px;
+        height: 18px;
+    }
+    
+    .toggle-switch::after {
+        width: 12px;
+        height: 12px;
+        top: 2px;
+        left: 2px;
+    }
+    
+    .toggle-switch.active::after {
+        left: 19px;
+    }
+    
+    .info-text {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.5rem;
+    }
+    
+    .status-msg {
+        font-size: 0.7rem;
+    }
+    
+    .legend {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .legend-item {
+        font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .language-selector {
+        top: 10px;
+        right: 10px;
+        gap: 5px;
+    }
+    
+    .lang-btn {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+    
+    .header {
+        padding: 0.8rem 1rem;
+    }
+    
+    .header h1 {
+        font-size: 18px;
+    }
+    
+    .header p {
+        font-size: 11px;
+    }
+    
+    .toggle-panel {
+        padding: 10px;
+    }
+    
+    .toggle-panel h3 {
+        font-size: 14px;
+    }
+    
+    .genre-label, .large-label {
+        font-size: 12px;
+    }
+    
+    .toggle-switch {
+        width: 32px;
+        height: 16px;
+    }
+    
+    .toggle-switch::after {
+        width: 10px;
+        height: 10px;
+        top: 2px;
+        left: 2px;
+    }
+    
+    .toggle-switch.active::after {
+        left: 17px;
+    }
+    
+    .logic-btn {
+        padding: 3px 8px;
+        font-size: 10px;
+    }
+    
+    .selected-game-tag {
+        font-size: 0.6rem;
+        padding: 2px 6px;
+    }
 }
 </style>
 </head>
@@ -1119,7 +1337,19 @@ d3.select("#spiral-container").html(`<div style="text-align:center; padding:3rem
 return;
 }
 
-const width = 1140, height = 900;
+const container = document.getElementById('spiral-container');
+const containerWidth = container.clientWidth;
+const isMobile = window.innerWidth <= 768;
+    
+    // Adjust dimensions based on screen size
+let width, height;
+if (isMobile) {
+    width = Math.min(containerWidth, window.innerWidth - 40);
+    height = width; // Keep square aspect ratio
+} else {
+    width = 1140;
+    height = 900;
+}
 const margin = { top: 20, bottom: 20, left: 60, right: 60 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
