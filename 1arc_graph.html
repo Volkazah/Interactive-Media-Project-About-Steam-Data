@@ -252,24 +252,32 @@
             cursor: pointer;
         }
 
-        .vis-container {
-            padding: 0.4rem 0.5rem;
+         .vis-container {
+            padding: 0.8rem;
             background: #1B1B1B;
             position: relative;
-            min-height: 400px;
+            min-height: 450px;
             width: 100%;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            border: 2px solid #D98D00;
+            border-radius: 20px;
+            margin: 10px 20px;
+            width: calc(100% - 40px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         #vis {
             width: 100%;
             height: 100%;
-            min-height: 400px;
+            min-height: 420px;
             display: flex;
             justify-content: center;
             align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
         }
 
         svg {
@@ -279,7 +287,7 @@
             cursor: grab;
             max-width: 100%;
             max-height: 100%;
-            border-radius: 16px;
+            border-radius: 12px;
         }
 
         .upload-panel {
@@ -338,10 +346,12 @@
         .scale-info {
             font-size: clamp(12px, 2vw, 16px);
             text-align: center;
-            margin-top: 8px;
-            padding-top: 6px;
+            margin-top: 15px;
+            padding: 10px;
             border-top: 1px solid rgba(217, 141, 0, 0.3);
             color: #888;
+            width: 100%;
+            clear: both;
         }
 
         .label {
@@ -530,9 +540,10 @@
         </div>
 
         <div class="drag-instruction" data-i18n="drag_instruction">Drag spheres • Hover for details</div>
-        <div class="scale-info" id="scaleInfo"></div>
     </div>
-
+    
+    <div class="scale-info" id="scaleInfo"></div>
+    
     <footer>
         Steam Name and the Steam logo are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners.
     </footer>
@@ -1220,21 +1231,22 @@
         // Update responsive sizes based on current screen
         const screenScale = updateResponsiveSizes();
         
-        // Get actual container dimensions instead of using window dimensions
-        const containerRect = container.parentElement.getBoundingClientRect();
-        const availableWidth = containerRect.width - 40; // Account for padding
-        const availableHeight = window.innerHeight - 350; // Account for header and controls
+        // Get actual container dimensions
+        const containerRect = container.getBoundingClientRect();
+        const availableWidth = containerRect.width - 20;
+        const availableHeight = Math.max(400, window.innerHeight - 450);
         
-        // Responsive dimensions - use available space
-        width = Math.max(300, availableWidth);
-        height = Math.max(250, availableHeight);
+        // Responsive dimensions
+        width = Math.max(350, availableWidth);
+        height = Math.max(350, availableHeight);
         
         svg = d3.select("#vis")
             .append("svg")
-            .attr("width", "100%")
-            .attr("height", "100%")
+            .attr("width", width)
+            .attr("height", height)
             .attr("viewBox", `0 0 ${width} ${height}`)
-            .attr("preserveAspectRatio", "xMidYMid meet")
+            .style("display", "block")
+            .style("margin", "0 auto")
             .call(d3.zoom().on("zoom", (event) => {
                 nodeGroup.attr("transform", event.transform);
                 linkGroup.attr("transform", event.transform);
