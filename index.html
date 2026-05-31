@@ -851,53 +851,56 @@
         <div class="card-preview">
           <svg viewBox="0 0 340 180" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
             <rect width="340" height="180" fill="#1B1B1B"/>
-            <g transform="translate(170,95)">
-              
-              <!-- Archimedean spiral - perfectly even spacing between revolutions -->
-              <!-- Each full revolution increases radius by 22 units -->
-              <path d="M0,0 
-                       C2,-2 6,-4 10,-4 
-                       C16,-3 22,2 26,9 
-                       C30,16 28,24 22,28 
-                       C16,32 8,32 2,28 
-                       C-4,24 -8,16 -7,8 
-                       C-6,0 -2,-8 4,-14 
-                       C10,-20 19,-23 27,-19 
-                       C35,-15 41,-6 43,4 
-                       C45,14 43,26 36,34 
-                       C28,42 18,46 8,44 
-                       C-2,42 -10,34 -14,24 
-                       C-18,14 -14,2 -6,-6 
-                       C2,-14 14,-18 24,-15 
-                       C34,-12 42,-2 46,8 
-                       C50,18 50,32 44,42 
-                       C38,52 28,58 16,60 
-                       C4,62 -6,56 -14,46 
-                       C-22,36 -24,24 -22,12 
-                       C-20,0 -12,-10 -2,-16 
-                       C8,-22 20,-24 32,-20 
-                       C44,-16 54,-4 58,8 
-                       C62,20 62,36 56,48 
-                       C50,60 40,68 28,72 
-                       C16,76 4,72 -4,62 
-                       C-12,52 -16,38 -14,24 
-                       C-12,10 -6,-2 4,-12"
-                    fill="none" 
-                    stroke="#D98D00" 
-                    stroke-width="2.2" 
-                    opacity="0.9"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"/>
-              
-              <!-- centre dot -->
-              <circle cx="0" cy="0" r="4" fill="#EFDFC0" stroke="#D98D00" stroke-width="1.5"/>
-              
-              <!-- even spacing circles -->
-              <circle cx="0" cy="0" r="20" fill="none" stroke="#D98D00" stroke-width="0.4" opacity="0.12"/>
-              <circle cx="0" cy="0" r="42" fill="none" stroke="#D98D00" stroke-width="0.4" opacity="0.10"/>
-              <circle cx="0" cy="0" r="64" fill="none" stroke="#D98D00" stroke-width="0.4" opacity="0.08"/>
-              
-            </g>
+            <!-- Archimedean spiral: r = 3 + b·θ, 2.5 turns, equal 29px arm spacing -->
+            <!-- Concentric reference circles at each full revolution radius -->
+            <circle cx="170" cy="97" r="27.3" fill="none" stroke="#232323" stroke-width="0.6"/>
+            <circle cx="170" cy="97" r="50.7" fill="none" stroke="#232323" stroke-width="0.6"/>
+            <circle cx="170" cy="97" r="74.0" fill="none" stroke="#232323" stroke-width="0.6"/>
+            <!-- The spiral path, computed r=3+4.647·θ -->
+            <path d="M170.00,94.00 L170.21,93.71 L170.45,93.44 L170.73,93.19 L171.04,92.96 L171.38,92.76 L171.75,92.58 L172.15,92.44 L172.57,92.32 L173.02,92.25 L173.48,92.21 L173.96,92.21 L174.45,92.26 L174.95,92.35 L175.46,92.48 L175.97,92.66 L176.48,92.89 L176.98,93.16 L177.47,93.48 L177.95,93.85 L178.41,94.27 L178.85,94.73 L179.26,95.23 L179.64,95.78 L179.99,96.37 L180.30,97.00 L180.57,97.67 L180.80,98.36 L180.98,99.09 L181.11,99.85 L181.18,100.63 L181.21,101.44 L181.17,102.26 L181.07,103.09 L180.92,103.93 L180.70,104.77 L180.41,105.61 L180.06,106.45 L179.65,107.28 L179.17,108.09 L178.63,108.88 L178.02,109.64 L177.35,110.38 L176.62,111.08 L175.83,111.74 L174.99,112.35 L174.09,112.92 L173.13,113.43 L172.13,113.88 L171.09,114.27 L170.00,114.60 L168.88,114.86 L167.72,115.04 L166.54,115.15 L165.33,115.18 L164.11,115.13 L162.88,114.99 L161.64,114.77 L160.40,114.47 L159.16,114.08 L157.94,113.60 L156.73,113.04 L155.55,112.38 L154.40,111.65 L153.29,110.82 L152.22,109.92 L151.20,108.93 L150.23,107.87 L149.32,106.73 L148.48,105.52 L147.71,104.24 L147.01,102.90 L146.40,101.50 L145.88,100.05 L145.44,98.55 L145.10,97.00 L144.86,95.42 L144.72,93.81 L144.68,92.17 L144.75,90.52 L144.93,88.85 L145.22,87.19 L145.62,85.53 L146.13,83.88 L146.76,82.25 L147.49,80.65 L148.34,79.08 L149.29,77.56 L150.36,76.08 L151.52,74.66 L152.79,73.31 L154.15,72.03 L155.61,70.83 L157.16,69.71 L158.79,68.69 L160.50,67.76 L162.28,66.94 L164.13,66.23 L166.04,65.63 L168.00,65.15 L170.00,64.80 L172.04,64.57 L174.11,64.47 L176.20,64.51 L178.30,64.68 L180.40,64.99 L182.50,65.43 L184.58,66.02 L186.64,66.74 L188.66,67.59 L190.64,68.59 L192.57,69.71 L194.44,70.97 L196.24,72.36 L197.96,73.87 L199.59,75.50 L201.13,77.24 L202.57,79.10 L203.89,81.05 L205.10,83.10 L206.18,85.24 L207.13,87.47 L207.94,89.76 L208.61,92.12 L209.13,94.54 L209.50,97.00 L209.71,99.50 L209.77,102.02 L209.66,104.57 L209.39,107.11 L208.96,109.66 L208.36,112.19 L207.59,114.69 L206.66,117.15 L205.57,119.57 L204.32,121.93 L202.91,124.23 L201.35,126.44 L199.64,128.56 L197.78,130.59 L195.79,132.50 L193.67,134.30 L191.42,135.96 L189.06,137.50 L186.58,138.88 L184.01,140.12 L181.35,141.20 L178.61,142.11 L175.79,142.85 L172.92,143.42 L170.00,143.80 L167.04,144.00 L164.06,144.01 L161.07,143.83 L158.07,143.46 L155.09,142.90 L152.13,142.14 L149.20,141.20 L146.33,140.06 L143.52,138.73 L140.78,137.22 L138.12,135.53 L135.56,133.67 L133.12,131.64 L130.79,129.44 L128.59,127.08 L126.54,124.58 L124.64,121.94 L122.90,119.16 L121.33,116.27 L119.94,113.27 L118.73,110.16 L117.72,106.97 L116.91,103.71 L116.30,100.38 L115.90,97.00 L115.72,93.58 L115.75,90.15 L116.00,86.70 L116.47,83.26 L117.16,79.83 L118.07,76.44 L119.20,73.10 L120.54,69.81 L122.10,66.60 L123.87,63.48 L125.84,60.47 L128.01,57.57 L130.37,54.80 L132.91,52.17 L135.63,49.69 L138.51,47.38 L141.55,45.24 L144.73,43.29 L148.04,41.54 L151.48,39.99 L155.02,38.66 L158.66,37.55 L162.38,36.66 L166.16,36.01 L170.00,35.60 L173.87,35.43 L177.77,35.50 L181.67,35.83 L185.56,36.40 L189.42,37.22 L193.25,38.28 L197.01,39.59 L200.71,41.15 L204.31,42.94 L207.81,44.96 L211.19,47.22 L214.43,49.69 L217.53,52.37 L220.46,55.26 L223.22,58.34 L225.79,61.60 L228.16,65.03 L230.31,68.62 L232.25,72.35 L233.95,76.22 L235.41,80.21 L236.62,84.29 L237.58,88.46 L238.27,92.70 L238.70,97.00 L238.86,101.33 L238.74,105.68 L238.34,110.04 L237.67,114.38 L236.73,118.68 L235.50,122.94 L234.01,127.12 L232.25,131.22 L230.22,135.22 L227.94,139.10 L225.41,142.84 L222.63,146.43 L219.63,149.85 L216.40,153.08 L212.96,156.12 L209.31,158.95 L205.49,161.55 L201.49,163.92 L197.33,166.03 L193.03,167.89 L188.61,169.48 L184.08,170.79 L179.45,171.82 L174.75,172.56 L170.00,173.00"
+              fill="none" stroke="#D98D00" stroke-width="2"
+              stroke-dasharray="627" stroke-dashoffset="627"
+              style="animation: drawLine 2.8s 0.2s ease forwards"/>
+            <!-- Year tick marks and labels at top of each full revolution -->
+            <line x1="170" y1="97" x2="170" y2="91" stroke="#D98D00" stroke-width="1" opacity="0.5"/>
+            <text x="170" y="87" text-anchor="middle" fill="#666" font-size="7.5" font-family="Consolas,monospace">2018</text>
+            <line x1="170" y1="67.8" x2="170" y2="61.8" stroke="#D98D00" stroke-width="1" opacity="0.5"/>
+            <text x="170" y="57" text-anchor="middle" fill="#666" font-size="7.5" font-family="Consolas,monospace">2019</text>
+            <line x1="170" y1="38.6" x2="170" y2="32.6" stroke="#D98D00" stroke-width="1" opacity="0.5"/>
+            <text x="170" y="28" text-anchor="middle" fill="#666" font-size="7.5" font-family="Consolas,monospace">2020</text>
+            <!-- Monthly data dots — radius encodes release volume -->
+            <circle cx="170" cy="94" r="2.3" fill="#FA8112" opacity="0.85"/>
+            <circle cx="172.7" cy="92.3" r="2.2" fill="#FA8112" opacity="0.85"/>
+            <circle cx="176.8" cy="93.1" r="2.8" fill="#FA8112" opacity="0.85"/>
+            <circle cx="180.3" cy="97" r="2.6" fill="#FA8112" opacity="0.85"/>
+            <circle cx="181" cy="103.4" r="2.9" fill="#FA8112" opacity="0.85"/>
+            <circle cx="177.6" cy="110.1" r="3.2" fill="#FA8112" opacity="0.85"/>
+            <circle cx="170" cy="114.6" r="2.9" fill="#FA8112" opacity="0.85"/>
+            <circle cx="160" cy="114.3" r="3.1" fill="#FA8112" opacity="0.85"/>
+            <circle cx="150.5" cy="108.2" r="3.3" fill="#FA8112" opacity="0.85"/>
+            <circle cx="145.1" cy="97" r="3.5" fill="#FA8112" opacity="0.85"/>
+            <circle cx="146.3" cy="83.3" r="3.1" fill="#FA8112" opacity="0.85"/>
+            <circle cx="155.1" cy="71.2" r="3.3" fill="#FA8112" opacity="0.85"/>
+            <circle cx="170" cy="64.8" r="2.8" fill="#FA8112" opacity="0.85"/>
+            <circle cx="187.3" cy="67" r="2.6" fill="#FA8112" opacity="0.85"/>
+            <circle cx="202.1" cy="78.5" r="3.1" fill="#FA8112" opacity="0.85"/>
+            <circle cx="209.5" cy="97" r="3.3" fill="#FA8112" opacity="0.85"/>
+            <circle cx="206.3" cy="118" r="3.6" fill="#FA8112" opacity="0.85"/>
+            <circle cx="192.2" cy="135.4" r="3.8" fill="#FA8112" opacity="0.85"/>
+            <circle cx="170" cy="143.8" r="3.4" fill="#FA8112" opacity="0.85"/>
+            <circle cx="145.4" cy="139.6" r="3.7" fill="#FA8112" opacity="0.85"/>
+            <circle cx="125.3" cy="122.8" r="3.9" fill="#FA8112" opacity="0.85"/>
+            <circle cx="115.9" cy="97" r="4.1" fill="#FA8112" opacity="0.85"/>
+            <circle cx="121" cy="68.7" r="3.5" fill="#FA8112" opacity="0.85"/>
+            <circle cx="140.5" cy="45.9" r="3.8" fill="#FA8112" opacity="0.85"/>
+            <circle cx="170" cy="35.6" r="3.2" fill="#FA8112" opacity="0.85"/>
+            <circle cx="201.9" cy="41.7" r="3.1" fill="#FA8112" opacity="0.85"/>
+            <circle cx="227.4" cy="63.9" r="3.5" fill="#FA8112" opacity="0.85"/>
+            <circle cx="238.7" cy="97" r="3.7" fill="#FA8112" opacity="0.85"/>
+            <circle cx="231.6" cy="132.6" r="3.9" fill="#FA8112" opacity="0.85"/>
+            <circle cx="206.8" cy="160.7" r="4.2" fill="#FA8112" opacity="0.85"/>
+            <!-- Origin -->
+            <circle cx="170" cy="97" r="3" fill="#EFDFC0" stroke="#D98D00" stroke-width="1.2"/>
           </svg>
         </div>
         <div class="card-body">
@@ -974,7 +977,7 @@
       </div>
 
       <div class="origin-source">
-        <div class="source-icon" data-i18n="source_api_icon">🛒</div>
+        <div class="source-icon" data-i18n="source_api_icon"></div>
         <span class="source-name" data-i18n="source_api_name">Steam Store API</span>
         <p class="source-desc" data-i18n="source_api_desc">
           Game metadata, review scores, and ownership estimates pulled directly from Valve's public endpoints. Covers titles with at least 10 user reviews.
@@ -983,7 +986,7 @@
       </div>
 
       <div class="origin-source">
-        <div class="source-icon" data-i18n="source_spy_icon">📊</div>
+        <div class="source-icon" data-i18n="source_spy_icon"></div>
         <span class="source-name" data-i18n="source_spy_name">SteamSpy</span>
         <p class="source-desc" data-i18n="source_spy_desc">
           Estimated player counts, CCU history, and genre tagging sourced from SteamSpy's community-maintained dataset. Used for retention curves.
@@ -992,7 +995,7 @@
       </div>
 
       <div class="origin-source">
-        <div class="source-icon" data-i18n="source_kaggle_icon">📁</div>
+        <div class="source-icon" data-i18n="source_kaggle_icon"></div>
         <span class="source-name" data-i18n="source_kaggle_name">Kaggle Dataset</span>
         <p class="source-desc" data-i18n="source_kaggle_desc">
           Supplemental publisher / developer relationship data and historical pricing from a curated Kaggle export. Cross-validated against live API responses.
