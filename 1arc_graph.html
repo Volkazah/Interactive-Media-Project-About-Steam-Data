@@ -256,13 +256,20 @@
             padding: 0.4rem 0.5rem;
             background: #1B1B1B;
             position: relative;
-            min-height: 280px;
+            min-height: 400px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         #vis {
             width: 100%;
             height: 100%;
-            min-height: 250px;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         svg {
@@ -270,8 +277,8 @@
             margin: 0 auto;
             background: transparent;
             cursor: grab;
-            width: 100%;
-            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
             border-radius: 16px;
         }
 
@@ -1213,14 +1220,21 @@
         // Update responsive sizes based on current screen
         const screenScale = updateResponsiveSizes();
         
-        // Responsive dimensions
-        width = Math.max(500, window.innerWidth - 200);
-        height = Math.max(250, window.innerHeight - 400);
+        // Get actual container dimensions instead of using window dimensions
+        const containerRect = container.parentElement.getBoundingClientRect();
+        const availableWidth = containerRect.width - 40; // Account for padding
+        const availableHeight = window.innerHeight - 350; // Account for header and controls
+        
+        // Responsive dimensions - use available space
+        width = Math.max(300, availableWidth);
+        height = Math.max(250, availableHeight);
         
         svg = d3.select("#vis")
             .append("svg")
-            .attr("width", width)
-            .attr("height", height)
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("viewBox", `0 0 ${width} ${height}`)
+            .attr("preserveAspectRatio", "xMidYMid meet")
             .call(d3.zoom().on("zoom", (event) => {
                 nodeGroup.attr("transform", event.transform);
                 linkGroup.attr("transform", event.transform);
@@ -1587,9 +1601,11 @@
     }
     
     function resetPositions() {
-        const radius = Math.min(width, height) * 0.38;
-        const centerX = width / 2;
-        const centerY = height / 2;
+        const currentWidth = width;
+        const currentHeight = height;
+        const radius = Math.min(currentWidth, currentHeight) * 0.38;
+        const centerX = currentWidth / 2;
+        const centerY = currentHeight / 2;
         
         nodes.forEach((node, idx) => {
             const angle = (idx / nodes.length) * Math.PI * 2;
@@ -1606,15 +1622,39 @@
     function handleResize() {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            if (nodes.length > 0) {
-                // Update responsive sizes
-                updateResponsiveSizes();
-                // Re-create visualization with new sizes
-                createVisualization();
-                // Reapply animations after resize
-                persistentGames.forEach(item => {
-                    applyContinuousAnimation(item.game, item.colorIndex);
-                });
+            if (nodes.length > 0 && svg) {
+                const containerRect = document.getElementById('vis').parentElement.getBoundingClientRect();
+                const newWidth = Math.max(300, containerRect.width - 40);
+                const newHeight = window.innerHeight - 350;
+                
+                if (newWidth > 0 && newHeight > 0) {
+                    width = newWidth;
+                    height = newHeight;
+                    
+                    // Update viewBox
+                    svg.attr("viewBox", `0 0 ${width} ${height}`);
+                    
+                    // Reposition nodes based on new dimensions
+                    const radius = Math.min(width, height) * 0.38;
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    
+                    nodes.forEach((node, idx) => {
+                        const angle = (idx / nodes.length) * Math.PI * 2;
+                        node.x = centerX + Math.cos(angle) * radius;
+                        node.y = centerY + Math.sin(angle) * radius;
+                    });
+                    
+                    // Update all visual elements
+                    nodeGroup.selectAll(".sphere").attr("cx", d => d.x).attr("cy", d => d.y);
+                    labelGroup.selectAll(".label").attr("x", d => d.x).attr("y", d => d.y);
+                    redrawArcs();
+                    
+                    // Reapply animations
+                    persistentGames.forEach(item => {
+                        applyContinuousAnimation(item.game, item.colorIndex);
+                    });
+                }
             }
         }, 250);
     }
