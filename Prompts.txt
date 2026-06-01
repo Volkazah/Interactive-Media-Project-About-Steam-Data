@@ -1,8 +1,12 @@
 Сбор id по названию видеоигр: https://chat.deepseek.com/share/b935djvl267t0r7m35
 Сбор данных со страницы Steam с помощью playwright: https://chat.deepseek.com/share/rezac3mwqpz7rsoh6m
 Сбор данных по Steam API и SteamSpy API: https://chat.deepseek.com/share/07x9fnne668t9b29am
-Визуализация ARC диаграммы: https://chat.deepseek.com/share/9wmasys8xpvy9tpkvj
-Визуализация Dial диаграммы: https://chat.deepseek.com/share/mzsqpmxj0z170s3vds
-Визуализация линейного CCU графика: https://chat.deepseek.com/share/ludlf7nikbse885j4v
-Визуализация Treemap: https://chat.deepseek.com/share/z263x90orocmwacfip
-Публикация проекта: https://chat.deepseek.com/share/sy1ie5bdayjc5kbpr2
+
+Визуализация ARC диаграммы: https://chat.deepseek.com/share/301hbqqn0vvl361sk2
+Визуализация Dial графика: https://chat.deepseek.com/share/mzsqpmxj0z170s3vds
+Визуализация линейного CCU графика: https://chat.deepseek.com/share/1akx1hukgpns0dd8vw
+Визуализация Treemap: https://chat.deepseek.com/share/qh7mvz4j9k4glsau5q
+Визуализация спирального графика: https://chat.deepseek.com/share/ud0gllums9zkh02o9s
+Визуализация радарного графика: https://chat.deepseek.com/share/28465smx9ssxsyfppk  
+Публикация проекта: https://chat.deepseek.com/share/u84db11opqjmi3uuej
+Изменение внешнего вида заглавной страницы: https://claude.ai/share/746a4369-f952-48ab-9714-d55fe62fa5b6
